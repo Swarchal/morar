@@ -1,0 +1,32 @@
+# TODO
+
+- Create sqlite database using sqlalchemy
+
+- Table per type of measurement
+    - AreaShape
+    - Intensities
+    - Texture
+    - Metadata
+
+- Relate objects together by ImageNumber and ObjectNumber
+
+- Need to relate parent and child objects, i.e multiple nulceoli per nuclei
+
+- Use this as the permanent store of data from the CP analysis
+
+- Once stored want to be able to easily pull out data from specific metadata
+    - i.e specific cell-line / compound
+    - all data from specific plate
+    - all data matching certain compound
+
+## Future ideas:
+
+- Methods to work on the database to pre-process the data
+    - Create well average
+    - Normalise against control
+
+- Methods to visualise, givens specific plateIDs and well numbers, want to be
+  able to visualise a plate map
+
+- Call up images from ImageURLS
+- Call up images from graphs, linking imageNumber to Images
