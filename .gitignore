@@ -1,0 +1,5 @@
+*.pyc
+/dist/
+/*.egg-info
+TODO.mdown
+sqlalchemy_tutorial.py
