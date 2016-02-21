@@ -11,6 +11,8 @@ setup(name='morar',
       test_suite='nose.collector',
       tests_require=['nose'],
       install_requires=['sqlalchemy',
-			'pandas'],
+			'pandas',
+			'os',
+			're'],
       zip_safe=False)
 
