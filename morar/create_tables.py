@@ -13,13 +13,9 @@ class results_directory(file_path):
     ------------------------------------------------------
 
     - list_csv(): lists all .csv files in the directory
-
-    - load_csv(): reads csv files as pandas DataFrame, method used by
-		  write_to_db()
-		  - truncate trims name down to just the object name
+		  - truncate trims the prefix and the .csv from the file name
 
     - create_db(): creates an sqlite database in the results directory
-		   - name is the argument to name the database
 
     - write_to_db(): loads the csv files using load_csv() and writes
 		     them as tables to the sqlite database created by
@@ -30,7 +26,7 @@ class results_directory(file_path):
 	self.path = file_path
 
 
-    def list_csv(self):
+    def list_csv(self, truncate = True):
 	# full name of csv files
 	full_paths = [i for i in os.listdir(file_path) if i.endswith(".csv")]
 	self.full_paths = full_paths
@@ -46,7 +42,7 @@ class results_directory(file_path):
 	    self.csv_files = full_paths
 
 
-    def create_db(self, name):
+    def create_db(self):
 	engine = create_engine('sqlite:///database.sqlite')
 
 
