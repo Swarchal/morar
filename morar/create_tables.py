@@ -18,7 +18,7 @@ class results_directory(file_path, truncate = True):
                tables to the sqlite database created by create_db()
     """
 
-    def __init__(self):
+    def __init__(self, truncate):
 	self.path = file_path
 	# full name of csv files
 	full_paths = [i for i in os.listdir(file_path) if i.endswith(".csv")]
