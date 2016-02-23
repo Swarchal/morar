@@ -45,9 +45,17 @@ class results_directory:
 	self.engine = create_engine('sqlite:///database.sqlite')
 
     def to_db(self):
+        print "length self.full_paths:  ", len(self.full_paths)
 	for x in xrange(len(self.full_paths)):
             f = os.path.join(self.path, self.full_paths[x])
 	    tmp_file = pd.read_csv(f)
 	    tmp_file.to_sql(self.csv_files[x], self.engine)
 
 
+# testing -- MemoryError!
+if __name__ == "__main__":
+    
+    path = "/media/windows_share/scott/ImageXpress/2015-06-26_val-screen"
+    x = results_directory(path)
+    x.create_db()
+    x.to_db()
