@@ -6,6 +6,9 @@ from sqlalchemy.ext.declarative import declarative_base
 
 # TODO: variable database name
 
+# TODO: truncate removes everything but final string before .csv
+#       currently rubbish if more than one underscore
+
 class results_directory:
     
     """
@@ -39,11 +42,12 @@ class results_directory:
         
         
     def create_db(self):
-	engine = create_engine('sqlite:///database.sqlite')
-
+	self.engine = create_engine('sqlite:///database.sqlite')
 
     def to_db(self):
-	for x in enumerate(self.full_path):
-	    tmp_file = pd.read_csv(self.full_path[x], chunk = 1000)
-	    tmp_file.to_sql(self.csv_files[x], engine, chunk = 1000)
+	for x in xrange(len(self.full_paths)):
+            f = os.path.join(self.path, self.full_paths[x])
+	    tmp_file = pd.read_csv(f)
+	    tmp_file.to_sql(self.csv_files[x], self.engine)
+
 
