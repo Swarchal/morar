@@ -1,7 +1,7 @@
 import os
 import re
 import pandas as pd
-from sqlalchemy import create_engine, Table, ForeignKey, Metadata
+from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 
 # TODO: variable database name
@@ -18,7 +18,7 @@ class results_directory:
                tables to the sqlite database created by create_db()
     """
 
-    def __init__(self, file_path, truncate):
+    def __init__(self, file_path, truncate = True):
 	self.path = file_path
 	# full name of csv files
 	full_paths = [i for i in os.listdir(file_path) if i.endswith(".csv")]
@@ -29,18 +29,21 @@ class results_directory:
 	    p = re.compile(ur'(?<=_)(.*)(?=.csv)')
 	    csv_files = []
 
-	    for csv in csv_files:
-	        csv_files.append(re.search(p, csv)
-	   self.csv_files = csv_file
+	    for csv in full_paths:
+	        csv_files.append(re.search(p, csv).group())
+            
+            self.csv_files = csv_files
+
         else:
             self.csv_files = full_paths
-
+        
+        
     def create_db(self):
 	engine = create_engine('sqlite:///database.sqlite')
 
 
     def to_db(self):
-	for x in enumerate(self.full_path)s:
+	for x in enumerate(self.full_path):
 	    tmp_file = pd.read_csv(self.full_path[x], chunk = 1000)
 	    tmp_file.to_sql(self.csv_files[x], engine, chunk = 1000)
 
