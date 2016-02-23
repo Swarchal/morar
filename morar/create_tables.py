@@ -6,7 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 # TODO: variable database name
 
-class results_directory(file_path, truncate = True):
+class results_directory:
     
     """
     Directory containing the .csv from a CellProfiler run
@@ -18,20 +18,22 @@ class results_directory(file_path, truncate = True):
                tables to the sqlite database created by create_db()
     """
 
-    def __init__(self, truncate):
+    def __init__(self, file_path, truncate):
 	self.path = file_path
 	# full name of csv files
 	full_paths = [i for i in os.listdir(file_path) if i.endswith(".csv")]
 	self.full_paths = full_paths
+
         if truncate == True:
 	    # trim between _ and .csv
 	    p = re.compile(ur'(?<=_)(.*)(?=.csv)')
 	    csv_files = []
+
 	    for csv in csv_files:
 	        csv_files.append(re.search(p, csv)
-	    self.csv_files = csv_file
+	   self.csv_files = csv_file
         else:
-            self.csv_files = full_pathss
+            self.csv_files = full_paths
 
     def create_db(self):
 	engine = create_engine('sqlite:///database.sqlite')
@@ -40,5 +42,5 @@ class results_directory(file_path, truncate = True):
     def to_db(self):
 	for x in enumerate(self.full_path)s:
 	    tmp_file = pd.read_csv(self.full_path[x], chunk = 1000)
-	    tmp_file.to_sql(self.csv_files[x], engine)
+	    tmp_file.to_sql(self.csv_files[x], engine, chunk = 1000)
 
