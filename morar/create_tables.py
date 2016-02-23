@@ -23,7 +23,7 @@ class results_directory:
 
     def __init__(self, file_path, truncate = True):
         # path of directory
-	self.path = file_pat
+	self.path = file_path
 	# full name of csv files
 	full_paths = [i for i in os.listdir(file_path) if i.endswith(".csv")]
 	self.full_paths = full_paths
