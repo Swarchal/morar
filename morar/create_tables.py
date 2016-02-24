@@ -1,4 +1,5 @@
 import os
+import sys
 import re
 import pandas as pd
 from sqlalchemy import create_engine
@@ -47,8 +48,11 @@ class results_directory:
     def to_db(self):
 	for x in xrange(len(self.full_paths)):
             f = os.path.join(self.path, self.full_paths[x])
-	    tmp_file = pd.read_csv(f)
-	    tmp_file.to_sql(self.csv_files[x], self.engine)
+	    tmp_file = pd.read_csv(f, iterator = True, chunksize = 1000)
+            all_file = pd.concat(tmp_file)
+	    all_file.to_sql(name = self.csv_files[x], con = self.engine,
+                    flavor ='sqlite', index = False, if_exists = 'replace',
+                    chunksize = 1000)
 
 
 # testing -- MemoryError!
