@@ -1,9 +1,7 @@
 import os
-import sys
 import re
 import pandas as pd
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_enginee
 
 # TODO: variable database name
 
@@ -54,11 +52,3 @@ class results_directory:
                     flavor ='sqlite', index = False, if_exists = 'replace',
                     chunksize = 1000)
 
-
-# testing -- MemoryError!
-if __name__ == "__main__":
-    
-    path = "/media/windows_share/scott/ImageXpress/2015-06-26_val-screen"
-    x = results_directory(path)
-    x.create_db()
-    x.to_db()
