@@ -1,4 +1,4 @@
-# Morar
+# morar
 
 Storing CellProfiler data
 
