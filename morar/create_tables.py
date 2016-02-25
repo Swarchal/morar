@@ -1,5 +1,6 @@
 import os
 import re
+from tqdm import *
 import logging
 import pandas as pd
 from sqlalchemy import create_engine
@@ -45,17 +46,13 @@ class results_directory:
 
             
     # create sqlite database in cwd    
-    def create_db(self, location = None, db_name = 'database'):
-        # if no location is given, then will use the current working directory
-        if not location:
-            location = os.getcwd()
-
-        self.engine = create_engine('sqlite:///%s/%s.sqlite') % (location, db_name) 
+    def create_db(self, location, db_name):
+        self.engine = create_engine('sqlite:///%s/%s.sqlite' % (location, db_name))
     
 
     # write csv files to database
     def to_db(self):
-	   for x in xrange(len(self.full_paths)):
+	   for x in tqdm(xrange(len(self.full_paths))):
             f = os.path.join(self.path, self.full_paths[x])
             tmp_file = pd.read_csv(f, iterator = True, chunksize = 1000)
             all_file = pd.concat(tmp_file)
@@ -68,6 +65,7 @@ if __name__ == '__main__':
     test_path = "/media/windows_share/Scott_1/morar_test"
      # need small testing datase
     x = results_directory(test_path)
-    x.create_db()
+    x.create_db("/home/scott", "db_test")
+    x.to_db()
     print x.path
     print x.engine
