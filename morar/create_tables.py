@@ -5,8 +5,6 @@ from sqlalchemy import create_enginee
 
 # TODO: variable database name
 
-# TODO: truncate removes everything but final string before .csv
-#       currently rubbish if more than one underscore
 
 class results_directory:
     
@@ -18,6 +16,9 @@ class results_directory:
 
     - to_db(): loads the csv files in the directory and writes them as
                tables to the sqlite database created by create_db()
+
+    - truncate: argument will name files from text between the last underscore
+      and .csv. e.g 'date_plate_cell.csv' will return 'cell'
     """
 
     def __init__(self, file_path, truncate = True):
@@ -29,7 +30,7 @@ class results_directory:
 
         if truncate == True:
 	    # trim between _ and .csv
-	    p = re.compile(ur'(?<=_)(.*)(?=.csv)')
+	    p = re.compile(ur'[^_][^_]+(?=.csv)')
 	    csv_files = []
 
 	    for csv in full_paths:
