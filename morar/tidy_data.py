@@ -136,6 +136,13 @@ class tidy_data:
         """
         pass
 
+    def to_dataframe(self):
+        """
+        Return a pandas dataframe
+        Allows more flexibility if we want to apply pandas functions
+        """
+        return pd.DataFrame(self.data)
+
 
 if __name__ == "__main__":
 
@@ -143,3 +150,5 @@ if __name__ == "__main__":
     print test.plate_col
     print test.well_col
     print test.aggregate_well()
+    x = test.to_dataframe()
+    print x.describe()
