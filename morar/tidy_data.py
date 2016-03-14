@@ -37,19 +37,16 @@ class tidy_data:
 
 
     
-    def get_metadata(self, metadata_prefix = "Metadata_", name = True):
+    def get_metadata(self, metadata_prefix = "Metadata"):
         """
         Returns list of columns that correspond 
         to metadata.
         """
         self.metadata_prefix = metadata_prefix
         self.metadata_cols = []
-        if name:
-            for col in self.data.columns:
-                if self.metadata_prefix in col:
-                    self.metadata_cols.append(col)
-        elif name == False:
-            pass # TODO return col index
+        for col in self.data.columns:
+            if self.metadata_prefix in col:
+                self.metadata_cols.append(col)
 
 
     # TODO: how to handle site repeats? 
@@ -76,7 +73,7 @@ class tidy_data:
             raise ValueError('%s was not found in available columns' %self.well_col)
 
 
-    def get_featuredata(self, name = True, numeric_only = True):
+    def get_featuredata(self, numeric_only = True):
         """
         Returns list of columns that correspond
         to feature data. i.e not metadata
@@ -85,37 +82,29 @@ class tidy_data:
         self.featuredata_cols = list(set(self.data.columns) - set(self.metadata_cols))
 	# check there is at least one column
 	assert len(list(self.featuredata_cols)) >= 1
-        if name:
-            if numeric_only:
-		# of those columns, get only the numeric columns
-                tmp = self.data[self.featuredata_cols].select_dtypes(include=[np.number])
-                self.featuredata_cols = tmp.columns
-		# check there is at least one column
-		assert len(list(self.featuredata_cols)) >= 1
-            return list(self.featuredata_cols)
-        elif name == False:
-            pass # TODO return col index
+        if numeric_only:
+	    # of those columns, get only the numeric columns
+            tmp = self.data[self.featuredata_cols].select_dtypes(include=[np.number])
+            self.featuredata_cols = tmp.columns
+	    # check there is at least one column
+	    assert len(list(self.featuredata_cols)) >= 1
+        return list(self.featuredata_cols)
 
 
-
-    def get_no_variance_col(self, name = True, tolerance = 1e-5):
+    def get_no_variance_col(self, tolerance = 1e-5):
         """
         Returns list of columns that have zero or very low variance.
 	Low variance defined as less than `tolerance`, default = 1e-5
         """
         self.zero_var_cols = []
-        if name == True:
-            for col in self.featuredata_cols:
-                if np.var(self.data[col]) < tolerance:
-                    self.zero_var_cols.append(col)
-        elif name == False:
-            pass # TODO return col index
-
+        for col in self.featuredata_cols:
+            if np.var(self.data[col]) < tolerance:
+                self.zero_var_cols.append(col)
         return self.zero_var_cols
 
 
 
-    def get_all_NA_col(self, name = True):
+    def get_all_NA_col(self):
         """"
         Returns list of columns that contain all NA values
         """
@@ -123,12 +112,9 @@ class tidy_data:
             'returns true of column contains all null values'
             return pd.isnull(x)
 
-        if name == True:
-            for col in self.data.columns:
-                if all_null(col):
-                    return col
-        elif name == False:
-            pass # TODO return col index
+        for col in self.data.columns:
+            if all_null(col):
+                return col
 
 
     def  get_any_NA_row(self):
