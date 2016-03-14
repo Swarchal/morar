@@ -106,7 +106,7 @@ class tidy_data:
 	return self.na_rows
 
 
-    # TODO
+
     def aggregate_well(self, method = "median"):
         """
         Aggregates values down to an image average
@@ -126,15 +126,30 @@ class tidy_data:
         return out
 
 
+
     # TODO
-    def normalise_to_control(self):
+    def normalise_to_control(self, unique_plate_col, compound_col = "Compound", neg_compound = "DMSO"):
         """
         Normalises each featue against the median DMSO value for
         that feature per plate.
         Producing a z-score +/- SDs from the DMSO median
             - TODO modify in place of return new copy?
         """
+        plate_grp = self.data.groupby(unique_plate_col)
+        
+        def neg_cntl_med():
+            pass
+            
         pass
+
+    
+    def scale_features(self):
+        """
+        z-score features, each feature scaled independent.
+        """
+        z_score = lambda x: (x - x.mean()) / x.std()
+        self.data[self.featuredata_cols].apply(zscore, axis = 0, reduce = False)
+
 
     def to_dataframe(self):
         """
@@ -150,5 +165,4 @@ if __name__ == "__main__":
     print test.plate_col
     print test.well_col
     print test.aggregate_well()
-    x = test.to_dataframe()
-    print x.describe()
+    print test.normalise_to_control(compound_col = "compound")
