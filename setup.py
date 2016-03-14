@@ -13,6 +13,7 @@ setup(name='morar',
       install_requires=['sqlalchemy',
 			'pandas',
 			'os',
-			're'],
+			're',
+                  'tqdm'],
       zip_safe=False)
 
