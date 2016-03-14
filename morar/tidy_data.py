@@ -11,10 +11,53 @@ class raw_data:
     class results_directory
     Functions to transform data into a useable format
     Then make into class tidy_data
+
+    --------------------------------------------------------------------------
+
+    Different datasets have differing number of rows
+    Can combine/merge/concat data is same number of rows
+    Need to aggregate by ImageNumber
+    Then merge together
+    Then aggregate by well
+    Then pass to tidy_data()
+
+    --------------------------------------------------------------------------
     """
 
-    pass
+    def __init__(self, path):
+        # sqlite database of separate table for each .csv
+        # connect to database
+        conn = sqlite3.connect(path)
+        c = conn.cursor()
+
+        # fetch table names
+        c.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        self.table_names = cursor.fetchall()
         
+
+        # TODO check Image table is present
+        # TODO summary statistics, dimensions of each table
+
+
+
+    # TODO
+    def aggregate_imagenumber(self, method = "median"):
+        """
+        Aggregates each table to a summary value per individual ImageNumber
+        This should mean each table then has the same number of rows, and can 
+        recursively merge all the tables by ImageNumber go get a single dataset
+        """
+        pass
+
+
+   
+
+
+
+
+
+
+
 
 
 class tidy_data:
