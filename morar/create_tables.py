@@ -1,12 +1,11 @@
 import os
 import re
-from tqdm import *
+from tqdm import tqdm
 import logging
 import pandas as pd
-from sqlalchemy import create_engine
-
-# TODO: variable database name
-# TODO: choose where to save the database
+from sqlalchemy import create_engine, MetaData
+from sqlalchemy.ext.automap import automap_base
+from sqlalchemy.orm import Session
 
 
 class results_directory:
@@ -35,12 +34,9 @@ class results_directory:
             # trim between _ and .csv
             p = re.compile(ur'[^_][^_]+(?=.csv)')
             csv_files = []
-    
             for csv in full_paths:
                 csv_files.append(re.search(p, csv).group())
-    
             self.csv_files = csv_files
-    
         else:
             self.csv_files = full_paths
 
@@ -60,12 +56,28 @@ class results_directory:
                         flavor ='sqlite', index = False, if_exists = 'replace',
                         chunksize = 1000)
 
+
+    def map_database(self):
+        # create db metadata
+        self.metadata = MetaData()
+        self.metadata = self.metadata.reflect(self.engine)
+        Base = automap_base()
+        Base.prepare(self.engine, reflect = True)
+        self.session = Session(self.engine)
+
+
+
 if __name__ == '__main__':
 
-    test_path = "/media/windows_share/Scott_1/morar_test"
-     # need small testing datase
+    test_path = "/media/datastore_scott/Scott_1/morar_test/"
+     # need small testing database
     x = results_directory(test_path)
-    x.create_db("/home/scott", "db_test")
+    x.create_db("/media/datastore_scott/Scott_1/", "db_test")
     x.to_db()
+    x.map_database()
+
     print x.path
     print x.engine
+    print x.metadata
+    for t in x.metadata.sorted_tables:
+        print t.name
