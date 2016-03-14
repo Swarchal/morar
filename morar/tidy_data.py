@@ -53,8 +53,8 @@ class tidy_data:
             raise ValueError("%s not found in columns" % self.well_col)
   
         # get featuredata columns
-        self.feature_data_cols = list(set(self.data.columns) - set(self.metadata_cols))
-        assert len(list(self.feature_data_cols)) >= 1
+        self.featuredata_cols = list(set(self.data.columns) - set(self.metadata_cols))
+        assert len(list(self.featuredata_cols)) >= 1
 
 
 
@@ -127,7 +127,7 @@ class tidy_data:
 
 
 
-    # TODO
+    # TODO make this
     def normalise_to_control(self, unique_plate_col, compound_col = "Compound", neg_compound = "DMSO"):
         """
         Normalises each featue against the median DMSO value for
@@ -143,18 +143,21 @@ class tidy_data:
         pass
 
     
+    # TODO test this is working correctly with a test dataframe
     def scale_features(self):
         """
         z-score features, each feature scaled independent.
         """
-        z_score = lambda x: (x - x.mean()) / x.std()
-        self.data[self.featuredata_cols].apply(zscore, axis = 0, reduce = False)
+        def zscore(x):
+            return (x - np.mean(x)) / np.std(x)
+        # zscore numeric featuredata columns
+        self.data.loc[:, self.featuredata_cols].apply(zscore, axis = 0, reduce = False)
 
 
     def to_dataframe(self):
         """
         Return a pandas dataframe
-        Allows more flexibility if we want to apply pandas functions
+        Allows option to use pandas functions
         """
         return pd.DataFrame(self.data)
 
@@ -162,7 +165,7 @@ class tidy_data:
 if __name__ == "__main__":
 
     test = tidy_data('/home/scott/Dropbox/Public/df_cell_subclass.csv')
-    print test.plate_col
-    print test.well_col
-    print test.aggregate_well()
-    print test.normalise_to_control(compound_col = "compound")
+    test.get_numeric_featuredata()
+    print test.scale_features()
+    x = test.to_dataframe()
+    print x.describe()
