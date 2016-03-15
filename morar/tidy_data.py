@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import sqlite3
+import warnings
 
 
 class raw_data:
@@ -34,10 +35,8 @@ class raw_data:
         c.execute("SELECT name FROM sqlite_master WHERE type='table';")
         self.table_names = cursor.fetchall()
         
-
-        # TODO check Image table is present
-        # TODO summary statistics, dimensions of each table
-
+        if 'Image' not in self.table_names:
+            warnings.warn("Warning: 'Image' table not found in database")
 
 
     # TODO
@@ -46,6 +45,33 @@ class raw_data:
         Aggregates each table to a summary value per individual ImageNumber
         This should mean each table then has the same number of rows, and can 
         recursively merge all the tables by ImageNumber go get a single dataset
+        """
+        pass
+
+
+    def flag_bad_images(self):
+        """
+        Identify bad or out-of-focus images from the Image table with
+        ImageQuality columns. If no ImageQuality columns are found return
+        a warning.
+        """
+        pass
+
+
+    def merge_tables(self):
+        """
+        Merge all tables together by ImageNumber.
+        The prefered method is merging the tables after they have been
+        aggregated by imagenumber using aggregate_imagenumber()
+        """
+        pass
+
+
+    def clean_cols(self):
+        """
+        Remove columns that are not featuredata or metadata.
+        Possibility of moving these columns into a separate table. As they may
+        be useful later on.
         """
         pass
 
@@ -67,7 +93,8 @@ class tidy_data:
     """
 
 
-    def __init__(self, path, storage = "csv", metadata_prefix = "Metadata", plate = "Plate", well = "Well", sep = "_"):
+    def __init__(self, path, storage = "csv", metadata_prefix = "Metadata",
+	    plate = "Plate", well = "Well", sep = "_"):
         
         # load data from csv or sqlite database
         try:
@@ -77,7 +104,8 @@ class tidy_data:
                 self.db_con = sqlite3.connect(path)
                 self.data = pd.read_sql(self.db_con)
         except ValueError:
-            print "%s is not a valid format, try either 'csv' or 'sqlite'" % storage
+            print "%s is not a valid format, try either" \
+                    "'csv' or 'sqlite'" % storage
         assert isinstance(self.data, pd.DataFrame)
         
         # get and define metadata columns
@@ -96,7 +124,8 @@ class tidy_data:
             raise ValueError("%s not found in columns" % self.well_col)
   
         # get featuredata columns
-        self.featuredata_cols = list(set(self.data.columns) - set(self.metadata_cols))
+        self.featuredata_cols = list(set(self.data.columns) - \
+                set(self.metadata_cols))
         assert len(list(self.featuredata_cols)) >= 1
 
 
@@ -165,7 +194,8 @@ class tidy_data:
         elif method == 'mean':
             out = grouped.mean()
         else:
-            raise ValueError("%s is not a valid method, try either 'median' or 'mean'" % method)
+            raise ValueError("%s is not a valid method,"\
+                    "try either 'median' or 'mean'" % method)
         return out
 
 
