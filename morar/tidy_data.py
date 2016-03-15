@@ -1,15 +1,17 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 import sqlite3
-import warnings
 
 
-class raw_data:
+class RawData:
 
     """
     Un-tidy data as it comes out of cell profiler stored from
     class results_directory
+    Will be a database of a table per csv file:
+        Image, Experiment, Objects (multiple)
+    With truncated names.
+
     Functions to transform data into a useable format
     Then make into class tidy_data
 
@@ -36,7 +38,7 @@ class raw_data:
         self.table_names = cursor.fetchall()
         
         if 'Image' not in self.table_names:
-            warnings.warn("Warning: 'Image' table not found in database")
+            print "Warning: 'Image' table not found in database"
 
 
     # TODO
@@ -46,32 +48,70 @@ class raw_data:
         This should mean each table then has the same number of rows, and can 
         recursively merge all the tables by ImageNumber go get a single dataset
         """
+        # pd.groupby().method()
+            # where method is either mean or median
         pass
 
 
-    def flag_bad_images(self):
+    # TODO
+    def flag_bad_images(self, method = "hampel", **kwargs):
         """
         Identify bad or out-of-focus images from the Image table with
         ImageQuality columns. If no ImageQuality columns are found return
         a warning.
+        Return ImageNumber, can be passed to remove_images()
         """
+        # identify imageQuality columns in image table
+        # method to identify bad images
+            # hampel outlier
+            # standard deviations
+            # certain values over threshold
         pass
 
 
+    # TODO
+    def flag_errors(self):
+        """
+        Using ModuleError columns, flag images that produced an error.
+        Return ImageNumber, can be passed to remove_images()
+        """
+        # identify error columns in image table
+        # return ImageNumber which has sum > 0 for the error cols
+        pass
+
+
+    # TODO
+    def remove_images(self, merged = True):
+        """
+        Given a list of ImageNumbers, this function will remove them from
+        either all tables, or from a single merged tables
+        """
+        # match ImageNumber to row index
+        # remove row index
+        pass
+
+
+    # TODO
     def merge_tables(self):
         """
         Merge all tables together by ImageNumber.
         The prefered method is merging the tables after they have been
         aggregated by imagenumber using aggregate_imagenumber()
+        Return warning if tables have not been aggregated:
+            - will have diff no. of rows per table
+            - and duplicate rows for ImageNumber in some tables
         """
         pass
 
 
-    def clean_cols(self):
+    # TODO
+    def clean_cols(self, keep = False, merged = True):
         """
         Remove columns that are not featuredata or metadata.
+        E.g file paths, ModuleError etc
+        Either from merged table, or from individual tables
         Possibility of moving these columns into a separate table. As they may
-        be useful later on.
+        be useful later on. (argument 'keep')
         """
         pass
 
@@ -86,7 +126,7 @@ class raw_data:
 
 
 
-class tidy_data:
+class TidyData:
     """
     Tidy data, i.e rows per observation, column per measurements
     with measurements from various objects together in a single table
@@ -104,10 +144,12 @@ class tidy_data:
                 self.db_con = sqlite3.connect(path)
                 self.data = pd.read_sql(self.db_con)
         except ValueError:
-            print "%s is not a valid format, try either" \
-                    "'csv' or 'sqlite'" % storage
-        assert isinstance(self.data, pd.DataFrame)
+            print "%s is not a valid format, try either 'csv' or 'sqlite'" % storage
         
+        # check it's actually returned a dataframe
+        assert isinstance(self.data, pd.DataFrame)
+       
+
         # get and define metadata columns
         self.metadata_prefix = metadata_prefix
         self.metadata_cols = []
@@ -124,8 +166,7 @@ class tidy_data:
             raise ValueError("%s not found in columns" % self.well_col)
   
         # get featuredata columns
-        self.featuredata_cols = list(set(self.data.columns) - \
-                set(self.metadata_cols))
+        self.featuredata_cols = list(set(self.data.columns) - set(self.metadata_cols))
         assert len(list(self.featuredata_cols)) >= 1
 
 
@@ -182,7 +223,7 @@ class tidy_data:
     def aggregate_well(self, method = "median"):
         """
         Aggregates values down to an image average
-            - TODO modify in place or return new copy?
+            - ??? modify in place or return new copy?
         """
 	# pandas group by and median
 	# have to define the metadata columns that are needed
@@ -194,8 +235,7 @@ class tidy_data:
         elif method == 'mean':
             out = grouped.mean()
         else:
-            raise ValueError("%s is not a valid method,"\
-                    "try either 'median' or 'mean'" % method)
+            raise ValueError("%s is not a valid method, try either 'median' or 'mean'" % method)
         return out
 
 
@@ -235,9 +275,20 @@ class tidy_data:
         return pd.DataFrame(self.data)
 
 
+
+    def pd_function(self, *args):
+        """
+        Apply pandas function to self.data without transforming to dataframe
+        Need to keep the self.data as a TidyData class, otherwise cannot use
+        other TidyData functions on it.
+        If need be can transform back to a TidyData class without passing through
+        __init__ again.
+        """
+        pass
+
 if __name__ == "__main__":
 
-    test = tidy_data('/home/scott/Dropbox/Public/df_cell_subclass.csv')
+    test = TidyData('/home/scott/Dropbox/Public/df_cell_subclass.csv')
     test.get_numeric_featuredata()
     print test.scale_features()
     x = test.to_dataframe()

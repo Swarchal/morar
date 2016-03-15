@@ -8,7 +8,7 @@ from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 
 
-class results_directory:
+class ResultsDirectory:
     
     """
     Directory containing the .csv from a CellProfiler run
@@ -71,7 +71,7 @@ if __name__ == '__main__':
 
     test_path = "/media/datastore_scott/Scott_1/morar_test/"
      # need small testing database
-    x = results_directory(test_path)
+    x = ResultsDirectory(test_path)
     x.create_db("/media/datastore_scott/Scott_1/", "db_test")
     x.to_db()
     x.map_database()
