@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import sqlite3
-
+import logging
 
 class RawData:
 
@@ -33,10 +33,13 @@ class RawData:
         conn = sqlite3.connect(path)
         c = conn.cursor()
 
+        # log setup
+        logging.basicConfig(filename="RawData.log", level=logging.DEBUG)
+
         # fetch table names
         c.execute("SELECT name FROM sqlite_master WHERE type='table';")
         self.table_names = cursor.fetchall()
-        
+        logging.info("Table names in database:  %s" % self.table_names)
         if 'Image' not in self.table_names:
             print "Warning: 'Image' table not found in database"
 
@@ -168,9 +171,14 @@ class TidyData:
         # get featuredata columns
         self.featuredata_cols = list(set(self.data.columns) - set(self.metadata_cols))
         assert len(list(self.featuredata_cols)) >= 1
+        
+        # log setup
+        logging.basicConfig(filename="TidyData.log",level=logging.DEBUG)
+        logging.debug("Columns found:  %s" % self.data.columns)
+        logging.debug("Metadata columns found: %s" % self.metadata_cols)
+        logging.debug("Featuredata columns found: %s" % self.featuredata_cols)
 
-
-
+        
     def get_numeric_featuredata(self, numeric_only = True):
         """
         Returns list of columns that correspond
@@ -181,6 +189,8 @@ class TidyData:
         self.featuredata_cols = tmp.columns
 	# check there is at least one column
 	assert len(list(self.featuredata_cols)) >= 1
+        logging.info("selected only numeric featuredata")
+        logging.debug("numeric featuredata columns: %s" % self.featuredata_cols)
         return list(self.featuredata_cols)
 
 
@@ -194,6 +204,8 @@ class TidyData:
         for col in self.featuredata_cols:
             if np.var(self.data[col]) < tolerance:
                 self.zero_var_cols.append(col)
+        logging.debug("no_variance_cols: %s" % self.zero_var_cols)
+        logging.debug("num no variance cols: %i" % len(self.zero_var_cols))
         return self.zero_var_cols
 
 
@@ -212,6 +224,7 @@ class TidyData:
         Returns row index of rows that contain any NA values
         """
         self.na_rows = self.data[self.data.isnull().any(axis=1)].index.tolist()
+        logging.debug("number of rows containing NA %i" % len(self.na_rows))
 	return self.na_rows
 
 
@@ -226,12 +239,14 @@ class TidyData:
         # e.g plate, well, site
         # can do this in define_metadata()
         grouped = self.data.groupby([self.plate_col, self.well_col])
+        logging.debug("aggregated wells by %s" % method)
         if method == 'median':
             out = grouped.median()
         elif method == 'mean':
             out = grouped.mean()
         else:
             raise ValueError("%s is not a valid method, try either 'median' or 'mean'" % method)
+        logging.debug("number of rows in aggregate: %i" % len(out.index))
         return out
 
 
@@ -257,9 +272,9 @@ class TidyData:
         """
         z-score features, each feature scaled independent.
         """
-        def zscore(x):
-            return (x - np.mean(x)) / np.std(x)
+        zscore lambda x: (x - np.mean(x)) / np.std(x)
         # zscore numeric featuredata columns
+        logging.info("scaled features")
         self.data.loc[:, self.featuredata_cols].apply(zscore, axis = 0, reduce = False)
 
 
