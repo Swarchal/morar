@@ -34,17 +34,19 @@ class RawData:
         c = conn.cursor()
 
         # log setup
-        logging.basicConfig(filename="RawData.log", level=logging.DEBUG)
+        logging.basicConfig(filename="RawData.log",
+                level=logging.DEBUG,
+                format='%(asctime)s %(levelname)s: %(message)s')
 
         # fetch table names
         c.execute("SELECT name FROM sqlite_master WHERE type='table';")
         self.table_names = cursor.fetchall()
-        logging.info("Table names in database:  %s" % self.table_names)
+        logging.info("Table names in database:  %s" % list(self.table_names))
         if 'Image' not in self.table_names:
-            print "Warning: 'Image' table not found in database"
+            logging.warning("'Image' table not found in database")
 
 
-    # TODO
+   # TODO
     def aggregate_imagenumber(self, method = "median"):
         """
         Aggregates each table to a summary value per individual ImageNumber
@@ -173,10 +175,15 @@ class TidyData:
         assert len(list(self.featuredata_cols)) >= 1
         
         # log setup
-        logging.basicConfig(filename="TidyData.log",level=logging.DEBUG)
-        logging.debug("Columns found:  %s" % self.data.columns)
-        logging.debug("Metadata columns found: %s" % self.metadata_cols)
-        logging.debug("Featuredata columns found: %s" % self.featuredata_cols)
+        logging.basicConfig(filename="TidyData.log",
+                level=logging.DEBUG,
+                format='%(asctime)s %(levelname)s: %(message)s')
+        logging.debug("Number of columns found: %i" % len(self.data.columns))
+        logging.info("Columns found:  %s" % list(self.data.columns))
+        logging.debug("Number metadata columns found: %i" % len(self.metadata_cols))
+        logging.debug("Metadata columns found: %s" % list(self.metadata_cols))
+        logging.info("Number of feature data columns found: %i" % len(self.featuredata_cols))
+        logging.debug("Featuredata columns found: %s" % list(self.featuredata_cols))
 
         
     def get_numeric_featuredata(self, numeric_only = True):
@@ -190,7 +197,7 @@ class TidyData:
 	# check there is at least one column
 	assert len(list(self.featuredata_cols)) >= 1
         logging.info("selected only numeric featuredata")
-        logging.debug("numeric featuredata columns: %s" % self.featuredata_cols)
+        logging.debug("numeric featuredata columns: %s" % list(self.featuredata_cols))
         return list(self.featuredata_cols)
 
 
@@ -204,8 +211,8 @@ class TidyData:
         for col in self.featuredata_cols:
             if np.var(self.data[col]) < tolerance:
                 self.zero_var_cols.append(col)
-        logging.debug("no_variance_cols: %s" % self.zero_var_cols)
-        logging.debug("num no variance cols: %i" % len(self.zero_var_cols))
+        logging.debug("Columns of zero variance: %s" % self.zero_var_cols)
+        logging.debug("number of zero variance cols: %i" % len(self.zero_var_cols))
         return self.zero_var_cols
 
 
@@ -272,7 +279,7 @@ class TidyData:
         """
         z-score features, each feature scaled independent.
         """
-        zscore lambda x: (x - np.mean(x)) / np.std(x)
+        zscore = lambda x: (x - np.mean(x)) / np.std(x)
         # zscore numeric featuredata columns
         logging.info("scaled features")
         self.data.loc[:, self.featuredata_cols].apply(zscore, axis = 0, reduce = False)
@@ -297,10 +304,12 @@ class TidyData:
         """
         pass
 
+
 if __name__ == "__main__":
 
     test = TidyData('/home/scott/Dropbox/Public/df_cell_subclass.csv')
     test.get_numeric_featuredata()
+    test.get_no_variance_col()
     print test.scale_features()
     x = test.to_dataframe()
     print x.describe()
