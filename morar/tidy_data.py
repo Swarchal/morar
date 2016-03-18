@@ -202,12 +202,8 @@ class TidyData:
         """"
         Returns list of columns that contain all NA values
         """
-        def all_null(x):
-            'returns true of column contains all null values'
-            return pd.isnull(x)
-
         for col in self.data.columns:
-            if all_null(col):
+            if pd.isnull(col):
                 return col
 
 
