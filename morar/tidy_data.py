@@ -149,6 +149,7 @@ class TidyData:
                 self.db_con = sqlite3.connect(path)
                 self.data = pd.read_sql(self.db_con)
         except ValueError:
+            logging.error("%s is not a valid format")
             print "%s is not a valid format, try either 'csv' or 'sqlite'" % storage
         
         # check it's actually returned a dataframe
@@ -166,8 +167,10 @@ class TidyData:
         self.well_col = self.metadata_prefix + sep + well
 
         if self.plate_col not in self.data.columns:
+            logging.error("%s not found in columns" % self.plate_col)
             raise ValueError("%s not found in columns" % self.plate_col)
         if self.well_col not in self.data.columns:
+            logging.error("%s not found in columns" % self.well_col)
             raise ValueError("%s not found in columns" % self.well_col)
   
         # get featuredata columns
@@ -178,8 +181,8 @@ class TidyData:
         logging.basicConfig(filename="TidyData.log",
                 level=logging.DEBUG,
                 format='%(asctime)s %(levelname)s: %(message)s')
-        logging.debug("Number of columns found: %i" % len(self.data.columns))
-        logging.info("Columns found:  %s" % list(self.data.columns))
+        logging.info("Number of columns found: %i" % len(self.data.columns))
+        logging.debug("Columns found:  %s" % list(self.data.columns))
         logging.debug("Number metadata columns found: %i" % len(self.metadata_cols))
         logging.debug("Metadata columns found: %s" % list(self.metadata_cols))
         logging.info("Number of feature data columns found: %i" % len(self.featuredata_cols))
@@ -196,8 +199,8 @@ class TidyData:
         self.featuredata_cols = tmp.columns
 	# check there is at least one column
 	assert len(list(self.featuredata_cols)) >= 1
-        logging.info("selected only numeric featuredata")
-        logging.debug("numeric featuredata columns: %s" % list(self.featuredata_cols))
+        logging.info("Selected only numeric featuredata")
+        logging.debug("Numeric featuredata columns: %s" % list(self.featuredata_cols))
         return list(self.featuredata_cols)
 
 
@@ -212,7 +215,7 @@ class TidyData:
             if np.var(self.data[col]) < tolerance:
                 self.zero_var_cols.append(col)
         logging.debug("Columns of zero variance: %s" % self.zero_var_cols)
-        logging.debug("number of zero variance cols: %i" % len(self.zero_var_cols))
+        logging.info("Number of zero variance columns: %i" % len(self.zero_var_cols))
         return self.zero_var_cols
 
 
@@ -231,7 +234,7 @@ class TidyData:
         Returns row index of rows that contain any NA values
         """
         self.na_rows = self.data[self.data.isnull().any(axis=1)].index.tolist()
-        logging.debug("number of rows containing NA %i" % len(self.na_rows))
+        logging.debug("Number of rows containing NA %i" % len(self.na_rows))
 	return self.na_rows
 
 
@@ -241,20 +244,15 @@ class TidyData:
         Aggregates values down to an image average
             - ??? modify in place or return new copy?
         """
-	# pandas group by and median
-	# have to define the metadata columns that are needed
-        # e.g plate, well, site
-        # can do this in define_metadata()
         grouped = self.data.groupby([self.plate_col, self.well_col])
-        logging.debug("aggregated wells by %s" % method)
+        logging.info("Aggregated wells by %s" % method)
         if method == 'median':
-            out = grouped.median()
+            self.data = grouped.median()
         elif method == 'mean':
-            out = grouped.mean()
+            self.data = grouped.mean()
         else:
             raise ValueError("%s is not a valid method, try either 'median' or 'mean'" % method)
-        logging.debug("number of rows in aggregate: %i" % len(out.index))
-        return out
+        logging.debug("Number of rows in aggregated data: %i" % len(self.data.index))
 
 
 
@@ -281,7 +279,7 @@ class TidyData:
         """
         zscore = lambda x: (x - np.mean(x)) / np.std(x)
         # zscore numeric featuredata columns
-        logging.info("scaled features")
+        logging.info("Features scaled via z-score")
         self.data.loc[:, self.featuredata_cols].apply(zscore, axis = 0, reduce = False)
 
 
@@ -310,6 +308,9 @@ if __name__ == "__main__":
     test = TidyData('/home/scott/Dropbox/Public/df_cell_subclass.csv')
     test.get_numeric_featuredata()
     test.get_no_variance_col()
+    print "%i in full data" % len(test.data.index)
+    test.aggregate_well()
+    print "%i in agg data" % len(test.data.index)
     print test.scale_features()
     x = test.to_dataframe()
     print x.describe()
