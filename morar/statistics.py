@@ -1,10 +1,15 @@
 import numpy as np
+from scipy import stats
+
 
 def median(x):
     return np.median(x)
 
+
 def mad(x):
+    """ median absolute deviation"""
     return median(np.absolute(x - median(x)))
+
 
 def hampel(x, sigma = 4):
     """
@@ -12,9 +17,9 @@ def hampel(x, sigma = 4):
     - 'sigma' is the number of median absolute deviations away from the
       sample median to define an outlier
     - Returns a list:
-        - 1  : positive outlier
-        - -1 : negative outlier
-        - 0  : normal value
+        -  1  : positive outlier
+        - -1  : negative outlier
+        -  0  : normal value
     """
     med_x = median(x)
     mad_x = mad(x)
@@ -30,3 +35,27 @@ def hampel(x, sigma = 4):
 	    out.append(0)
     assert len(out) == len(x)
     return out
+
+
+def trim_mean(x, prop = 0.1):
+    """ Trimmed mean """
+    return stats.trim_mean(x, prop)
+
+
+def winsorise(x, prop = 0.1):
+    """ Winsorised numbers"""
+    return stats.mstats.winsorize(x, limits = prop)
+
+
+def winsor_mean(x, prop = 0.1):
+    """ Winsorised mean"""
+    return np.mean(winsorise(x, prop))
+
+
+
+
+if __name__ == "__main__":
+    x = [1,2,3,4,2,4,2,2,4,2,1,3,1999]
+    print "trim mean:   %f" % trim_mean(x, prop = 0.5)
+    print winsor_mean(x, prop = 0.1)
+    print winsorise(x, prop = 0.1)
