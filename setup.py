@@ -12,8 +12,8 @@ setup(name='morar',
       tests_require=['nose'],
       install_requires=['sqlalchemy',
 			'pandas',
-			'os',
-			're',
-                  'tqdm'],
+                        'tqdm',
+                        'numpy',
+                        'scipy'],
       zip_safe=False)
 

@@ -57,15 +57,6 @@ class ResultsDirectory:
                         chunksize = 1000)
 
 
-    def map_database(self):
-        # create db metadata
-        self.metadata = MetaData()
-        self.metadata = self.metadata.reflect(self.engine)
-        Base = automap_base()
-        Base.prepare(self.engine, reflect = True)
-        self.session = Session(self.engine)
-
-
 
 if __name__ == '__main__':
 

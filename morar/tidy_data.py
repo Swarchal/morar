@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import sqlite3
+from statistics import hampel
 import logging
 
 class RawData:
@@ -251,6 +252,7 @@ class TidyData:
         elif method == 'mean':
             self.data = grouped.mean()
         else:
+            logging.error("None vald method for aggregate_well selected")
             raise ValueError("%s is not a valid method, try either 'median' or 'mean'" % method)
         logging.debug("Number of rows in aggregated data: %i" % len(self.data.index))
 
@@ -277,7 +279,8 @@ class TidyData:
         """
         z-score features, each feature scaled independent.
         """
-        zscore = lambda x: (x - np.mean(x)) / np.std(x)
+        def zscore(x):
+            (x - np.mean(x)) / np.std(x)
         # zscore numeric featuredata columns
         logging.info("Features scaled via z-score")
         self.data.loc[:, self.featuredata_cols].apply(zscore, axis = 0, reduce = False)
