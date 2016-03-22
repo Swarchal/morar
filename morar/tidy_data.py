@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import sqlite3
+import sqlite3 as sql
 from statistics import hampel
 import logging
 
@@ -31,7 +31,7 @@ class RawData:
     def __init__(self, path):
         # sqlite database of separate table for each .csv
         # connect to database
-        conn = sqlite3.connect(path)
+        conn = sql.connect(path)
         c = conn.cursor()
 
         # log setup
@@ -41,11 +41,15 @@ class RawData:
 
         # fetch table names
         c.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        self.table_names = cursor.fetchall()
-        logging.info("Table names in database:  %s" % list(self.table_names))
-        if 'Image' not in self.table_names:
-            logging.warning("'Image' table not found in database")
-
+        self.table_names = c.fetchall()
+        # convert from list of tuples to list
+        self.table_names = [i[0] for i in self.table_names]
+        # convert strings from unicode to ascii
+        self.table_names = [s.encode('ascii', 'ignore') for s in self.table_names]
+        logging.info("Table names in database:  %s" % self.table_names)
+        if  "Image" not in self.table_names:
+            logging.error("'Image' table not found in database")
+            ValueError("'Image' table not found in database")
 
    # TODO
     def aggregate_imagenumber(self, method = "median"):
@@ -317,3 +321,6 @@ if __name__ == "__main__":
     print test.scale_features()
     x = test.to_dataframe()
     print x.describe()
+
+    x = RawData("/media/datastore_scott/Scott_1/db_test.sqlite")
+
