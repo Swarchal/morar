@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import sqlite3 as sql
+import sqlalchemy as sql
 from statistics import hampel
 import logging
 
@@ -31,37 +31,43 @@ class RawData:
     def __init__(self, path):
         # sqlite database of separate table for each .csv
         # connect to database
-        conn = sql.connect(path)
-        c = conn.cursor()
-
+        engine = sql.create_engine("sqlite:///%s" % path)
+        self.connection = engine.connect()
         # log setup
         logging.basicConfig(filename="RawData.log",
                 level=logging.DEBUG,
                 format='%(asctime)s %(levelname)s: %(message)s')
-
         # fetch table names
-        c.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        self.table_names = c.fetchall()
-        # convert from list of tuples to list
-        self.table_names = [i[0] for i in self.table_names]
-        # convert strings from unicode to ascii
-        self.table_names = [s.encode('ascii', 'ignore') for s in self.table_names]
+        self.table_names = engine.table_names()
+        # convert to ascii table names
+        self.table_names = [s.encode('ascii') for s in self.table_names]
         logging.info("Table names in database:  %s" % self.table_names)
         if  "Image" not in self.table_names:
             logging.error("'Image' table not found in database")
             ValueError("'Image' table not found in database")
 
-   # TODO
+
     def aggregate_imagenumber(self, method = "median"):
         """
         Aggregates each table to a summary value per individual ImageNumber
-        This should mean each table then has the same number of rows, and can 
-        recursively merge all the tables by ImageNumber go get a single dataset
+        This should mean each table then has the same number of rows.t
         """
-        # pd.groupby().method()
-            # where method is either mean or median
-        pass
-
+        logging.info("aggregated by ImageNumber via %s" % method)
+        # Experiment table does not contain ImageNumber column
+        not_experiment = [n for n in self.table_names if n != 'Experiment']
+        for name in not_experiment:
+            tmp = pd.read_sql_table(name, self.connection)
+            logging.debug("%s original row count: %i" % (name,len(tmp.index)))
+            grouped = tmp.groupby(["ImageNumber"])
+            if method == "median":
+                out = grouped.aggregate(np.median)
+            elif method == "mean":
+                out = grouped.aggregate(np.mean)
+            else:
+                ValueError("method has to be 'mean' or 'median'")
+            logging.debug("%s aggregate row count: %i" %(name,len(out.index)))
+            out.to_sql(name, self.connection, if_exists='replace')
+            logging.debug("replaced %s with aggregate data" % name)
 
     # TODO
     def flag_bad_images(self, method = "hampel", **kwargs):
@@ -323,4 +329,5 @@ if __name__ == "__main__":
     print x.describe()
 
     x = RawData("/media/datastore_scott/Scott_1/db_test.sqlite")
+    x.aggregate_imagenumber()
 
