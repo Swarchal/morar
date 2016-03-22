@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
 import sqlalchemy as sql
-from statistics import hampel
+import statistics as stats
 import logging
+from tqdm import tqdm
 
 class RawData:
 
@@ -50,19 +51,19 @@ class RawData:
     def aggregate_imagenumber(self, method = "median"):
         """
         Aggregates each table to a summary value per individual ImageNumber
-        This should mean each table then has the same number of rows.t
+        This should mean each table then has the same number of rows
         """
         logging.info("aggregated by ImageNumber via %s" % method)
         # Experiment table does not contain ImageNumber column
         not_experiment = [n for n in self.table_names if n != 'Experiment']
-        for name in not_experiment:
+        for name in tqdm(not_experiment):
             tmp = pd.read_sql_table(name, self.connection)
             logging.debug("%s original row count: %i" % (name,len(tmp.index)))
             grouped = tmp.groupby(["ImageNumber"])
             if method == "median":
                 out = grouped.aggregate(np.median)
             elif method == "mean":
-                out = grouped.aggregate(np.mean)
+                 out = grouped.aggregate(np.mean)
             else:
                 ValueError("method has to be 'mean' or 'median'")
             logging.debug("%s aggregate row count: %i" %(name,len(out.index)))
@@ -73,16 +74,48 @@ class RawData:
     def flag_bad_images(self, method = "hampel", **kwargs):
         """
         Identify bad or out-of-focus images from the Image table with
-        ImageQuality columns. If no ImageQuality columns are found return
-        a warning.
+        ImageQuality columns.
         Return ImageNumber, can be passed to remove_images()
         """
-        # identify imageQuality columns in image table
-        # method to identify bad images
-            # hampel outlier
-            # standard deviations
-            # certain values over threshold
-        pass
+        image = pd.read_sql_table("Image", self.connection,
+                index_col = "ImageNumber")
+
+        def subset_col(df, string):
+            """
+            Returns slice of dataframe, selecting only columns that
+            contain 'string'
+            """
+            out = df[df.columns[df.columns.to_series().str.contains(string)]]
+            return out
+
+        df_iq = subset_col(image, "ImageQuality")
+        logging.debug("called flag_bad_images with %s" % method)
+        if method == "hampel":
+            # hampel outlier test on imagequality metrics
+            tmp = df_iq.apply(stats.hampel, axis = 0)
+            outlier = tmp.abs().sum(axis = 1) # abs of hampel outliers
+            lim = np.median(outlier) + 1.5 * stats.iqr(outlier)
+            return list(outlier[outlier > lim].index.tolist())
+        elif method == "focus":
+            # beyond normal range for focus score (low is bad)
+            tmp = subset_col(df_iq, "FocusScore_")
+            outlier = tmp.apply(stats.u_iqr, axis = 1).sum(axis = 1)
+            return list(outlier[outlier != 0].index.tolist())
+        elif method == "plls":
+            # beyond normal range for powerloglogslope metrics (high is bad)
+            tmp = subset_col(df_iq, "PowerLogLogSlope_")
+            outlier = tmp.apply(stats.o_iqr, axis = 1).sum(axis = 1)
+            return list(outlier[outlier != 0].index.tolist())
+        elif method == "correlation":
+            # beyond normal range for correlation (high is bad)
+            tmp = subset_col(df_iq, "Correlation_")
+            outlier = tmp.apply(stats.o_iqr, axis = 1).sum(axis = 1)
+            return list(outlier[outlier != 0].index.tolist())
+        else:
+            logging.error("Non-valid method of '%s' for flag_bad_image"%method)
+            ValueError("Invalid method. Options: hampel, focus, plls")
+
+
 
 
     # TODO
@@ -330,4 +363,4 @@ if __name__ == "__main__":
 
     x = RawData("/media/datastore_scott/Scott_1/db_test.sqlite")
     x.aggregate_imagenumber()
-
+    print x.flag_bad_images(method = "hampel")
