@@ -52,7 +52,9 @@ def winsor_mean(x, prop = 0.1):
     return np.mean(winsorise(x, prop))
 
 
-
+def iqr(x):
+    out = np.percentile(x, 75) - np.percentile(x, 25)
+    return out
 
 if __name__ == "__main__":
     x = [1,2,3,4,2,4,2,2,4,2,1,3,1999]
