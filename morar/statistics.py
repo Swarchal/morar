@@ -56,6 +56,33 @@ def iqr(x):
     out = np.percentile(x, 75) - np.percentile(x, 25)
     return out
 
+
+def o_iqr(x):
+    ' >1.5*IQR'
+    out = []
+    lim = np.median(x) + 1.5 * iqr(x)
+    for i in x:
+        if i > lim:
+            out.append(1)
+        else:
+            out.append(0)
+    assert len(out) == len(x)
+    return out
+
+
+def u_iqr(x):
+    ' <1.5*IQR'
+    out = []
+    lim = np.median(x) - 1.5 * iqr(x)
+    for i in x:
+        if i < lim:
+            out.append(1)
+        else:
+            out.append(0)
+    assert len(out) == len(x)
+    return out
+
+
 if __name__ == "__main__":
     x = [1,2,3,4,2,4,2,2,4,2,1,3,1999]
     print "trim mean:   %f" % trim_mean(x, prop = 0.5)
