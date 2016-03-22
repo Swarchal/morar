@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import sqlalchemy as sql
 import statistics as stats
+import dataframes as df
 import logging
 from tqdm import tqdm
 
@@ -68,9 +69,9 @@ class RawData:
                 ValueError("method has to be 'mean' or 'median'")
             logging.debug("%s aggregate row count: %i" %(name,len(out.index)))
             out.to_sql(name, self.connection, if_exists='replace')
-            logging.debug("replaced %s with aggregate data" % name)
+            logging.debug("replaced %s with aggregate data" % name)    
 
-    # TODO
+
     def flag_bad_images(self, method = "hampel", **kwargs):
         """
         Identify bad or out-of-focus images from the Image table with
@@ -79,16 +80,8 @@ class RawData:
         """
         image = pd.read_sql_table("Image", self.connection,
                 index_col = "ImageNumber")
-
-        def subset_col(df, string):
-            """
-            Returns slice of dataframe, selecting only columns that
-            contain 'string'
-            """
-            out = df[df.columns[df.columns.to_series().str.contains(string)]]
-            return out
-
-        df_iq = subset_col(image, "ImageQuality")
+        
+        df_iq = df.subset_col(image, "ImageQuality")
         logging.debug("called flag_bad_images with %s" % method)
         if method == "hampel":
             # hampel outlier test on imagequality metrics
@@ -98,27 +91,25 @@ class RawData:
             return list(outlier[outlier > lim].index.tolist())
         elif method == "focus":
             # beyond normal range for focus score (low is bad)
-            tmp = subset_col(df_iq, "FocusScore_")
+            tmp = df.subset_col(df_iq, "FocusScore_")
             outlier = tmp.apply(stats.u_iqr, axis = 1).sum(axis = 1)
             return list(outlier[outlier != 0].index.tolist())
         elif method == "plls":
             # beyond normal range for powerloglogslope metrics (high is bad)
-            tmp = subset_col(df_iq, "PowerLogLogSlope_")
+            tmp = df.subset_col(df_iq, "PowerLogLogSlope_")
             outlier = tmp.apply(stats.o_iqr, axis = 1).sum(axis = 1)
             return list(outlier[outlier != 0].index.tolist())
         elif method == "correlation":
             # beyond normal range for correlation (high is bad)
-            tmp = subset_col(df_iq, "Correlation_")
+            tmp = df.subset_col(df_iq, "Correlation_")
             outlier = tmp.apply(stats.o_iqr, axis = 1).sum(axis = 1)
             return list(outlier[outlier != 0].index.tolist())
         else:
             logging.error("Non-valid method of '%s' for flag_bad_image"%method)
             ValueError("Invalid method. Options: hampel, focus, plls")
+    
 
 
-
-
-    # TODO
     def flag_errors(self):
         """
         Using ModuleError columns, flag images that produced an error.
@@ -126,7 +117,13 @@ class RawData:
         """
         # identify error columns in image table
         # return ImageNumber which has sum > 0 for the error cols
-        pass
+        image = pd.read_sql_table("Image", self.connection,
+                index_col = "ImageNumber")
+	# slice just ModuleError columns	
+	df_err = df.subset_col(image, "ModuleError_")
+	errors = df_err.sum(axis = 1)
+        logging.info("%i errors found in ModuleErrors" % sum(errors))
+	return list(errors[errors > 0].index.tolist())
 
 
     # TODO
@@ -364,3 +361,4 @@ if __name__ == "__main__":
     x = RawData("/media/datastore_scott/Scott_1/db_test.sqlite")
     x.aggregate_imagenumber()
     print x.flag_bad_images(method = "hampel")
+    print x.flag_errors()
