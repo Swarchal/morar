@@ -48,3 +48,12 @@ def test_iqr():
 #     print out
 #     ans = [0] * 39 + [1]
 #     assert out == ans
+
+def test_box_cox():
+    x_array = np.random.normal(100, 100, 100)
+    out_array = sts.box_cox(x_array)
+    assert len(out_array) == 100
+
+    x_list = list(x_array)
+    out_list = sts.box_cox(x_list)
+    assert len(out_array) == 100
