@@ -83,8 +83,15 @@ def u_iqr(x):
     return out
 
 
-if __name__ == "__main__":
-    x = [1,2,3,4,2,4,2,2,4,2,1,3,1999]
-    print "trim mean:   %f" % trim_mean(x, prop = 0.5)
-    print winsor_mean(x, prop = 0.1)
-    print winsorise(x, prop = 0.1)
+def box_cox(x, lmbda = None, alpha = None):
+    # box_cox doesn't work for negative numbers
+    # need to add a constant to remove any negative numbers
+    # if negative: x + abs(min) + 1
+    
+    negative = (i < 0 for i in x)
+    if any(negative):
+        x = [i + abs(min(x))+1 for i in x]
+
+    if isinstance(x, list):
+        x = np.array(x)
+    return stats.boxcox(x, lmbda, alpha)[0]
