@@ -1,23 +1,25 @@
+import logging
+import sqlite3
 import pandas as pd
 import numpy as np
-import sqlalchemy as sql
-import statistics as stats
-import dataframes as df
-import logging
-from tqdm import tqdm
+#import sqlalchemy as sql
+#import statistics as stats
+#import dataframes as df
+#from tqdm import tqdm
 
 
 
 class TidyData:
+
     """
     Tidy data, i.e rows per observation, column per measurements
     with measurements from various objects together in a single table
     """
 
 
-    def __init__(self, path, storage = "csv", metadata_prefix = "Metadata",
-	    plate = "Plate", well = "Well", sep = "_"):
-        
+    def __init__(self, path, storage="csv", metadata_prefix="Metadata",
+	                plate="Plate", well="Well", sep="_"):
+
         # load data from csv or sqlite database
         try:
             if storage == "csv":
@@ -26,12 +28,12 @@ class TidyData:
                 self.db_con = sqlite3.connect(path)
                 self.data = pd.read_sql(self.db_con)
         except ValueError:
-            logging.error("%s is not a valid format")
-            print "%s is not a valid format, try either 'csv' or 'sqlite'" % storage
-        
+            logging.error("%s is not a valid format" %storage)
+            print("{} is not a valid format, try either 'csv' or 'sqlite'".format(storage))
+
         # check it's actually returned a dataframe
         assert isinstance(self.data, pd.DataFrame)
-       
+
 
         # get and define metadata columns
         self.metadata_prefix = metadata_prefix
@@ -49,24 +51,24 @@ class TidyData:
         if self.well_col not in self.data.columns:
             logging.error("%s not found in columns" % self.well_col)
             raise ValueError("%s not found in columns" % self.well_col)
-  
+
         # get featuredata columns
         self.featuredata_cols = list(set(self.data.columns) - set(self.metadata_cols))
         assert len(list(self.featuredata_cols)) >= 1
-        
+
         # log setup
         logging.basicConfig(filename="TidyData.log",
-                level=logging.DEBUG,
-                format='%(asctime)s %(levelname)s: %(message)s')
-        logging.info("Number of columns found: %i" % len(self.data.columns))
-        logging.debug("Columns found:  %s" % list(self.data.columns))
+                            level=logging.DEBUG,
+                            format='%(asctime)s %(levelname)s: %(message)s')
+        logging.info('Number of columns found:{}'.format(len(self.data.columns)))
+        logging.debug("Columns found:{}".format(list(self.data.columns)))
         logging.debug("Number metadata columns found: %i" % len(self.metadata_cols))
         logging.debug("Metadata columns found: %s" % list(self.metadata_cols))
         logging.info("Number of feature data columns found: %i" % len(self.featuredata_cols))
         logging.debug("Featuredata columns found: %s" % list(self.featuredata_cols))
 
-        
-    def get_numeric_featuredata(self, numeric_only = True):
+
+    def get_numeric_featuredata(self, numeric_only=True):
         """
         Returns list of columns that correspond
         to feature data. i.e not metadata
@@ -82,7 +84,7 @@ class TidyData:
 
 
 
-    def get_no_variance_col(self, tolerance = 1e-5):
+    def get_no_variance_col(self, tolerance=1e-5):
         """
         Returns list of columns that have zero or very low variance.
 	Low variance defined as less than `tolerance`, default = 1e-5
@@ -116,10 +118,10 @@ class TidyData:
 
 
 
-    def aggregate_well(self, method = "median"):
+    def aggregate_well(self, method="median"):
         """
         Aggregates values down to an image average
-            - ??? modify in place or return new copy?
+            - modifies data in place
         """
         grouped = self.data.groupby([self.plate_col, self.well_col])
         logging.info("Aggregated wells by %s" % method)
@@ -135,7 +137,7 @@ class TidyData:
 
 
     # TODO make this
-    def normalise_to_control(self, unique_plate_col, compound_col = "Compound", neg_compound = "DMSO"):
+    def normalise_to_control(self, unique_plate_col, compound_col="Compound", neg_compound="DMSO"):
         """
         Normalises each featue against the median DMSO value for
         that feature per plate.
@@ -143,13 +145,13 @@ class TidyData:
             - TODO modify in place of return new copy?
         """
         plate_grp = self.data.groupby(unique_plate_col)
-        
+
         def neg_cntl_med():
             pass
-            
+
         pass
 
-    
+
     # TODO test this is working correctly with a test dataframe
     def scale_features(self):
         """
@@ -159,7 +161,7 @@ class TidyData:
             (x - np.mean(x)) / np.std(x)
         # zscore numeric featuredata columns
         logging.info("Features scaled via z-score")
-        self.data.loc[:, self.featuredata_cols].apply(zscore, axis = 0, reduce = False)
+        self.data.loc[:, self.featuredata_cols].apply(zscore, axis=0, reduce=False)
 
 
     def to_dataframe(self):
@@ -171,26 +173,13 @@ class TidyData:
 
 
 
-    def pd_function(self, *args):
-        """
-        Apply pandas function to self.data without transforming to dataframe
-        Need to keep the self.data as a TidyData class, otherwise cannot use
-        other TidyData functions on it.
-        If need be can transform back to a TidyData class without passing through
-        __init__ again.
-        """
-        pass
-
-
 if __name__ == "__main__":
 
-    test = TidyData('/home/scott/Dropbox/Public/df_cell_subclass.csv')
-    test.get_numeric_featuredata()
-    test.get_no_variance_col()
-    print "%i in full data" % len(test.data.index)
-    test.aggregate_well()
-    print "%i in agg data" % len(test.data.index)
-    print test.scale_features()
-    x = test.to_dataframe()
-    print x.describe()
-
+    Xtest = TidyData('/home/scott/Dropbox/Public/df_cell_subclass.csv')
+    Xtest.get_numeric_featuredata()
+    Xtest.get_no_variance_col()
+    print "%i in full data" % len(Xtest.data.index)
+    Xtest.aggregate_well()
+    print "%i in agg data" % len(Xtest.data.index)
+    print Xtest.scale_features()
+    print Xtest.to_dataframe()

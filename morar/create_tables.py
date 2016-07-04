@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 
 class ResultsDirectory:
-    
+
     """
     Directory containing the .csv from a CellProfiler run
     ------------------------------------------------------
@@ -23,7 +23,7 @@ class ResultsDirectory:
       and .csv. e.g 'date_plate_cell.csv' will return 'cell'
     """
 
-    def __init__(self, file_path, truncate = True):
+    def __init__(self, file_path, truncate=True):
         # path of directory
         self.path = file_path
         # full name of csv files
@@ -40,21 +40,21 @@ class ResultsDirectory:
         else:
             self.csv_files = full_paths
 
-            
-    # create sqlite database in cwd    
+
+    # create sqlite database in cwd
     def create_db(self, location, db_name):
         self.engine = create_engine('sqlite:///%s/%s.sqlite' % (location, db_name))
-    
+
 
     # write csv files to database
     def to_db(self):
 	   for x in tqdm(xrange(len(self.full_paths))):
-            f = os.path.join(self.path, self.full_paths[x])
-            tmp_file = pd.read_csv(f, iterator = True, chunksize = 1000)
-            all_file = pd.concat(tmp_file)
-            all_file.to_sql(name = self.csv_files[x], con = self.engine,
-                        flavor ='sqlite', index = False, if_exists = 'replace',
-                        chunksize = 1000)
+		f = os.path.join(self.path, self.full_paths[x])
+		tmp_file = pd.read_csv(f, iterator=True, chunksize=1000)
+		all_file = pd.concat(tmp_file)
+		all_file.to_sql(name=self.csv_files[x], con=self.engine,
+			flavor ='sqlite', index=False, if_exists='replace',
+                        chunksize=1000)
 
 
 
@@ -65,10 +65,3 @@ if __name__ == '__main__':
     x = ResultsDirectory(test_path)
     x.create_db("/media/datastore_scott/Scott_1/", "db_test")
     x.to_db()
-    x.map_database()
-
-    print x.path
-    print x.engine
-    print x.metadata
-    for t in x.metadata.sorted_tables:
-        print t.name

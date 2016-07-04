@@ -37,17 +37,17 @@ def hampel(x, sigma = 4):
     return out
 
 
-def trim_mean(x, prop = 0.1):
+def trim_mean(x, prop=0.1):
     """ Trimmed mean """
     return stats.trim_mean(x, prop)
 
 
-def winsorise(x, prop = 0.1):
+def winsorise(x, prop=0.1):
     """ Winsorised numbers"""
     return stats.mstats.winsorize(x, limits = prop)
 
 
-def winsor_mean(x, prop = 0.1):
+def winsor_mean(x, prop=0.1):
     """ Winsorised mean"""
     return np.mean(winsorise(x, prop))
 
@@ -83,11 +83,10 @@ def u_iqr(x):
     return out
 
 
-def box_cox(x, lmbda = None, alpha = None):
+def box_cox(x, lmbda=None, alpha=None):
     # box_cox doesn't work for negative numbers
     # need to add a constant to remove any negative numbers
-    # if negative: x + abs(min) + 1
-    
+    # constant makes min number 1
     negative = (i < 0 for i in x)
     if any(negative):
         x = [i + abs(min(x))+1 for i in x]
