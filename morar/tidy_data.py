@@ -7,7 +7,7 @@ import numpy as np
 #import dataframes as df
 #from tqdm import tqdm
 
-
+# TODO make this work with the multi-indexed dataframes we're now using
 
 class TidyData:
 
@@ -18,7 +18,7 @@ class TidyData:
 
 
     def __init__(self, path, storage="csv", metadata_prefix="Metadata",
-	                plate="Plate", well="Well", sep="_"):
+                 plate="Plate", well="Well", sep="_"):
 
         # load data from csv or sqlite database
         try:
@@ -73,21 +73,20 @@ class TidyData:
         Returns list of columns that correspond
         to feature data. i.e not metadata
         """
-	# of those columns, get only the numeric columns
+        # of those columns, get only the numeric columns
         tmp = self.data[self.featuredata_cols].select_dtypes(include=[np.number])
         self.featuredata_cols = tmp.columns
-	# check there is at least one column
-	assert len(list(self.featuredata_cols)) >= 1
+        # check there is at least one column
+        assert len(list(self.featuredata_cols)) >= 1
         logging.info("Selected only numeric featuredata")
         logging.debug("Numeric featuredata columns: %s" % list(self.featuredata_cols))
         return list(self.featuredata_cols)
 
 
-
     def get_no_variance_col(self, tolerance=1e-5):
         """
         Returns list of columns that have zero or very low variance.
-	Low variance defined as less than `tolerance`, default = 1e-5
+        Low variance defined as less than `tolerance`, default = 1e-5
         """
         self.zero_var_cols = []
         for col in self.featuredata_cols:
@@ -98,24 +97,18 @@ class TidyData:
         return self.zero_var_cols
 
 
-
     def get_all_NA_col(self):
-        """"
-        Returns list of columns that contain all NA values
-        """
+        """Returns list of columns that contain all NA values"""
         for col in self.data.columns:
             if pd.isnull(col):
                 return col
 
 
     def  get_any_NA_row(self):
-        """"
-        Returns row index of rows that contain any NA values
-        """
+        """"Returns row index of rows that contain any NA values"""
         self.na_rows = self.data[self.data.isnull().any(axis=1)].index.tolist()
         logging.debug("Number of rows containing NA %i" % len(self.na_rows))
-	return self.na_rows
-
+            return self.na_rows
 
 
     def aggregate_well(self, method="median"):
@@ -135,7 +128,6 @@ class TidyData:
         logging.debug("Number of rows in aggregated data: %i" % len(self.data.index))
 
 
-
     # TODO make this
     def normalise_to_control(self, unique_plate_col, compound_col="Compound", neg_compound="DMSO"):
         """
@@ -147,7 +139,7 @@ class TidyData:
         plate_grp = self.data.groupby(unique_plate_col)
 
         def neg_cntl_med():
-            pass
+            pass # TODO make this
 
         pass
 
@@ -170,6 +162,7 @@ class TidyData:
         Allows option to use pandas functions
         """
         return pd.DataFrame(self.data)
+        # TODO probably a better way of using pandas functions on this
 
 
 
