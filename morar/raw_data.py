@@ -116,10 +116,10 @@ class RawData:
         """
         image = pd.read_sql_table("Image", self.connection,
                                   index_col="ImageNumber")
-    df_err = df.subset_col(image, "ModuleError_")
-    errors = df_err.sum(axis=1)
-    logging.info("%i errors found in ModuleErrors" % sum(errors))
-    return list(errors[errors > 0].index.tolist())
+        df_err = df.subset_col(image, "ModuleError_")
+        errors = df_err.sum(axis=1)
+        logging.info("%i errors found in ModuleErrors" % sum(errors))
+        return list(errors[errors > 0].index.tolist())
 
 
 
