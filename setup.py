@@ -10,8 +10,8 @@ setup(name='morar',
       packages=['morar'],
       test_suite='nose.collector',
       tests_require=['nose'],
-      install_requires=['sqlalchemy',
-			'pandas',
+      install_requires=['pandas',
+                        'numpy'
 			'os',
 			're'],
       zip_safe=False)
