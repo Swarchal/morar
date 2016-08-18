@@ -2,7 +2,7 @@ import numpy as np
 
 def mad(data):
     """ median absolute deviation """
-    arr = np.ma.array(arr).compressed()
+    arr = np.ma.array(data).compressed()
     med = np.median(arr)
     return np.median(np.abs(arr - med))
 
