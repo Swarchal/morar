@@ -1,6 +1,6 @@
 from morar import stats
 import pandas as pd
-
+import numpy as np
 
 def test_mad_wikipedia_example():
     data_in = [1,1,2,2,4,6,9]
@@ -44,4 +44,27 @@ def test_mad_dataframe_apply():
 
 
 def test_glog():
-    pass
+    x = [1,2,3,4,5,6,7,100]
+    out = stats.glog(x)
+    assert isinstance(out, np.ndarray)
+
+
+def test_glog_1():
+    out = stats.glog(1)
+    assert abs(out - 0.08174569) < 1e-4
+
+
+def test_glog_skew():
+    x = np.random.randn(10000)
+    y = np.append(x, 100)
+    out = stats.glog(y)
+    assert max(out) < 10
+
+
+def test_glog_dataframe():
+    x = np.random.randn(1000)
+    y = np.random.randn(1000)
+    z = np.random.randn(1000)
+    df = pd.DataFrame(zip(x, y, z))
+    glog_df = df.applymap(lambda x: stats.glog(x))
+    assert isinstance(glog_df, pd.DataFrame)

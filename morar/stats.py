@@ -10,6 +10,6 @@ def mad(data):
 def glog(x, c=1):
     """
     generalized log transformation
-    to be used as: pd.DataFrame.apply(glog)
     """
+    x = np.array(x)
     return np.log10((x + (x**2 + c**2) ** 0.5) / 2)
