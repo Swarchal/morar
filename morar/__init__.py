@@ -1,2 +1,2 @@
 import stats
-from normalise import Normalise
+import normalise
