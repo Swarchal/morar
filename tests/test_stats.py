@@ -2,7 +2,7 @@ from morar import stats
 import pandas as pd
 import numpy as np
 
-def test_mad_wikipedia_example():
+def test_mad_returns_correct_answer():
     data_in = [1,1,2,2,4,6,9]
     correct = 1.0
     assert stats.mad(data_in) == correct
@@ -51,7 +51,7 @@ def test_glog():
 
 def test_glog_1():
     out = stats.glog(1)
-    assert abs(out - 0.08174569) < 1e-4
+    assert abs(out - 0.08174569) < 1e-6
 
 
 def test_glog_skew():
@@ -68,3 +68,21 @@ def test_glog_dataframe():
     df = pd.DataFrame(zip(x, y, z))
     glog_df = df.applymap(lambda x: stats.glog(x))
     assert isinstance(glog_df, pd.DataFrame)
+
+
+def test_zscore_returns_same_size():
+    x = [1,2,3,4,5]
+    out = stats.z_score(x)
+    assert len(x) == len(out)
+
+
+def test_zscore_means_to_zero():
+    x = [1,2,3,4,5,6,3,2,4,5,3,2,3,4]
+    out = stats.z_score(x)
+    assert abs(out.mean() - 0) < 1e-6
+
+
+def test_zscore_sd_to_1():
+    x = [1,2,3,4,5,6,3,2,4,5,3,2,3,4]
+    out = stats.z_score(x)
+    assert abs(out.std() - 1) < 1e-6
