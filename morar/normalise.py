@@ -56,7 +56,6 @@ def normalise(df, plate_id, compound="Metadata_compound",
     @param method method to normalise against negative control
     @param metadata_prefix string, prefix for metadata columns
     """
-
     valid_methods = ["subtract", "divide"]
     if method not in valid_methods:
         raise ValueError("Invalid method, options: 'subtract', 'divide'")
