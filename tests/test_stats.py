@@ -86,3 +86,50 @@ def test_zscore_sd_to_1():
     x = [1,2,3,4,5,6,3,2,4,5,3,2,3,4]
     out = stats.z_score(x)
     assert abs(out.std() - 1) < 1e-6
+
+
+def test_find_correlation():
+    x = range(1000)
+    noise = np.random.randn(1000)
+    y = [a+b for a,b in zip(x, noise)]
+    z = np.random.randn(1000)
+    df = pd.DataFrame(zip(x, y, z), columns=["x", "y", "z"])
+    out = stats.find_correlation(df)
+    assert len(out) == 1
+    assert out[0] == ["x"] or ["y"]
+    assert out[0] != ["z"]
+
+
+def test_find_correlation_threshold_works():
+    x = range(1000)
+    noise = np.random.randn(1000)
+    y = [a+b for a,b in zip(x, noise)]
+    z = np.random.randn(1000)
+    df = pd.DataFrame(zip(x, y, z), columns=["x", "y", "z"])
+    out = stats.find_correlation(df, thresh=1.0)
+    assert len(out) == 0
+
+
+def test_find_correlation_multiple_correlated():
+    x = range(1000)
+    noise = np.random.randn(1000)
+    y = [a+b for a,b in zip(x, noise)]
+    xx = [a+b for a,b in zip(x, noise)]
+    z = np.random.randn(1000)
+    df = pd.DataFrame(zip(x, xx, y, z), columns=["x", "xx", "y", "z"])
+    out = stats.find_correlation(df)
+    assert len(out) == 2
+    assert "z" not in out
+
+
+
+def test_find_correlation_large_n():
+    x = range(100000)
+    noise = np.random.randn(100000)
+    y = [a+b for a,b in zip(x, noise)]
+    z = np.random.randn(100000)
+    df = pd.DataFrame(zip(x, y, z), columns=["x", "y", "z"])
+    out = stats.find_correlation(df)
+    assert len(out) == 1
+    assert out[0] == ["x"] or ["y"]
+    assert out[0] != ["z"]
