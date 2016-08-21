@@ -1,5 +1,7 @@
 # morar
 
+[![Build Status](https://travis-ci.org/Swarchal/morar.svg?branch=master)](https://travis-ci.org/Swarchal/morar)
+
 Python package for phenotypic screening data.
 
 ### normalising plate and batch effects
