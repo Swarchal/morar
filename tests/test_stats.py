@@ -42,7 +42,6 @@ def test_mad_dataframe_apply():
     out = list(df.apply(lambda x: stats.mad(x), axis=1).values)
     assert isinstance(out, list)
     assert isinstance(out[0], float)
-    print out
     assert list(out)[0] == 0.0
 
 
