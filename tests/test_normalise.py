@@ -97,6 +97,12 @@ compound = (["drug"]*10) + (["drug"]*8 + ["DMSO"]*2)*4
 colnames = ["A", "B", "C", "Metadata_plate", "Metadata_compound"]
 missing_control_df = pd.DataFrame(zip(x, y, z, plate, compound), columns=colnames)
 
+# simple dataframe to check actual values
+x = [4,4,4,2,2]
+compound = (["drug"]*3 + ["DMSO"]*2)
+plate = ["plate_1"]*5
+colnames = ["f1", "Metadata_compound", "Metadata_plate"]
+simple_df = pd.DataFrame(zip(x, compound, plate), columns=colnames)
 
 
 @raises(ValueError)
@@ -126,30 +132,24 @@ def test_normalise_returns_correct_size():
     assert out.shape[0] == df.shape[0]
 
 
-def test_normalise_returns_correct_values():
-    out = normalise.normalise(df, plate_id="Metadata_plate")
+def test_normalise_divide_returns_correct_values():
+    out = normalise.normalise(simple_df, plate_id="Metadata_plate",
+                              method="divide")
     assert isinstance(out, pd.DataFrame)
-    assert out.shape[0] == df.shape[0]
-    # TODO assert correct values
+    assert out["f1"].tolist() == [2,2,2,1,1]
 
 
-def test_normalise_method_subtract():
-    out = normalise.normalise(df, plate_id="Metadata_plate")
+def test_normalise_subtract_returns_correct_values():
+    out = normalise.normalise(simple_df, plate_id="Metadata_plate",
+                              method="subtract")
     assert isinstance(out, pd.DataFrame)
-    # TODO assert correct values
-
-
-def test_normalise_method_divide():
-    out = normalise.normalise(df, plate_id="Metadata_plate")
-    assert isinstance(out, pd.DataFrame)
-    # TODO assert correct values
+    assert out["f1"].tolist() == [2,2,2,0,0]
 
 
 def test_normalise_non_default_cols():
     out = normalise.normalise(non_default_df, metadata_prefix="meta",
                               compound="meta_cmpd", plate_id="meta_plate")
     assert isinstance(out, pd.DataFrame)
-    assert out.shape[0] == non_default_df.shape[0]
 
 
 def test_robust_normalise_returns_dataframe():
