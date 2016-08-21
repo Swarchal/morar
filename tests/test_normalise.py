@@ -9,7 +9,7 @@ def test_get_featuredata_simple():
     y = [4,3,2,1]
     z = [1,2,3,4]
     columns = ["colA", "colB", "Metadata_A"]
-    test_df = pd.DataFrame(zip(x, y, z), columns=columns)
+    test_df = pd.DataFrame(list(zip(x, y, z)), columns=columns)
     cols = normalise.get_featuredata(test_df)
     assert cols == ["colA", "colB"]
 
@@ -20,7 +20,7 @@ def test_get_featuredata_middle_prefix():
     z = [1,2,3,4]
     a = [4,3,5,1]
     columns = ["colA", "colB", "something_Metadata", "Metadata_A"]
-    test_df = pd.DataFrame(zip(x, y, z, a), columns=columns)
+    test_df = pd.DataFrame(list(zip(x, y, z, a)), columns=columns)
     cols = normalise.get_featuredata(test_df)
     assert cols == ["colA", "colB", "something_Metadata"]
 
@@ -31,7 +31,7 @@ def test_get_featuredata_different_case():
     z = [1,2,3,4]
     a = [4,3,5,1]
     columns = ["colA", "colB", "metadata_A", "Metadata_A"]
-    test_df = pd.DataFrame(zip(x, y, z, a), columns=columns)
+    test_df = pd.DataFrame(list(zip(x, y, z, a)), columns=columns)
     cols = normalise.get_featuredata(test_df, metadata_prefix="metadata")
     assert cols == ["colA", "colB", "Metadata_A"]
 
@@ -41,7 +41,7 @@ def test_get_metadata_simple():
     y = [4,3,2,1]
     z = [1,2,3,4]
     columns = ["colA", "colB", "Metadata_A"]
-    test_df = pd.DataFrame(zip(x, y, z), columns=columns)
+    test_df = pd.DataFrame(list(zip(x, y, z)), columns=columns)
     cols = normalise.get_metadata(test_df)
     assert cols == ["Metadata_A"]
 
@@ -52,7 +52,7 @@ def test_get_metadata_middle_prefix():
     z = [1,2,3,4]
     a = [4,3,5,1]
     columns = ["colA", "colB", "something_Metadata", "Metadata_A"]
-    test_df = pd.DataFrame(zip(x, y, z, a), columns=columns)
+    test_df = pd.DataFrame(list(zip(x, y, z, a)), columns=columns)
     cols = normalise.get_metadata(test_df)
     assert cols == ["Metadata_A"]
 
@@ -63,7 +63,7 @@ def test_get_metadata_different_case():
     z = [1,2,3,4]
     a = [4,3,5,1]
     columns = ["colA", "colB", "metadata_A", "Metadata_A"]
-    test_df = pd.DataFrame(zip(x, y, z, a), columns=columns)
+    test_df = pd.DataFrame(list(zip(x, y, z, a)), columns=columns)
     cols = normalise.get_metadata(test_df, metadata_prefix="metadata")
     assert cols == ["metadata_A"]
 
@@ -75,7 +75,7 @@ z = np.random.randn(50).tolist()
 plate = ["plate1"]*10 + ["plate2"]*10 + ["plate3"]*10 + ["plate4"]*10 + ["plate5"]*10
 compound = (["drug"]*8 + ["DMSO"]*2)*5
 colnames = ["A", "B", "C", "Metadata_plate", "Metadata_compound"]
-df = pd.DataFrame(zip(x, y, z, plate, compound), columns=colnames)
+df = pd.DataFrame(list(zip(x, y, z, plate, compound)), columns=colnames)
 
 
 # dataframe with weird columns names
@@ -85,7 +85,8 @@ z = np.random.randn(50).tolist()
 plate = ["plate1"]*10 + ["plate2"]*10 + ["plate3"]*10 + ["plate4"]*10 + ["plate5"]*10
 compound = (["drug"]*8 + ["DMSO"]*2)*5
 colnames = ["A", "B", "C", "meta_plate", "meta_cmpd"]
-non_default_df = pd.DataFrame(zip(x, y, z, plate, compound), columns=colnames)
+non_default_df = pd.DataFrame(list(zip(x, y, z, plate, compound)),
+                              columns=colnames)
 
 
 # dataframe with missing controls in one plate
@@ -95,14 +96,15 @@ z = np.random.randn(50).tolist()
 plate = ["plate1"]*10 + ["plate2"]*10 + ["plate3"]*10 + ["plate4"]*10 + ["plate5"]*10
 compound = (["drug"]*10) + (["drug"]*8 + ["DMSO"]*2)*4
 colnames = ["A", "B", "C", "Metadata_plate", "Metadata_compound"]
-missing_control_df = pd.DataFrame(zip(x, y, z, plate, compound), columns=colnames)
+missing_control_df = pd.DataFrame(list(zip(x, y, z, plate, compound)),
+                                  columns=colnames)
 
 # simple dataframe to check actual values
 x = [4,4,4,2,2]
 compound = (["drug"]*3 + ["DMSO"]*2)
 plate = ["plate_1"]*5
 colnames = ["f1", "Metadata_compound", "Metadata_plate"]
-simple_df = pd.DataFrame(zip(x, compound, plate), columns=colnames)
+simple_df = pd.DataFrame(list(zip(x, compound, plate)), columns=colnames)
 
 
 @raises(ValueError)

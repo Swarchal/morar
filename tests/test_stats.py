@@ -30,7 +30,7 @@ def test_mad_dataframe_row():
     x = [1,2,3]
     y = [4,10, 5]
     z = [0.4, 8, 0.6]
-    df = pd.DataFrame(zip(x, y, z), columns=["x", "y", "z"])
+    df = pd.DataFrame(list(zip(x, y, z)), columns=["x", "y", "z"])
     assert isinstance(stats.mad(df.ix[0]), float)
 
 
@@ -38,7 +38,7 @@ def test_mad_dataframe_apply():
     x = [1,2,3]
     y = [1,10, 5]
     z = [1, 8, 0.6]
-    df = pd.DataFrame(zip(x, y, z), columns=["x", "y", "z"])
+    df = pd.DataFrame(list(zip(x, y, z)), columns=["x", "y", "z"])
     out = list(df.apply(lambda x: stats.mad(x), axis=1).values)
     assert isinstance(out, list)
     assert isinstance(out[0], float)
@@ -67,7 +67,7 @@ def test_glog_dataframe():
     x = np.random.randn(1000)
     y = np.random.randn(1000)
     z = np.random.randn(1000)
-    df = pd.DataFrame(zip(x, y, z))
+    df = pd.DataFrame(list(zip(x, y, z)))
     glog_df = df.applymap(lambda x: stats.glog(x))
     assert isinstance(glog_df, pd.DataFrame)
 
@@ -95,7 +95,7 @@ def test_find_correlation():
     noise = np.random.randn(1000)
     y = [a+b for a,b in zip(x, noise)]
     z = np.random.randn(1000)
-    df = pd.DataFrame(zip(x, y, z), columns=["x", "y", "z"])
+    df = pd.DataFrame(list(zip(x, y, z)), columns=["x", "y", "z"])
     out = stats.find_correlation(df)
     assert len(out) == 1
     assert out[0] == ["x"] or ["y"]
@@ -107,7 +107,7 @@ def test_find_correlation_threshold_works():
     noise = np.random.randn(1000)
     y = [a+b for a,b in zip(x, noise)]
     z = np.random.randn(1000)
-    df = pd.DataFrame(zip(x, y, z), columns=["x", "y", "z"])
+    df = pd.DataFrame(list(zip(x, y, z)), columns=["x", "y", "z"])
     out = stats.find_correlation(df, threshold=1.0)
     assert len(out) == 0
 
@@ -118,7 +118,7 @@ def test_find_correlation_multiple_correlated():
     y = [a+b for a,b in zip(x, noise)]
     xx = [a+b for a,b in zip(x, noise)]
     z = np.random.randn(1000)
-    df = pd.DataFrame(zip(x, xx, y, z), columns=["x", "xx", "y", "z"])
+    df = pd.DataFrame(list(zip(x, xx, y, z)), columns=["x", "xx", "y", "z"])
     out = stats.find_correlation(df)
     assert len(out) == 2
     assert "z" not in out
