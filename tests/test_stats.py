@@ -109,7 +109,7 @@ def test_find_correlation_threshold_works():
     y = [a+b for a,b in zip(x, noise)]
     z = np.random.randn(1000)
     df = pd.DataFrame(zip(x, y, z), columns=["x", "y", "z"])
-    out = stats.find_correlation(df, thresh=1.0)
+    out = stats.find_correlation(df, threshold=1.0)
     assert len(out) == 0
 
 
