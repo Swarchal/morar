@@ -1,2 +1,2 @@
-import stats
-import normalise
+from morar import stats
+from morar import normalise
