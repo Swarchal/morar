@@ -43,12 +43,12 @@ def scale_features(data):
     return data.apply(z_score)
 
 
-def find_correlation(df, thresh=0.9):
+def find_correlation(df, threshold=0.9):
     """
     Given a numeric pd.DataFrame, this will find highly correlated features,
     and return a list of features to remove
     @param df pandas DataFrame
-    @param thresh correlation threshold, will remove one of pairs of features
+    @param threshold correlation threshold, will remove one of pairs of features
         with a correlation greater than this value
     @return list of column names to be removed
     """
@@ -57,7 +57,7 @@ def find_correlation(df, thresh=0.9):
     already_in = set()
     result = []
     for col in corrMatrix:
-        perfect_corr = corrMatrix[col][corrMatrix[col] > thresh].index.tolist()
+        perfect_corr = corrMatrix[col][corrMatrix[col] > threshold].index.tolist()
         if perfect_corr and col not in already_in:
             already_in.update(set(perfect_corr))
             perfect_corr.append(col)
