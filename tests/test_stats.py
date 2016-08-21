@@ -129,7 +129,7 @@ def test_find_correlation_large_n():
     noise = np.random.randn(100000)
     y = [a+b for a,b in zip(x, noise)]
     z = np.random.randn(100000)
-    df = pd.DataFrame(zip(x, y, z), columns=["x", "y", "z"])
+    df = pd.DataFrame(list(zip(x, y, z)), columns=["x", "y", "z"])
     out = stats.find_correlation(df)
     assert len(out) == 1
     assert out[0] == ["x"] or ["y"]
