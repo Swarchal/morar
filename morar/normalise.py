@@ -47,7 +47,7 @@ def check_control(df, plate_id, compound="Metadata_compound",
 
 
 def normalise(df, plate_id, compound="Metadata_compound",
-              neg_compound="DMSO", method="divide",
+              neg_compound="DMSO", method="subtract",
               metadata_prefix="Metadata"):
     """
     Normalise values against negative controls values per plate.
