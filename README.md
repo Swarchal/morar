@@ -49,48 +49,6 @@ normalise(data, plate_id="Metadata_plate")
 This returns the normalised data.
 
 ```
-val1  val2
-2.0   0.50
-2.0   0.50
-2.0   0.50
-1.0   1.00
-1.0   1.00
-2.0   0.25
-2.0   0.25
-2.0   0.25
-1.0   1.00
-1.0   1.00
-```
-
-We can normalise this in place to keep the metadata.
-
-```python
-from morar.normalise import get_featuredata
-
-data[get_featuredata(data)] = normalise(data, plate_id="Metadata_plate")
-```
-
-```
-val1  val2       Metadata_plate       Metadata_compound
-2.0  0.50        plate_1              drug
-2.0  0.50        plate_1              drug
-2.0  0.50        plate_1              drug
-1.0  1.00        plate_1              DMSO
-1.0  1.00        plate_1              DMSO
-2.0  0.25        plate_2              drug
-2.0  0.25        plate_2              drug
-2.0  0.25        plate_2              drug
-1.0  1.00        plate_2              DMSO
-1.0  1.00        plate_2              DMSO
-
-```
-
-By default the normalise function divides the feature values by the median negative control value for that plate. Though we can also subtract the median negative controls values using the `method` argument.
-
-```python
-normalise(data, plate_id="Metadata_plate", method="subtract")
-```
-```
 val1   val2
 2.0   -1.0
 2.0   -1.0
@@ -103,6 +61,48 @@ val1   val2
 0.0    0.0
 0.0    0.0
 
+```
+
+We can normalise this in place to keep the metadata.
+
+```python
+from morar.normalise import get_featuredata
+
+data[get_featuredata(data)] = normalise(data, plate_id="Metadata_plate")
+```
+
+```
+val1  val2       Metadata_plate       Metadata_compound
+2.0  -1.0        plate_1              drug
+2.0  -1.0        plate_1              drug
+2.0  -1.0        plate_1              drug
+0.0   0.0        plate_1              DMSO
+0.0   0.0        plate_1              DMSO
+4.0  -3.0        plate_2              drug
+4.0  -3.0        plate_2              drug
+4.0  -3.0        plate_2              drug
+0.0   0.0        plate_2              DMSO
+0.0   0.0        plate_2              DMSO
+
+```
+
+By default the normalise function subtracts the feature values by the median negative control value for that plate. Though we can also divide the median negative controls values using the `method` argument.
+
+```python
+normalise(data, plate_id="Metadata_plate", method="divide")
+```
+```
+val1  val2
+2.0   0.50
+2.0   0.50
+2.0   0.50
+1.0   1.00
+1.0   1.00
+2.0   0.25
+2.0   0.25
+2.0   0.25
+1.0   1.00
+1.0   1.00
 ```
 
 #### Robust methods
