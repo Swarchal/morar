@@ -93,6 +93,18 @@ def test_zscore_sd_to_1():
     assert abs(out.std() - 1) < 1e-6
 
 
+def test_scale_features():
+    x = np.random.normal(loc=5, scale=1, size=1000)
+    y = np.random.normal(loc=10, scale=5, size=1000)
+    df = pd.DataFrame(list(zip(x, y)))
+    df.columns = ["x", "y"]
+    out = stats.scale_features(df)
+    assert abs(out["x"].mean() - 0.0) < 1e-6
+    assert abs(np.std(out["x"]) - 1.0) < 1e-6
+    assert abs(out["y"].mean() - 0.0) < 1e-6
+    assert abs(np.std(out["y"]) - 1.0) < 1e-6
+
+
 def test_find_correlation():
     x = range(1000)
     noise = np.random.randn(1000)
