@@ -55,6 +55,11 @@ def test_check_control_within_function():
     # assert for ValueError
 
 
+@raises(ValueError)
+def test_normalise_errors_invalid_method():
+    normalise.normalise(df, plate_id="Metadata_plate", method="invalid")
+
+
 def test_normalise_returns_dataframe_subtract():
     out = normalise.normalise(df, plate_id="Metadata_plate", method="subtract")
     assert isinstance(out, pd.DataFrame)
