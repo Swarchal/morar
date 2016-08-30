@@ -1,32 +1,7 @@
 from morar import stats
+from morar import utils
 import pandas as pd
 import numpy as np
-
-
-def get_featuredata(df, metadata_prefix="Metadata"):
-    """
-    identifies columns in a dataframe that are not labelled with the
-    metadata prefix. Its assumed everything not labelled metadata is
-    featuredata
-
-    @param df dataframe
-    @param metadata_prefix string, prefix for metadata columns
-    @return list of column names
-    """
-    f_cols = [i for i in df.columns if not i.startswith(metadata_prefix)]
-    return f_cols
-
-
-def get_metadata(df, metadata_prefix="Metadata"):
-    """
-    identifies column in a dataframe that are labelled with the metadata_prefix
-
-    @param df pandas DataFrame
-    @param metadata_prefix metadata prefix in column name
-    @return list of column names
-    """
-    m_cols = [i for i in df.columns if i.startswith(metadata_prefix)]
-    return m_cols
 
 
 def check_control(df, plate_id, compound="Metadata_compound",
@@ -43,7 +18,7 @@ def check_control(df, plate_id, compound="Metadata_compound",
     for name, group in df.groupby(plate_id):
         group_cmps = list(set(group[compound]))
         if neg_compound not in group_cmps:
-            raise ValueError("{} does not contain any negative control values".format(name))
+            raise ValueError(name, "does not contain any negative control values")
 
 
 def normalise(df, plate_id, compound="Metadata_compound",
@@ -66,7 +41,7 @@ def normalise(df, plate_id, compound="Metadata_compound",
     # check there are some negative controls on each plate
     check_control(df, plate_id, compound, neg_compound)
     # identify feature columns
-    f_cols = get_featuredata(df, metadata_prefix)
+    f_cols = utils.get_featuredata(df, metadata_prefix)
     # dataframe for output
     df_out = pd.DataFrame()
     # group by plate
@@ -102,7 +77,7 @@ def robust_normalise(df, plate_id, compound="Metadata_compound",
     @return pandas DataFrame.
     """
     check_control(df, plate_id, compound, neg_compound)
-    f_cols = get_featuredata(df, metadata_prefix)
+    f_cols = utils.get_featuredata(df, metadata_prefix)
     grouped = df.groupby(plate_id, as_index=False)
     df_out = pd.DataFrame()
     # calculate the average negative control values per plate_id
