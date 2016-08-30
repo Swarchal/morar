@@ -1,6 +1,7 @@
 from morar import stats
 import pandas as pd
 import numpy as np
+from nose.tools import raises
 
 np.random.seed(0)
 
@@ -157,3 +158,31 @@ def test_hampel_sigma():
     out = stats.hampel(x_new, sigma=20)
     ans = np.zeros(101)
     assert all(out == ans)
+
+
+a = np.random.random(100)
+b = np.zeros(100)
+c = np.random.random(100)
+df = pd.DataFrame(list(zip(a, b, c)))
+df.columns = ["a", "b", "c"]
+
+
+def test_find_low_var():
+    out = stats.find_low_var(df)
+    assert len(out) == 1
+    assert out == ["b"]
+
+@raises(ValueError)
+def test_find_low_var_errors():
+    stats.find_low_var(df["a"].tolist())
+
+
+def test_fine_low_var_threshold():
+    sigma = 0.5
+    var = sigma**2
+    x = np.random.normal(loc=1, scale=sigma, size=1000)
+    y = np.random.normal(loc=1, scale=1.0, size=1000)
+    df2 = pd.DataFrame(list(zip(x, y)))
+    df2.columns = ["x", "y"]
+    out = stats.find_low_var(df2, threshold=var*2)
+    assert out == ["x"]
