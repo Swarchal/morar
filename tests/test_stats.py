@@ -2,6 +2,8 @@ from morar import stats
 import pandas as pd
 import numpy as np
 
+np.random.seed(0)
+
 def test_mad_returns_correct_answer():
     data_in = [1,1,2,2,4,6,9]
     correct = 1.0
@@ -134,3 +136,24 @@ def test_find_correlation_large_n():
     assert len(out) == 1
     assert out[0] == ["x"] or ["y"]
     assert out[0] != ["z"]
+
+
+def test_hampel():
+    x = np.random.random(100)
+    x_new = np.append(x, 100)
+    out = stats.hampel(x_new)
+    ans = np.zeros(100)
+    ans = np.append(ans, 1.0)
+    assert len(out) == 101
+    assert sum(out) == 1.0
+    assert all(out == ans)
+
+
+def test_hampel_sigma():
+    x = np.random.random(100)
+    # append a value slightly higher than the others
+    x_new = np.append(x, 3)
+    # v. high sigma value
+    out = stats.hampel(x_new, sigma=20)
+    ans = np.zeros(101)
+    assert all(out == ans)

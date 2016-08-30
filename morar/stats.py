@@ -65,3 +65,29 @@ def find_correlation(df, threshold=0.9):
     select_nested = [f[1:] for f in result]
     select_flat = [i for j in select_nested for i in j]
     return select_flat
+
+
+def hampel(x, sigma=6):
+    """
+    Hampel filter without window
+
+    @param x array or list of numerical values
+    @param sigma number of median absolute deviations away from the sample
+                 median to define an outlier
+
+    @details (1) = positive outlier,
+            (-1) = negative outlier,
+             (0) = nominal value
+    """
+    x = np.array(x).astype(np.float)
+    med_x = np.median(x)
+    mad_x = mad(x)
+    h_pos = med_x + sigma * mad_x
+    h_neg = med_x - sigma * mad_x
+    out = np.zeros(len(x))
+    for i, val in enumerate(x):
+        if val > h_pos:
+            out[i] = 1
+        elif val < h_neg:
+            out[i] = -1
+    return out
