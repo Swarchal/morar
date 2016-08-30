@@ -162,6 +162,17 @@ def test_hampel():
     assert all(out == ans)
 
 
+def test_hampel_negative():
+    x = np.random.random(100)
+    x_new = np.append(x, -100)
+    out = stats.hampel(x_new)
+    ans = np.zeros(100)
+    ans = np.append(ans, -1.0)
+    assert len(out) == 101
+    assert sum(out) == -1.0
+    assert all(out == ans)
+
+
 def test_hampel_sigma():
     x = np.random.random(100)
     # append a value slightly higher than the others
