@@ -35,6 +35,16 @@ def test_get_image_quality_fails_non_dataframe():
     outliers.get_image_quality(test_list)
 
 
+@raises(ValueError)
+def test_get_image_quality_no_im_qc_cols():
+    x = [1,2,3,4]
+    y = [2,3,4,5]
+    df = pd.DataFrame(list(zip(x, y)))
+    df.columns = ["x", "y"]
+    outliers.get_image_quality(df)
+
+
+# example dataset for get_outlier_index
 x = np.random.random(100).tolist()
 y = np.random.random(100).tolist()
 # add outlying values to last row
@@ -57,5 +67,31 @@ def test_get_outlier_index_errors_non_dataframe():
 def test_get_outlier_index_values():
     out = outliers.get_outlier_index(df3)
     assert len(out) == 1
-    print(out)
     assert out == [100] # 0-based indexing
+
+
+def test_get_outlier_index_ImageQuality():
+    # create dataframe with important ImageQuality measurements
+    # FocusScore, PowerLogLogSlope
+    # have a row with atypical values
+    x = np.random.random(1000)
+    x2 = np.random.random(1000)
+    x3 = np.random.random(1000)
+    x4 = np.random.random(1002)
+    x5 = np.random.random(1002)
+    x6 = np.random.random(1002)
+    # introduce two bad images with low focus and ppls values
+    x = np.append(x, [-3, -5])
+    x2 = np.append(x2, [-2, -4])
+    x3 = np.append(x3, [-1, -2])
+    df = pd.DataFrame(list(zip(x, x2, x3, x4, x5, x6)))
+    df.columns = [
+        "ImageQuality_PowerLogLogSlope_ch1",
+        "ImageQuality_PowerLogLogSlope_ch2",
+        "ImageQuality_FocusScore_ch1",
+        "ImageQuality_FocusScore_ch2",
+        "vals1", "vals2"
+    ]
+    out = outliers.get_outlier_index(df, method="ImageQuality")
+    assert len(out) == 2
+    assert out == [1000, 1001]
