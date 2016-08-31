@@ -116,6 +116,7 @@ robust_normalise(data, plate_id="Metadata_plate")
 
 
 #### Z-scoring values
+
 Z-scoring means each feature has a mean of 0 and standard deviation of 1.
 
 ```python
@@ -137,4 +138,59 @@ data[get_featuredata(data)].applymap(lambda x: stats.glog(x))
 To find which features are redundant with a pairwise correlation > threshold, find correlation returns a list of columns names, keeping one of pairs of highly correlated features.
 ```python
 stats.find_correlation(data, threshold=0.8)
+```
+
+### Removing columns with low variance
+
+We can remove feature columns that have little or zero variance with `morar.stats.find_low_var`.
+
+```python
+from morar import stats
+# create example data
+x = np.ones(100) # all 1's
+y = np.random.random(100)
+z = np.random.random(100)
+meta = ["plate_1"] * 100
+df = pd.DataFrame(list(zip(x, y, z, meta)))
+df.columns = ["x", "y", "z", "Metadata_plate"]
+df.head()
+```
+
+```
+x    y         z           Metadata_plate
+1.0  0.114824  0.210411    plate_1
+1.0  0.477286  0.110609    plate_1
+1.0  0.685683  0.641711    plate_1
+1.0  0.744898  0.022308    plate_1
+1.0  0.541362  0.988253    plate_1
+```
+
+```python
+stats.find_low_var(df)
+```
+```
+["x"]
+```
+
+### Detecting outliers
+
+We can detect outliers within the data either from unusual feature values, or out-of-focus images using `morar.outliers.get_outlier_index`.
+
+
+The default is to use a hampel outlier test on the feature values, with a sigma of 6. That is any values that are beyond 6 median absolute deviations from the feature median are flagged as either positive or negative outliers.
+```python
+from morar import outliers
+outliers.get_outlier_index(df)
+```
+
+We can change the sigma value to be more or less stringent.
+```python
+# less stringent
+outliers.get_outlier_index(df, sigma=10)
+```
+
+Or, if we have used the ImageQuality module in CellProfiler, we can detect images with poor values that indicate out-of-focus images using FocusScore or PowerLogLogSlope.
+
+```python
+outliers.get_outlier(df, method="ImageQuality")
 ```
