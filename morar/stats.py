@@ -1,3 +1,4 @@
+from morar import utils
 import numpy as np
 import pandas as pd
 
@@ -95,12 +96,12 @@ def hampel(x, sigma=6):
 
 def find_low_var(df, threshold=1e-5):
     """
-    Return column names of columns with zero or very low variance
+    Return column names of feature columns with zero or very low variance
 
     @param df pandas DataFrame
     @oaram threshold low variance threshold
     """
     if not isinstance(df, pd.DataFrame):
         raise ValueError(df, "is not a pandas DataFrame")
-    var = df.var(axis=0)
+    var = df[utils.get_featuredata(df)].var(axis=0)
     return var[var < threshold].index.tolist()
