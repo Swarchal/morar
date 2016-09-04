@@ -41,7 +41,8 @@ def scale_features(data):
     @param df pandas DataFrame
     @return pandas DataFrame
     """
-    return data.apply(z_score)
+    feature_data = data[utils.get_featuredata(data)]
+    return feature_data.apply(z_score)
 
 
 def find_correlation(df, threshold=0.9):
