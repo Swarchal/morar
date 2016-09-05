@@ -214,7 +214,7 @@ def test_fine_low_var_threshold():
 def test_find_low_var_nan():
     # dataset containing NaN values
     x = [np.nan]*10
-    y = range(10)
+    y = list(range(10))
     z = [1]*10
     df_nan = pd.DataFrame(list(zip(x, y, z)))
     df_nan.columns = ["x", "y", "z"]

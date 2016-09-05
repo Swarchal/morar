@@ -69,8 +69,8 @@ def test_get_metadata_different_case():
 
 def test_is_all_nan():
     x = [np.nan]*10
-    y = range(10)
-    z = range(9) + [np.nan]
+    y = list(range(10))
+    z = list(range(9)) + [np.nan]
     df = pd.DataFrame(list(zip(x, y, z)))
     df.columns = ["x", "y", "z"]
     out = utils.is_all_nan(df)
