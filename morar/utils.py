@@ -1,3 +1,5 @@
+import numpy as np
+
 def get_featuredata(df, metadata_prefix="Metadata"):
     """
     identifies columns in a dataframe that are not labelled with the
@@ -22,3 +24,16 @@ def get_metadata(df, metadata_prefix="Metadata"):
     """
     m_cols = [i for i in df.columns if i.startswith(metadata_prefix)]
     return m_cols
+
+
+def is_all_nan(df):
+    """
+    Returns column name if all values in that column are np.nan
+    """
+    is_null = df.isnull().sum()
+    nrows = df.shape[0]
+    out_cols = []
+    for i in is_null.index:
+        if is_null[i] == nrows:
+            out_cols.append(i)
+    return out_cols

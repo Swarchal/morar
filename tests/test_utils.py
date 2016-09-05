@@ -1,5 +1,6 @@
 from morar import utils
 import pandas as pd
+import numpy as np
 
 
 def test_get_featuredata_simple():
@@ -64,3 +65,14 @@ def test_get_metadata_different_case():
     test_df = pd.DataFrame(list(zip(x, y, z, a)), columns=columns)
     cols = utils.get_metadata(test_df, metadata_prefix="metadata")
     assert cols == ["metadata_A"]
+
+
+def test_is_all_nan():
+    x = [np.nan]*10
+    y = range(10)
+    z = range(9) + [np.nan]
+    df = pd.DataFrame(list(zip(x, y, z)))
+    df.columns = ["x", "y", "z"]
+    out = utils.is_all_nan(df)
+    print(out)
+    assert out == ["x"]
