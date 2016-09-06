@@ -6,6 +6,10 @@ python:
     - "3.5-dev" # 3.5 development branch
     - "nightly" # currently points to 3.6-dev
 # command to install dependencies
+virtual env:
+    - system_site_packages: true
+before_install:
+    - sudo apt-get isntall -qq python-scipy
 install:
     - python setup.py install
     - pip install codecov
