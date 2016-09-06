@@ -3,7 +3,8 @@ import pandas as pd
 import numpy as np
 from nose.tools import raises
 
- 
+np.random.seed(0)
+
 # example dataset for get_outlier_index
 x = np.random.random(100).tolist()
 y = np.random.random(100).tolist()
@@ -43,7 +44,7 @@ def test_get_outlier_index_ImageQuality():
     # introduce two bad images with low focus and ppls values
     x = np.append(x, [-3, -5])
     x2 = np.append(x2, [-2, -4])
-    x3 = np.append(x3, [-1, -2])
+    x3 = np.append(x3, [-3, -3])
     df = pd.DataFrame(list(zip(x, x2, x3, x4, x5, x6)))
     df.columns = [
         "ImageQuality_PowerLogLogSlope_ch1",
@@ -52,6 +53,6 @@ def test_get_outlier_index_ImageQuality():
         "ImageQuality_FocusScore_ch2",
         "vals1", "vals2"
     ]
-    out = outliers.get_outlier_index(df, method="ImageQuality")
+    out = outliers.get_outlier_index(df, method="ImageQuality", sigma=6)
     assert len(out) == 2
     assert out == [1000, 1001]
