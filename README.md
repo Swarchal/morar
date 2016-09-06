@@ -5,7 +5,20 @@
 
 Python package for phenotypic screening data.
 
-### normalising plate and batch effects
+Currently works for:
+- 2.6
+- 2.7
+- 3.4
+- 3.5
+- 3.5-dev
+- python-nightly
+
+Requires:
+- numpy
+- pandas
+
+
+## normalising plate and batch effects
 
 Take an example multivariate dataset containing multiple plates/batches.
 
@@ -105,7 +118,7 @@ val1  val2
 1.0   1.00
 ```
 
-#### Robust methods
+### Robust methods
 
 There is also `morar.normalise.robust_normalise`, which for each plate: subtracts the median negative control value from the sample values, divides by the median absolute deviation of the negative controls.
 
@@ -115,7 +128,7 @@ robust_normalise(data, plate_id="Metadata_plate")
 ```
 
 
-#### Z-scoring values
+## Z-scoring values
 
 Z-scoring means each feature has a mean of 0 and standard deviation of 1.
 
@@ -132,7 +145,7 @@ Or, a simplified method, that normalises feature data:
 stats.scale_features(data)
 ```
 
-#### Transforming features
+## Transforming features
 
 We can use the generalised logarithm to coerce features towards a normal distribution.
 
@@ -140,14 +153,14 @@ We can use the generalised logarithm to coerce features towards a normal distrib
 data[get_featuredata(data)].applymap(stats.glog)
 ```
 
-### Removing highly correlated measurements
+## Removing highly correlated measurements
 
 To find which features are redundant with a pairwise correlation > threshold, find correlation returns a list of columns names, keeping one of pairs of highly correlated features.
 ```python
 stats.find_correlation(data, threshold=0.8)
 ```
 
-### Removing columns with low variance
+## Removing columns with low variance
 
 We can remove feature columns that have little or zero variance with `morar.stats.find_low_var`.
 
@@ -185,7 +198,7 @@ We can change the threshold for what defines low variance with the threshold arg
 stats.find_low_var(df, threshold=0.001)
 ```
 
-### Detecting outliers
+## Detecting outliers
 
 We can detect outliers within the data either from unusual feature values, or out-of-focus images using `morar.outliers.get_outlier_index`.
 
