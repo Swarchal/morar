@@ -9,7 +9,7 @@ python:
 virtual env:
     - system_site_packages: true
 before_install:
-    - sudo apt-get isntall -qq python-scipy
+    - sudo apt-get install -qq python-scipy
 install:
     - python setup.py install
     - pip install codecov
