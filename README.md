@@ -125,12 +125,19 @@ from morar import stats
 data[get_featuredata(data)].apply(stats.z_score)
 ```
 
+Or, a simplified method, that normalises feature data:
+
+
+```python
+stats.scale_features(data)
+```
+
 #### Transforming features
 
 We can use the generalised logarithm to coerce features towards a normal distribution.
 
 ```python
-data[get_featuredata(data)].applymap(lambda x: stats.glog(x))
+data[get_featuredata(data)].applymap(stats.glog)
 ```
 
 ### Removing highly correlated measurements
@@ -170,6 +177,12 @@ stats.find_low_var(df)
 ```
 ```
 ["x"]
+```
+
+We can change the threshold for what defines low variance with the threshold argument. The default is variance less than 1e-5.
+
+```python
+stats.find_low_var(df, threshold=0.001)
 ```
 
 ### Detecting outliers

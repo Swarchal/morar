@@ -48,7 +48,6 @@ def normalise(df, plate_id, compound="Metadata_compound",
     grouped = df.groupby(plate_id, as_index=False)
     # calculate the average negative control values for each plate
     for _, group in grouped:
-        # TODO keep metadata columns
         dmso_med = group[group[compound] == neg_compound][f_cols].median()
         assert len(dmso_med) == group[f_cols].shape[1]
         if method == "subtract":
