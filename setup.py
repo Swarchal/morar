@@ -10,7 +10,7 @@ setup(name='morar',
       packages=['morar'],
       test_suite='nose.collector',
       tests_require=['nose'],
-      install_requires=['pandas (>=0.16)', 'numpy (>=1.0)',
-                        'scikit-learn (>=0.16)'],
+      install_requires=['pandas>=0.16',
+                        'numpy>=1.0',
+                        'scikit-learn>=0.16'],
       zip_safe=False)
-
