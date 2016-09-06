@@ -1,6 +1,7 @@
 from morar import utils
 import numpy as np
 import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
 
 def find_correlation(df, threshold=0.9):
     """
@@ -42,32 +43,40 @@ def find_low_var(df, threshold=1e-5):
     return columns
 
 
-# TODO
-def mrmr(df):
+def rf_controls_importances(df, neg_cmpd, pos_cmpd,
+                            compound_col="Metadata_compound"):
     """
-    Maximum relevancy, minimum redundancy feature selection method (MRMR)
-
-    @param df pandas DataFrame
-    @returns column names
-    """
-    raise NotImplementedError("not made this yet")
-
-
-# TODO
-def controls(df, neg_cmpd, pos_cmpd, compound_col="Metadata_compound",
-             n_features=None):
-    """
-    Select features best used to separate the positive and negative controls
-    in a dataset.
+    Return features importances, based on separating the positive and negative
+    controls in a random forest classifier.
 
     @param pandas DataFrame
     @param neg_cmpd string, name of negative control in compound_col
     @param pos_cmpd string, name of positive control in compound_col
     @param compound_col string, name of column in df that contains compound
                         labels
-    @param n_features int, if used with select the n most discriminating
-                      features
-    @returns column names
+    @returns feature importances
     """
-    raise NotImplementedError("not made this yet")
-
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError(df, "is not a pandas DataFrame")
+    if compound_col not in df.columns:
+        raise ValueError(compound_col, "is not a column in", df)
+    if neg_cmpd not in df[compound_col].tolist():
+        raise ValueError(neg_cmpd, "is not in column", compound_col)
+    if pos_cmpd not in df[compound_col].tolist():
+        raise ValueError(pos_cmpd, "is not in column", compound_col)
+    #split data into just positive and negative controls
+    controls = [neg_cmpd, pos_cmpd]
+    df_cntrl = df[df[compound_col].isin(controls)]
+    # convert compound labels to integers. pos_cmpd=1, neg_cmpd=0
+    cntrl_int = pd.Categorical(df_cntrl[compound_col]).codes.tolist()
+    df_cntrl[compound_col] = cntrl_int
+    # select just feature data
+    X = df_cntrl[utils.get_featuredata(df_cntrl)]
+    Y = df_cntrl[compound_col].tolist()
+    # create classifier
+    clf = RandomForestClassifier(n_jobs=-1)
+    clf.fit(X, Y)
+    # extract feature importance from model
+    importances = clf.feature_importances_
+    col_names = X.columns.tolist()
+    return zip(col_names, importances)
