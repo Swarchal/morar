@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 def get_featuredata(df, metadata_prefix="Metadata"):
     """
@@ -37,3 +38,20 @@ def is_all_nan(df):
         if is_null[i] == nrows:
             out_cols.append(i)
     return out_cols
+
+
+def get_image_quality(df):
+    """
+    Returns list of column names from the CelLProfiler ImageQuality module
+    that are present in df.
+
+    @param df pandas DataFrame
+    """
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError(df, "is not a pandas DataFrame")
+    colnames = df.columns.tolist()
+    im_qc_cols = [col for col in colnames if "ImageQuality" in col]
+    if len(im_qc_cols) == 0:
+        raise ValueError("no ImageQuality measurements found")
+    else:
+        return im_qc_cols
