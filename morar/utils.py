@@ -30,6 +30,8 @@ def get_metadata(df, metadata_prefix="Metadata"):
 def is_all_nan(df):
     """
     Returns column name if all values in that column are np.nan
+
+    @param df pandas DataFrame
     """
     is_null = df.isnull().sum()
     nrows = df.shape[0]
