@@ -12,7 +12,7 @@ before_install:
     - sudo apt-get install gfortran libblas-dev liblapack-dev
     - sudo apt-get install -qq python-scipy
 install:
-    - pip install scipy --user
+    - pip install scipy
     - python setup.py install
     - pip install codecov
 # command to run tests
