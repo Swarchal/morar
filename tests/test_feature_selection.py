@@ -101,7 +101,7 @@ def test_feature_importance_errors_incorrect_compound_col():
     df = pd.DataFrame(list(zip(x, y, z)))
     df.columns = ["x", "y", "Metadata_compound"]
     feature_selection.feature_importance(df, "pos", "neg",
-                                              compound_col="incorrect")
+                                         compound_col="incorrect")
 
 @raises(ValueError)
 def test_feature_importance_errors_wrong_control_names():
@@ -121,7 +121,7 @@ def test_feature_importance_errors_wrong_control_names2():
     df = pd.DataFrame(list(zip(x, y, z)))
     df.columns = ["x", "y", "Metadata_compound"]
     feature_selection.feature_importance(df, "incorrect", "neg",
-                                              compound_col="Metadata_compound")
+                                         compound_col="Metadata_compound")
 
 
 @raises(ValueError)
@@ -132,7 +132,7 @@ def test_feature_importance_errors_non_dataframe():
     df = pd.DataFrame(list(zip(x, y, z)))
     df.columns = ["x", "y", "Metadata_compound"]
     feature_selection.feature_importance(x, "pos", "neg",
-                                              compound_col="incorrect")
+                                         compound_col="incorrect")
 
 
 def test_feature_importance_returns_all_feature_columns():
@@ -143,7 +143,8 @@ def test_feature_importance_returns_all_feature_columns():
     x.columns = ["x"+str(i)for i in range(1,11)]
     x["Metadata_compound"] = ["pos", "neg"]*50
     print(x.head())
-    out = feature_selection.feature_importance(df=x,
+    out = feature_selection.feature_importance(
+        df=x,
         neg_cmpd="neg",
         pos_cmpd="pos",
         compound_col="Metadata_compound")

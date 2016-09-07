@@ -66,7 +66,7 @@ def feature_importance(df, neg_cmpd, pos_cmpd,
         raise ValueError(pos_cmpd, "is not in column", compound_col)
     #split data into just positive and negative controls
     controls = [neg_cmpd, pos_cmpd]
-    df_cntrl = df[df[compound_col].isin(controls)]
+    df_cntrl = df[df[compound_col].isin(controls)].copy()
     # convert compound labels to integers. pos_cmpd=1, neg_cmpd=0
     cntrl_int = pd.Categorical(df_cntrl[compound_col]).codes.tolist()
     df_cntrl[compound_col] = cntrl_int
