@@ -1,4 +1,5 @@
 from morar import feature_selection
+from morar import utils
 from nose.tools import raises
 import numpy as np
 import pandas as pd
@@ -165,3 +166,20 @@ def test_feature_importance_sort():
     f_names, importances = list(zip(*out))
     sorted_importances = sorted(list(importances), reverse=True)
     assert sorted_importances == list(importances)
+
+
+def test_feature_importance_returns_colnames():
+    x, y = make_classification(n_samples=100,
+                               n_features=10,
+                               n_informative=2)
+    x = pd.DataFrame(x)
+    x.columns = ["x"+str(i)for i in range(1,11)]
+    x["Metadata_compound"] = ["pos", "neg"]*50
+    out = feature_selection.feature_importance(
+        df=x,
+        neg_cmpd="neg",
+        pos_cmpd="pos",
+        compound_col="Metadata_compound")
+    f_names, importances = list(zip(*out))
+    feature_col_names = utils.get_featuredata(x)
+    assert list(f_names) == list(feature_col_names)
