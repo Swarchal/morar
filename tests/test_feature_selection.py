@@ -125,7 +125,7 @@ def test_rf_control_importances_errors_wrong_control_names2():
 
 
 @raises(ValueError)
-def trst_rf_control_importances_errors_non_dataframe():
+def test_rf_control_importances_errors_non_dataframe():
     x = np.random.random(100)
     y = np.random.random(100)
     z = ["pos", "neg"]*50
