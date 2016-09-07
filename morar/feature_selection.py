@@ -2,15 +2,27 @@ from morar import utils
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import LinearSVC
+from sklearn.feature_selection import SelectFromModel
 
 def find_correlation(df, threshold=0.9):
     """
     Given a numeric pd.DataFrame, this will find highly correlated features,
-    and return a list of features to remove
-    @param df pandas DataFrame
-    @param threshold correlation threshold, will remove one of pairs of features
-        with a correlation greater than this value
-    @return list of column names to be removed
+    and return a list of features to remove.
+
+    Parameters
+    -----------
+    df : pandas DataFrame
+        DataFrame
+
+    threshold : float
+        correlation threshold, will remove one of pairs of features with a
+        correlation greater than this value
+
+    Returns
+    --------
+    select_flat : list
+        listof column names to be removed
     """
     corrMatrix = df.corr()
     corrMatrix.loc[:,:] =  np.tril(corrMatrix, k=-1)
@@ -31,8 +43,17 @@ def find_low_var(df, threshold=1e-5):
     """
     Return column names of feature columns with zero or very low variance
 
-    @param df pandas DataFrame
-    @oaram threshold low variance threshold
+    Parameters
+    ------------
+    df : pandas DataFrame
+        DataFrame
+    threshold : float
+        low variance threshold
+
+    Returns
+    -------
+    columns : list
+        list of columns to remove
     """
     if not isinstance(df, pd.DataFrame):
         raise ValueError("not a pandas DataFrame")
@@ -49,14 +70,104 @@ def feature_importance(df, neg_cmpd, pos_cmpd,
     Return features importances, based on separating the positive and negative
     controls in a random forest classifier.
 
-    @param pandas DataFrame
-    @param neg_cmpd string, name of negative control in compound_col
-    @param pos_cmpd string, name of positive control in compound_col
-    @param compound_col string, name of column in df that contains compound
-                        labels
-    @param sort boolean, if True will sort the list of features on importance,
-                         otherwise will return them in the original order
-    @returns feature importances
+    Parameters
+    -----------
+    df: pandas DataFrame
+        DataFrame
+
+    neg_cmpd : string
+        name of negative control in compound_col
+
+    pos_cmpd : string
+        name of positive control in compound_col
+
+    compound_col (default="Metadata_compound") : string
+        name of column in df that contains compound labels
+
+    sort : boolean (default=False)
+        if True will sort the list of features on importance otherwise will
+        return them in the original order
+
+    Returns
+    --------
+    importances : list
+        list of lists, feature name and importances
+    """
+    X, Y = split_classes(df, neg_cmpd, pos_cmpd, compound_col)
+    # create classifier
+    clf = RandomForestClassifier(n_jobs=-1)
+    clf.fit(X, Y)
+    # extract feature importance from model
+    importances = clf.feature_importances_
+    col_names = X.columns.tolist()
+    importances = list(zip(col_names, importances))
+    # convert to list of lists rather than list of tuples
+    importances = [list(elem) for elem in importances]
+    if sort:
+        importances.sort(key=lambda x: x[1], reverse=True)
+    return importances
+
+
+def select_features(df, neg_cmpd, pos_cmpd, compound_col="Metadata_compound",
+                    C=0.01):
+    """
+    Return selected features basd on L1 linear svc.
+
+    Parameters
+    -----------
+    df : pandas DataFrame
+
+    neg_cmpd : string
+        name of negative control in compound_col
+
+    pos_cmpd : string
+        name of positive control in compound_col
+
+    compound_col : string
+        name of column in df that contains compound labels
+
+    C : float (default=0.01)
+        Sparsity, lower the number the fewer features are selected
+
+    Returns
+    -------
+    selected_features : list
+        Selected features
+    """
+    X, Y = split_classes(df, neg_cmpd, pos_cmpd, compound_col)
+    lin_svc = LinearSVC(C=C, penalty="l1", dual=False).fit(X, Y)
+    model = SelectFromModel(lin_svc, prefit=True)
+    feature_mask = np.array(model.get_support())
+    feature_names = np.array(X.columns.tolist())
+    selected_features = list(feature_names[feature_mask])
+    return selected_features
+
+
+
+def split_classes(df, neg_cmpd, pos_cmpd, compound_col):
+    """
+    Internal function used to separate featuredata and compound labels for
+    classification.
+
+    Parameters
+    -----------
+    df : pandas DataFrame
+
+    neg_cmpd : string
+        name of negative control in compound_col
+
+    pos_cmpd : string
+        name of positive control in compound_col
+
+    compound_col : string
+        name of column in df that contains compound labels
+
+    Returns
+    --------
+
+    classes: list
+        [X, Y], where X is the dataframe containing feature columns, and Y
+        is the list of integers matching to postive or negative controls.
     """
     if not isinstance(df, pd.DataFrame):
         raise ValueError("is not a pandas DataFrame")
@@ -75,15 +186,4 @@ def feature_importance(df, neg_cmpd, pos_cmpd,
     # select just feature data
     X = df_cntrl[utils.get_featuredata(df_cntrl)]
     Y = df_cntrl[compound_col].tolist()
-    # create classifier
-    clf = RandomForestClassifier(n_jobs=-1)
-    clf.fit(X, Y)
-    # extract feature importance from model
-    importances = clf.feature_importances_
-    col_names = X.columns.tolist()
-    importances = list(zip(col_names, importances))
-    # convert to list of lists rather than list of tuples
-    importances = [list(elem) for elem in importances]
-    if sort:
-        importances.sort(key=lambda x: x[1], reverse=True)
-    return importances
+    return [X, Y]

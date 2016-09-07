@@ -183,3 +183,19 @@ def test_feature_importance_returns_colnames():
     f_names, importances = list(zip(*out))
     feature_col_names = utils.get_featuredata(x)
     assert list(f_names) == list(feature_col_names)
+
+
+def test_select_features():
+    x, y = make_classification(n_samples=100,
+                               n_features=10,
+                               n_informative=2)
+    x = pd.DataFrame(x)
+    x.columns = ["x"+str(i)for i in range(1,11)]
+    x["Metadata_compound"] = ["pos", "neg"]*50
+    out = feature_selection.select_features(
+        df=x,
+        neg_cmpd="neg",
+        pos_cmpd="pos",
+        compound_col="Metadata_compound")
+    assert isinstance(out, list)
+    assert len(out) < len(x.columns.tolist())
