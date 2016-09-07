@@ -13,5 +13,5 @@ setup(name='morar',
       install_requires=['pandas>=0.16',
                         'numpy>=1.0',
                         "scipy>=0.9",
-                        'scikit-learn>=0.16],
+                        'scikit-learn>=0.16'],
       zip_safe=False)
