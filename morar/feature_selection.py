@@ -93,7 +93,7 @@ def feature_importance(df, neg_cmpd, pos_cmpd,
     importances : list
         list of lists, feature name and importances
     """
-    X, Y = split_classes(df, neg_cmpd, pos_cmpd, compound_col)
+    X, Y = _split_classes(df, neg_cmpd, pos_cmpd, compound_col)
     # create classifier
     clf = RandomForestClassifier(n_jobs=-1)
     clf.fit(X, Y)
@@ -134,7 +134,7 @@ def select_features(df, neg_cmpd, pos_cmpd, compound_col="Metadata_compound",
     selected_features : list
         Selected features
     """
-    X, Y = split_classes(df, neg_cmpd, pos_cmpd, compound_col)
+    X, Y = _split_classes(df, neg_cmpd, pos_cmpd, compound_col)
     lin_svc = LinearSVC(C=C, penalty="l1", dual=False).fit(X, Y)
     model = SelectFromModel(lin_svc, prefit=True)
     feature_mask = np.array(model.get_support())
@@ -144,7 +144,7 @@ def select_features(df, neg_cmpd, pos_cmpd, compound_col="Metadata_compound",
 
 
 
-def split_classes(df, neg_cmpd, pos_cmpd, compound_col):
+def _split_classes(df, neg_cmpd, pos_cmpd, compound_col):
     """
     Internal function used to separate featuredata and compound labels for
     classification.
