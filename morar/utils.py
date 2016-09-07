@@ -50,7 +50,7 @@ def get_image_quality(df):
     @param df pandas DataFrame
     """
     if not isinstance(df, pd.DataFrame):
-        raise ValueError(df, "is not a pandas DataFrame")
+        raise ValueError("not a pandas DataFrame")
     colnames = df.columns.tolist()
     im_qc_cols = [col for col in colnames if "ImageQuality" in col]
     if len(im_qc_cols) == 0:

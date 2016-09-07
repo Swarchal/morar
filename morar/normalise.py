@@ -18,7 +18,7 @@ def check_control(df, plate_id, compound="Metadata_compound",
     for name, group in df.groupby(plate_id):
         group_cmps = list(set(group[compound]))
         if neg_compound not in group_cmps:
-            raise ValueError(name, "does not contain any negative control values")
+            raise ValueError("{} does not contain any negative control values".format(name))
 
 
 def normalise(df, plate_id, compound="Metadata_compound",

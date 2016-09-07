@@ -35,7 +35,7 @@ def find_low_var(df, threshold=1e-5):
     @oaram threshold low variance threshold
     """
     if not isinstance(df, pd.DataFrame):
-        raise ValueError(df, "is not a pandas DataFrame")
+        raise ValueError("not a pandas DataFrame")
     var = df[utils.get_featuredata(df)].var(axis=0)
     below_thresh = var[var < threshold].index.tolist()
     is_nan = utils.is_all_nan(df)
@@ -59,13 +59,13 @@ def feature_importance(df, neg_cmpd, pos_cmpd,
     @returns feature importances
     """
     if not isinstance(df, pd.DataFrame):
-        raise ValueError(df, "is not a pandas DataFrame")
+        raise ValueError("is not a pandas DataFrame")
     if compound_col not in df.columns:
-        raise ValueError(compound_col, "is not a column in", df)
+        raise ValueError("{} is not a column in df".format(compound_col))
     if neg_cmpd not in df[compound_col].tolist():
-        raise ValueError(neg_cmpd, "is not in column", compound_col)
+        raise ValueError("{} is not in column {}".format(neg_cmpd, compound_col))
     if pos_cmpd not in df[compound_col].tolist():
-        raise ValueError(pos_cmpd, "is not in column", compound_col)
+        raise ValueError("{} is not in column {}".format(pos_cmpd, compound_col))
     #split data into just positive and negative controls
     controls = [neg_cmpd, pos_cmpd]
     df_cntrl = df[df[compound_col].isin(controls)].copy()

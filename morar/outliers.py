@@ -18,7 +18,7 @@ def get_outlier_index(df, method="values", sigma=6):
              to detect rows with low values for FocusScore or PowerLogLogSlope.
     """
     if not isinstance(df, pd.DataFrame):
-        raise ValueError(df, "is not a pandas DataFrame")
+        raise ValueError("not a pandas DataFrame")
     accepted_methods = ["values", "ImageQuality"]
     if method not in accepted_methods:
         raise ValueError("invalid argument. Options: simple, ImageQuality")
