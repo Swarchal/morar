@@ -44,7 +44,7 @@ def find_low_var(df, threshold=1e-5):
 
 
 def feature_importance(df, neg_cmpd, pos_cmpd,
-                            compound_col="Metadata_compound"):
+                            compound_col="Metadata_compound", sort=False):
     """
     Return features importances, based on separating the positive and negative
     controls in a random forest classifier.
@@ -54,6 +54,8 @@ def feature_importance(df, neg_cmpd, pos_cmpd,
     @param pos_cmpd string, name of positive control in compound_col
     @param compound_col string, name of column in df that contains compound
                         labels
+    @param sort boolean, if True will sort the list of features on importance,
+                         otherwise will return them in the original order
     @returns feature importances
     """
     if not isinstance(df, pd.DataFrame):
@@ -79,4 +81,7 @@ def feature_importance(df, neg_cmpd, pos_cmpd,
     # extract feature importance from model
     importances = clf.feature_importances_
     col_names = X.columns.tolist()
-    return zip(col_names, importances)
+    importances = zip(col_names, importances)
+    if sort:
+        importances.sort(key=lambda x: x[1], reverse=True)
+    return importances

@@ -43,7 +43,6 @@ def test_find_low_var_nan():
     df_nan = pd.DataFrame(list(zip(x, y, z)))
     df_nan.columns = ["x", "y", "z"]
     out = feature_selection.find_low_var(df_nan)
-    print(out)
     assert (out == ["x", "z"]) or (out == ["z", "x"])
 
 
@@ -142,10 +141,27 @@ def test_feature_importance_returns_all_feature_columns():
     x = pd.DataFrame(x)
     x.columns = ["x"+str(i)for i in range(1,11)]
     x["Metadata_compound"] = ["pos", "neg"]*50
-    print(x.head())
     out = feature_selection.feature_importance(
         df=x,
         neg_cmpd="neg",
         pos_cmpd="pos",
         compound_col="Metadata_compound")
     assert len(list(out)) == 10
+
+
+def test_feature_importance_sort():
+    x, y = make_classification(n_samples=100,
+                               n_features=10,
+                               n_informative=2)
+    x = pd.DataFrame(x)
+    x.columns = ["x"+str(i)for i in range(1,11)]
+    x["Metadata_compound"] = ["pos", "neg"]*50
+    out = feature_selection.feature_importance(
+        df=x,
+        neg_cmpd="neg",
+        pos_cmpd="pos",
+        compound_col="Metadata_compound",
+        sort=True)
+    f_names, importances = list(zip(*out))
+    sorted_importances = sorted(list(importances), reverse=True)
+    assert sorted_importances == list(importances)
