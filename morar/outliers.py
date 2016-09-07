@@ -7,15 +7,24 @@ def get_outlier_index(df, method="values", sigma=6):
     """
     Returns index of outlying row(s)
 
-    @param df pandas dataframe
-    @param method either 'simple' which is based on hampels robust outlier
-                  test on feature values, or 'ImageQualty' which uses the
-                  ImageQualty metrics - FocusScore and PowerLogLogSlope.
-    @param sigma number of median absolute deviations away from the sample
-                 median to define an outlier.
-    @details when method="values", both positive and negative outliers are used.
-             Whereas when method="ImageQuality", only negative values are used
-             to detect rows with low values for FocusScore or PowerLogLogSlope.
+    Parameters
+    ----------
+    df : pandas dataframe
+        DataFrame
+
+    method : string (default="values")
+        either 'simple' which is based on hampels robust outlier
+        test on feature values, or 'ImageQualty' which uses the
+        ImageQualty metrics - FocusScore and PowerLogLogSlope.
+
+    sigma : int (default=6)
+        number of median absolute deviations away from the sample median to
+        define an outlier.
+
+    Returns
+    -------
+    bad_index : list
+        list of row index/indices to remove
     """
     if not isinstance(df, pd.DataFrame):
         raise ValueError("not a pandas DataFrame")
@@ -40,4 +49,5 @@ def get_outlier_index(df, method="values", sigma=6):
         hampel_plls = df[plls_cols].apply(stats.hampel, sigma=sigma)
         plls_sum = hampel_focus.apply(lambda x: sum(x), axis=1)
         plls_bad = plls_sum[plls_sum < 0].index.tolist()
-        return list(set(focus_bad + plls_bad))
+        bad_index = list(set(focus_bad + plls_bad))
+        return bad_index

@@ -4,16 +4,25 @@ import pandas as pd
 import numpy as np
 
 
-def check_control(df, plate_id, compound="Metadata_compound",
+def _check_control(df, plate_id, compound="Metadata_compound",
                   neg_compound="DMSO"):
     """
     check each plate contains at least 1 negative control value. Raise an error
     if this is not the case.
 
-    @param df dataframe
-    @param plate_id string for column containing plate ID/label
-    @param compound string for column containing compound name/ID
-    @param neg_compound string name of negative control compound in compound col
+    Parameters
+    ----------
+    df : pandas DataFrame
+        DataFrame
+
+    plate_id : string
+        column containing plate ID/label
+
+    compound : string (default="Metadata_compound")
+        column containing compound name/ID
+
+    neg_compound : string (default="DMSO")
+        name of negative control compound in compound col
     """
     for name, group in df.groupby(plate_id):
         group_cmps = list(set(group[compound]))
@@ -27,19 +36,36 @@ def normalise(df, plate_id, compound="Metadata_compound",
     """
     Normalise values against negative controls values per plate.
 
-    @param df dataframe
-    @param plate_id string for column containing plate ID/label
-    @param compound string for column containing compound name/ID
-    @param neg_compound string name of negative control compound in compound col
-    @param method method to normalise against negative control
-    @param metadata_prefix string, prefix for metadata columns
-    @return pandas DataFrame.
+    Parameters
+    ----------
+    df : pandas DataFrame
+        DataFrame
+
+    plate_id : string
+        column containing plate ID/label
+
+    compound : string (default="Metadata_compound")
+        column containing compound name/ID
+
+    neg_compound : string (default="DMSO")
+        name of negative control compound in compound col
+
+    method :string (default="subtract")
+        method to normalise against negative control
+
+    metadata_prefix : string (default="Metadata")
+        prefix for metadata columns
+
+    Returns
+    --------
+    df_out : pandas DataFrame
+        DataFrame of normalised feature values
     """
     valid_methods = ["subtract", "divide"]
     if method not in valid_methods:
         raise ValueError("Invalid method, options: 'subtract', 'divide'")
     # check there are some negative controls on each plate
-    check_control(df, plate_id, compound, neg_compound)
+    _check_control(df, plate_id, compound, neg_compound)
     # identify feature columns
     f_cols = utils.get_featuredata(df, metadata_prefix)
     # dataframe for output
@@ -68,14 +94,29 @@ def robust_normalise(df, plate_id, compound="Metadata_compound",
     each plate negative control from the treatment feature value and divide by
     the median absolute deviation.
 
-    @param df dataframe
-    @param plate_id string for column containing plate ID/label
-    @param compound string for column containing compound name/ID
-    @param neg_compound string name of negative control compound in compound col
-    @param metadata_prefix string, prefix for metadata columns
-    @return pandas DataFrame.
+    Parameters
+    ----------
+    df : pandas DataFrame
+        DataFrame
+
+    plate_id : string
+        column containing plate ID/label
+
+    compound : string (default="Metadata_compound")
+        column containing compound name/ID
+
+    neg_compound : string (default="DMSO")
+        name of negative control compound in compound col
+
+    metadata_prefix : string (default="Metadata")
+        prefix for metadata columns
+
+    Returns
+    --------
+    df_out : pandas DataFrame
+        DataFrame of normalised feature values
     """
-    check_control(df, plate_id, compound, neg_compound)
+    _check_control(df, plate_id, compound, neg_compound)
     f_cols = utils.get_featuredata(df, metadata_prefix)
     grouped = df.groupby(plate_id, as_index=False)
     df_out = pd.DataFrame()
