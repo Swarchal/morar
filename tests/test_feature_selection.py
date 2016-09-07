@@ -147,4 +147,4 @@ def test_rf_control_importances_returns_all_feature_columns():
         neg_cmpd="neg",
         pos_cmpd="pos",
         compound_col="Metadata_compound")
-    assert len(out) == 10
+    assert len(list(out)) == 10
