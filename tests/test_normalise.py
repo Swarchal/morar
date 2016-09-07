@@ -44,12 +44,6 @@ simple_df = pd.DataFrame(list(zip(x, compound, plate)), columns=colnames)
 
 
 @raises(ValueError)
-def test_check_control():
-    normalise.check_control(missing_control_df, plate_id="Metadata_plate")
-    # assert for ValueError
-
-
-@raises(ValueError)
 def test_check_control_within_function():
     normalise.normalise(missing_control_df, plate_id="Metadata_plate")
     # assert for ValueError
