@@ -94,48 +94,48 @@ def test_find_correlation_large_n():
 
 
 @raises(ValueError)
-def test_rf_controls_importances_errors_incorrect_compound_col():
+def test_feature_importance_errors_incorrect_compound_col():
     x = np.random.random(100)
     y = np.random.random(100)
     z = ["pos", "neg"]*50
     df = pd.DataFrame(list(zip(x, y, z)))
     df.columns = ["x", "y", "Metadata_compound"]
-    feature_selection.rf_controls_importances(df, "pos", "neg",
+    feature_selection.feature_importance(df, "pos", "neg",
                                               compound_col="incorrect")
 
 @raises(ValueError)
-def test_rf_control_importances_errors_wrong_control_names():
+def test_feature_importance_errors_wrong_control_names():
     x = np.random.random(100)
     y = np.random.random(100)
     z = ["pos", "neg"]*50
     df = pd.DataFrame(list(zip(x, y, z)))
     df.columns = ["x", "y", "Metadata_compound"]
-    feature_selection.rf_controls_importances(df, "pos", "incorrect",
-                                              compound_col="Metadata_compound")
+    feature_selection.feature_importance(df, "pos", "incorrect",
+                                         compound_col="Metadata_compound")
 
 @raises(ValueError)
-def test_rf_control_importances_errors_wrong_control_names2():
+def test_feature_importance_errors_wrong_control_names2():
     x = np.random.random(100)
     y = np.random.random(100)
     z = ["pos", "neg"]*50
     df = pd.DataFrame(list(zip(x, y, z)))
     df.columns = ["x", "y", "Metadata_compound"]
-    feature_selection.rf_controls_importances(df, "incorrect", "neg",
+    feature_selection.feature_importance(df, "incorrect", "neg",
                                               compound_col="Metadata_compound")
 
 
 @raises(ValueError)
-def test_rf_control_importances_errors_non_dataframe():
+def test_feature_importance_errors_non_dataframe():
     x = np.random.random(100)
     y = np.random.random(100)
     z = ["pos", "neg"]*50
     df = pd.DataFrame(list(zip(x, y, z)))
     df.columns = ["x", "y", "Metadata_compound"]
-    feature_selection.rf_controls_importances(x, "pos", "neg",
+    feature_selection.feature_importance(x, "pos", "neg",
                                               compound_col="incorrect")
 
 
-def test_rf_control_importances_returns_all_feature_columns():
+def test_feature_importance_returns_all_feature_columns():
     x, y = make_classification(n_samples=100,
                                n_features=10,
                                n_informative=2)
@@ -143,7 +143,7 @@ def test_rf_control_importances_returns_all_feature_columns():
     x.columns = ["x"+str(i)for i in range(1,11)]
     x["Metadata_compound"] = ["pos", "neg"]*50
     print(x.head())
-    out = feature_selection.rf_controls_importances(df=x,
+    out = feature_selection.feature_importance(df=x,
         neg_cmpd="neg",
         pos_cmpd="pos",
         compound_col="Metadata_compound")

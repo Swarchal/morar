@@ -43,7 +43,7 @@ def find_low_var(df, threshold=1e-5):
     return columns
 
 
-def rf_controls_importances(df, neg_cmpd, pos_cmpd,
+def feature_importance(df, neg_cmpd, pos_cmpd,
                             compound_col="Metadata_compound"):
     """
     Return features importances, based on separating the positive and negative
