@@ -81,7 +81,9 @@ def feature_importance(df, neg_cmpd, pos_cmpd,
     # extract feature importance from model
     importances = clf.feature_importances_
     col_names = X.columns.tolist()
-    importances = zip(col_names, importances)
+    importances = list(zip(col_names, importances))
+    # convert to list of lists rather than list of tuples
+    importances = [list(elem) for elem in importances]
     if sort:
         importances.sort(key=lambda x: x[1], reverse=True)
     return importances
