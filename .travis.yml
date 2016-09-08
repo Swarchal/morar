@@ -10,9 +10,10 @@ virtual env:
     - system_site_packages: true
 before_install:
     - sudo apt-get install gfortran libblas-dev liblapack-dev
-    - sudo apt-get install -qq python-scipy
 install:
+    - sudo apt-get update
     - pip install scipy
+    - pip install pandas
     - python setup.py install
     - pip install codecov
 # command to run tests
