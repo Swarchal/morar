@@ -1,3 +1,4 @@
+from morar import aggregate
 from morar import stats
 from morar import normalise
 from morar import outliers
