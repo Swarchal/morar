@@ -76,3 +76,24 @@ def test_aggregate_on_multiple_columns():
     assert out.shape[1] == df.shape[1]
     assert out.columns.tolist() == df.columns.tolist()
 
+
+def test_aggregate_methods():
+    x = [1,2,10, 1,5,10]
+    y = [1,2,1,  2,5,1 ]
+    names = ["a", "a", "a", "b", "b", "b"]
+    df = pd.DataFrame(list(zip(x, y, names)))
+    df.columns = ["x", "y", "group"]
+    out_median = aggregate.aggregate(df, on="group", method="median")
+    out_mean = aggregate.aggregate(df, on="group", method="mean")
+    assert out_median.columns.tolist() == out_mean.columns.tolist()
+    assert out_median.shape == out_mean.shape
+    assert out_median["x"].values.tolist() == [2, 5]
+    assert out_median["y"].values.tolist() == [1, 2]
+    # floating point numbers, so will have to assert for small differences
+    mean_x = out_mean["x"].values.tolist()
+    mean_y = out_mean["y"].values.tolist()
+    assert abs(mean_x[0] - 4.333333) < 1e-5
+    assert abs(mean_x[1] - 5.333333) < 1e-5
+    assert abs(mean_y[0] - 1.333333) < 1e-5
+    assert abs(mean_y[1] - 2.666666) < 1e-5
+
