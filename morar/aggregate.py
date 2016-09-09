@@ -25,8 +25,6 @@ def aggregate(df, on, method="median"):
     _check_inputs(df, on, method)
     # keep track of original column order
     df_columns = df.columns.tolist()
-    # need to drop metadata from df, though add back in any 'on' columns
-
     grouped = df.groupby(on, as_index=False)
     if method == "mean":
         agg = grouped.aggregate(np.mean)
