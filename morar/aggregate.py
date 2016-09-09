@@ -39,9 +39,9 @@ def aggregate(df, on, method="median"):
     df_metadata.drop_duplicates(subset=on, inplace=True)
     merged_df = pd.merge(agg, df_metadata, on=on, how="outer",
                          suffixes=("remove_me", ""))
-    #assert len(merged_df.columns) == len(df.columns)
-    # re-arrange to columns are in original order
     merged_df = merged_df[df_columns]
+    # re-arrange to columns are in original order
+    assert len(merged_df.columns) == len(df.columns)
     return merged_df
 
 
