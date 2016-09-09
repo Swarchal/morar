@@ -97,3 +97,19 @@ def test_aggregate_methods():
     assert abs(mean_y[0] - 1.333333) < 1e-5
     assert abs(mean_y[1] - 2.666666) < 1e-5
 
+
+def test_aggregate_multiple_metadata():
+    x = np.random.random(1000)
+    y = np.random.random(1000)
+    z = np.random.random(1000)
+    metadata_imagenumber = ["a", "b", "c", "d", "e"]*200
+    metadata_group = ["X", "Y"]*500
+    metadata_other = np.random.random(1000)
+    df = pd.DataFrame(list(zip(x, y, z, metadata_imagenumber, metadata_group, metadata_other)))
+    df.columns = ["x", "y", "z", "Metadata_imagenumber", "Metadata_group", "Metadata_other"]
+    out = aggregate.aggregate(df, on=["Metadata_imagenumber", "Metadata_group"])
+    print(out.columns.tolist())
+    print(df.columns.tolist())
+    assert out.columns.tolist() == df.columns.tolist()
+    assert out.shape[0] == 10
+

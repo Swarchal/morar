@@ -25,6 +25,8 @@ def aggregate(df, on, method="median"):
     _check_inputs(df, on, method)
     # keep track of original column order
     df_columns = df.columns.tolist()
+    # need to drop metadata from df, though add back in any 'on' columns
+
     grouped = df.groupby(on, as_index=False)
     if method == "mean":
         agg = grouped.aggregate(np.mean)
@@ -35,13 +37,16 @@ def aggregate(df, on, method="median"):
     df_metadata[on] = df[on]
     # drop metadata to the same level as aggregated data
     df_metadata.drop_duplicates(subset=on, inplace=True)
-    merged_df = pd.merge(agg, df_metadata, on=on)
+    merged_df = pd.merge(agg, df_metadata, on=on, how="outer",
+                         suffixes=("remove_me", ""))
+    #assert len(merged_df.columns) == len(df.columns)
     # re-arrange to columns are in original order
     merged_df = merged_df[df_columns]
     return merged_df
 
 
 def _check_inputs(df, on, method):
+    """ internal function for aggregate() to check validity of inputs """
     valid_methods = ["median", "mean"]
     if not isinstance(df, pd.DataFrame):
         raise ValueError("not a a pandas DataFrame")
