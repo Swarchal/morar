@@ -61,6 +61,7 @@ def test_aggregate_on_string():
     assert out.shape[0] == 5
     assert out.shape[1] == df.shape[1]
     assert out.columns.tolist() == df.columns.tolist()
+    assert out.isnull().sum().sum() == 0
 
 
 def test_aggregate_on_multiple_columns():
@@ -75,6 +76,7 @@ def test_aggregate_on_multiple_columns():
     assert out.shape[0] == 10
     assert out.shape[1] == df.shape[1]
     assert out.columns.tolist() == df.columns.tolist()
+    assert out.isnull().sum().sum() == 0
 
 
 def test_aggregate_methods():
@@ -96,6 +98,9 @@ def test_aggregate_methods():
     assert abs(mean_x[1] - 5.333333) < 1e-5
     assert abs(mean_y[0] - 1.333333) < 1e-5
     assert abs(mean_y[1] - 2.666666) < 1e-5
+    assert out_mean.isnull().sum().sum() == 0
+    assert out_median.isnull().sum().sum() == 0
+
 
 
 def test_aggregate_multiple_metadata():
@@ -108,8 +113,28 @@ def test_aggregate_multiple_metadata():
     df = pd.DataFrame(list(zip(x, y, z, metadata_imagenumber, metadata_group, metadata_other)))
     df.columns = ["x", "y", "z", "Metadata_imagenumber", "Metadata_group", "Metadata_other"]
     out = aggregate.aggregate(df, on=["Metadata_imagenumber", "Metadata_group"])
-    print(out.columns.tolist())
-    print(df.columns.tolist())
     assert out.columns.tolist() == df.columns.tolist()
     assert out.shape[0] == 10
+    assert out.isnull().sum().sum() == 0
 
+
+def test_aggregate_multiple_metadata_non_numeric():
+    x = np.random.random(1000)
+    y = np.random.random(1000)
+    z = np.random.random(1000)
+    metadata_imagenumber = ["a", "b", "c", "d", "e"]*200
+    metadata_group = ["X", "Y"]*500
+    metadata_other = np.random.random(1000)
+    metadata_other_text = ["foo", "bar"]*500
+    df = pd.DataFrame(list(zip(x, y, z, metadata_imagenumber, metadata_group,
+                               metadata_other, metadata_other_text)))
+    df.columns = ["x", "y", "z", "Metadata_imagenumber", "Metadata_group",
+                  "Metadata_other", "Metadata_other_text"]
+    out = aggregate.aggregate(df, on=["Metadata_imagenumber"])
+    assert out.columns.tolist() == df.columns.tolist()
+    assert out.shape[0] == 5
+    assert out["x"].dtype == x.dtype
+    assert out["y"].dtype == y.dtype
+    assert out["z"].dtype == z.dtype
+    assert out["Metadata_group"].dtype == "O"
+    assert out.isnull().sum().sum() == 0
