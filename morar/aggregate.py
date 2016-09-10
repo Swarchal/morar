@@ -2,7 +2,7 @@ from morar import utils
 import numpy as np
 import pandas as pd
 
-def aggregate(df, on, method="median"):
+def aggregate(df, on, method="median", **kwargs):
     """
     Aggregate dataset
 
@@ -17,6 +17,8 @@ def aggregate(df, on, method="median"):
     method : string (default="median")
         method to average each group. options = "median" or "mean"
 
+    **kwargs : additional args to utils.get_metadata / utils.get_featuredata
+
     Returns
     -------
     agg_df : pandas DataFrame
@@ -24,20 +26,22 @@ def aggregate(df, on, method="median"):
     """
     _check_inputs(df, on, method)
     # keep track of original column order
-    df_columns = df.columns.tolist()
+    df_cols = df.columns.tolist()
     grouped = df.groupby(on, as_index=False)
     if method == "mean":
         agg = grouped.aggregate(np.mean)
     if method == "median":
         agg = grouped.aggregate(np.median)
-    df_metadata = df[utils.get_metadata(df)].copy()
+    df_metadata = df[utils.get_metadata(df, **kwargs)].copy()
     # add indexing column to metadata if not already present
     df_metadata[on] = df[on]
     # drop metadata to the same level as aggregated data
     df_metadata.drop_duplicates(subset=on, inplace=True)
+    # merge aggregated and feature data
     merged_df = pd.merge(agg, df_metadata, on=on, how="outer",
                          suffixes=("remove_me", ""))
-    merged_df = merged_df[df_columns]
+    # merge untracked columns with merged data
+    merged_df = merged_df[df_cols]
     # re-arrange to columns are in original order
     assert len(merged_df.columns) == len(df.columns)
     return merged_df

@@ -155,14 +155,13 @@ def test_aggregate_handles_non_standard_metadata_tags():
     df.columns = ["x", "y", "z", "Img_Metadata_imagenumber",
                   "Img_Metadata_group", "Img_Metadata_other",
                   "Img_Metadata_other_text"]
-    out = aggregate.aggregate(df, on=["Img_Metadata_imagenumber"])
+    out = aggregate.aggregate(df, on="Img_Metadata_imagenumber", prefix=False)
     assert out.columns.tolist() == df.columns.tolist()
     assert out.shape[0] == 5
 
 
-# use test dataset
 def test_aggregate_real_dataset():
     df = pd.read_csv(my_data_path)
-    out = aggregate.aggregate(out, on="Image_ImageNumber")
+    out = aggregate.aggregate(df, on="Image_ImageNumber", prefix=False)
     n_imagesets = len(set(df.Image_ImageNumber))
     assert out.shape[0] == n_imagesets
