@@ -31,8 +31,7 @@ def _check_control(df, plate_id, compound="Metadata_compound",
 
 
 def normalise(df, plate_id, compound="Metadata_compound",
-              neg_compound="DMSO", method="subtract",
-              metadata_prefix="Metadata"):
+              neg_compound="DMSO", method="subtract", **kwargs):
     """
     Normalise values against negative controls values per plate.
 
@@ -53,8 +52,7 @@ def normalise(df, plate_id, compound="Metadata_compound",
     method :string (default="subtract")
         method to normalise against negative control
 
-    metadata_prefix : string (default="Metadata")
-        prefix for metadata columns
+    **kwargs : additional arguments to utils.get_featuredata/metadata
 
     Returns
     --------
@@ -67,7 +65,7 @@ def normalise(df, plate_id, compound="Metadata_compound",
     # check there are some negative controls on each plate
     _check_control(df, plate_id, compound, neg_compound)
     # identify feature columns
-    f_cols = utils.get_featuredata(df, metadata_prefix)
+    f_cols = utils.get_featuredata(df, **kwargs)
     # dataframe for output
     df_out = pd.DataFrame()
     # group by plate
@@ -88,7 +86,7 @@ def normalise(df, plate_id, compound="Metadata_compound",
 
 
 def robust_normalise(df, plate_id, compound="Metadata_compound",
-                     neg_compound="DMSO", metadata_prefix="Metadata"):
+                     neg_compound="DMSO", **kwargs):
     """
     Method used in the Carpenter lab. Substract the median feature value for
     each plate negative control from the treatment feature value and divide by
@@ -108,8 +106,7 @@ def robust_normalise(df, plate_id, compound="Metadata_compound",
     neg_compound : string (default="DMSO")
         name of negative control compound in compound col
 
-    metadata_prefix : string (default="Metadata")
-        prefix for metadata columns
+    **kwargs : additional arguments to utils.get_featuredata/metadata
 
     Returns
     --------
@@ -117,7 +114,7 @@ def robust_normalise(df, plate_id, compound="Metadata_compound",
         DataFrame of normalised feature values
     """
     _check_control(df, plate_id, compound, neg_compound)
-    f_cols = utils.get_featuredata(df, metadata_prefix)
+    f_cols = utils.get_featuredata(df, **kwargs)
     grouped = df.groupby(plate_id, as_index=False)
     df_out = pd.DataFrame()
     # calculate the average negative control values per plate_id
