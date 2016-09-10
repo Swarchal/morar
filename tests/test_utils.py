@@ -20,9 +20,20 @@ def test_get_featuredata_middle_prefix():
     a = [4,3,5,1]
     columns = ["colA", "colB", "something_Metadata", "Metadata_A"]
     test_df = pd.DataFrame(list(zip(x, y, z, a)), columns=columns)
-    cols = utils.get_featuredata(test_df)
+    cols = utils.get_featuredata(test_df, prefix=True)
     assert cols == ["colA", "colB", "something_Metadata"]
 
+
+def test_get_feature_data_prefix_options():
+    x = [1,2,3,4]
+    y = [4,3,2,1]
+    z = [1,2,3,4]
+    a = [4,3,5,1]
+    columns = ["colA", "colB", "something_Metadata", "Metadata_A"]
+    test_df = pd.DataFrame(list(zip(x, y, z, a)), columns=columns)
+    out = utils.get_featuredata(test_df, prefix=False)
+    ans = ["colA", "colB"]
+    assert out == ans
 
 def test_get_featuredata_different_case():
     x = [1,2,3,4]
@@ -31,7 +42,7 @@ def test_get_featuredata_different_case():
     a = [4,3,5,1]
     columns = ["colA", "colB", "metadata_A", "Metadata_A"]
     test_df = pd.DataFrame(list(zip(x, y, z, a)), columns=columns)
-    cols = utils.get_featuredata(test_df, metadata_prefix="metadata")
+    cols = utils.get_featuredata(test_df, metadata_string="metadata")
     assert cols == ["colA", "colB", "Metadata_A"]
 
 
@@ -63,7 +74,7 @@ def test_get_metadata_different_case():
     a = [4,3,5,1]
     columns = ["colA", "colB", "metadata_A", "Metadata_A"]
     test_df = pd.DataFrame(list(zip(x, y, z, a)), columns=columns)
-    cols = utils.get_metadata(test_df, metadata_prefix="metadata")
+    cols = utils.get_metadata(test_df, metadata_string="metadata")
     assert cols == ["metadata_A"]
 
 

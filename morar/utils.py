@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-def get_featuredata(df, metadata_prefix="Metadata"):
+def get_featuredata(df, metadata_string="Metadata", prefix=True):
     """
     identifies columns in a dataframe that are not labelled with the
     metadata prefix. Its assumed everything not labelled metadata is
@@ -13,19 +13,27 @@ def get_featuredata(df, metadata_prefix="Metadata"):
     df : pandas DataFrame
         DataFrame
 
-    metadata_prefix : string (default="Metadata")
-        prefix for metadata columns
+    metadata_string : string (default="Metadata")
+        string that denotes a column is a metadata column
+
+    prefix: boolean (default=True)
+        if True, then only columns that are prefixed with metadata_string are
+        selected as metadata. If False, then any columns that contain the
+        metadata_string are selected as metadata columns
 
     Returns
     -------
     f_cols : list
         List of feature column labels
     """
-    f_cols = [i for i in df.columns if not i.startswith(metadata_prefix)]
+    if prefix:
+        f_cols = [i for i in df.columns if not i.startswith(metadata_string)]
+    elif prefix == False:
+        f_cols = [i for i in df.columns if not metadata_string in i]
     return f_cols
 
 
-def get_metadata(df, metadata_prefix="Metadata"):
+def get_metadata(df, metadata_string="Metadata", prefix=True):
     """
     identifies column in a dataframe that are labelled with the metadata_prefix
 
@@ -34,15 +42,25 @@ def get_metadata(df, metadata_prefix="Metadata"):
     df : pandas DataFrame
         DataFrame
 
-    metadata_prefix : string (default="Metadata")
-        metadata prefix in column name
+    metadata_string : string (default="Metadata")
+        string that denotes a column is a metadata column
+
+    prefix: boolean (default=True)
+        if True, then only columns that are prefixed with metadata_string are
+        selected as metadata. If False, then any columns that contain the
+        metadata_string are selected as metadata columns
+
     Returns
     -------
     m_cols : list
         list of metadata column labels
     """
-    m_cols = [i for i in df.columns if i.startswith(metadata_prefix)]
+    if prefix:
+        m_cols = [i for i in df.columns if i.startswith(metadata_string)]
+    elif prefix == False:
+        m_cols = [i for i in df.columns if metadata_string in i]
     return m_cols
+
 
 
 def is_all_nan(df):
