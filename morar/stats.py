@@ -61,7 +61,7 @@ def z_score(x):
     return (x_np - x_np.mean()) / x_np.std()
 
 
-def scale_features(data):
+def scale_features(data, **kwargs):
     """
     scale and centre features with a z-score
 
@@ -70,13 +70,21 @@ def scale_features(data):
     df : pandas DataFrame
         DataFrame
 
+    **kwargs : additional arguments to utils.get_featuredata/get_metadata
+
     Returns
     -------
     scaled : pandas DataFrame
-        dataframe of scaled feature values
+        dataframe of same dimensions as df, with scaled feature values
     """
-    feature_data = data[utils.get_featuredata(data)]
-    return feature_data.apply(z_score)
+    data_columns = data.columns.tolist()
+    feature_data = data[utils.get_featuredata(data, **kwargs)]
+    metadata = data[utils.get_metadata(data, **kwargs)]
+    scaled_featuredata = feature_data.apply(z_score)
+    scaled_both = pd.concat([scaled_featuredata, metadata], axis=1)
+    # return columns to original order
+    scaled_both = scaled_both[data_columns]
+    return scaled_both
 
 
 def hampel(x, sigma=6):
