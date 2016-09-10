@@ -2,8 +2,11 @@ from morar import aggregate
 import numpy as np
 import pandas as pd
 from nose.tools import raises
+import os
 
 np.random.seed(0)
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+my_data_path = os.path.join(THIS_DIR, 'test_data/single_cell_test_data.csv')
 
 @raises(ValueError)
 def test_aggregate_errors_wrong_column():
@@ -138,3 +141,28 @@ def test_aggregate_multiple_metadata_non_numeric():
     assert out["z"].dtype == z.dtype
     assert out["Metadata_group"].dtype == "O"
     assert out.isnull().sum().sum() == 0
+
+def test_aggregate_handles_non_standard_metadata_tags():
+    x = np.random.random(1000)
+    y = np.random.random(1000)
+    z = np.random.random(1000)
+    metadata_imagenumber = ["a", "b", "c", "d", "e"]*200
+    metadata_group = ["X", "Y"]*500
+    metadata_other = np.random.random(1000)
+    metadata_other_text = ["foo", "bar"]*500
+    df = pd.DataFrame(list(zip(x, y, z, metadata_imagenumber, metadata_group,
+                               metadata_other, metadata_other_text)))
+    df.columns = ["x", "y", "z", "Img_Metadata_imagenumber",
+                  "Img_Metadata_group", "Img_Metadata_other",
+                  "Img_Metadata_other_text"]
+    out = aggregate.aggregate(df, on=["Img_Metadata_imagenumber"])
+    assert out.columns.tolist() == df.columns.tolist()
+    assert out.shape[0] == 5
+
+
+# use test dataset
+def test_aggregate_real_dataset():
+    df = pd.read_csv(my_data_path)
+    out = aggregate.aggregate(out, on="Image_ImageNumber")
+    n_imagesets = len(set(df.Image_ImageNumber))
+    assert out.shape[0] == n_imagesets
