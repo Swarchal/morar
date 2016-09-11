@@ -5,16 +5,15 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import LinearSVC
 from sklearn.feature_selection import SelectFromModel
 
-def find_correlation(df, threshold=0.9):
+def find_correlation(data, threshold=0.9):
     """
     Given a numeric pd.DataFrame, this will find highly correlated features,
     and return a list of features to remove.
 
     Parameters
     -----------
-    df : pandas DataFrame
+    data : pandas DataFrame
         DataFrame
-
     threshold : float
         correlation threshold, will remove one of pairs of features with a
         correlation greater than this value
@@ -24,12 +23,12 @@ def find_correlation(df, threshold=0.9):
     select_flat : list
         listof column names to be removed
     """
-    corrMatrix = df.corr()
-    corrMatrix.loc[:,:] =  np.tril(corrMatrix, k=-1)
+    corr_mat = data.corr()
+    corr_mat.loc[:, :] =  np.tril(corr_mat, k=-1)
     already_in = set()
     result = []
-    for col in corrMatrix:
-        perfect_corr = corrMatrix[col][corrMatrix[col] > threshold].index.tolist()
+    for col in corr_mat:
+        perfect_corr = corr_mat[col][corr_mat[col] > threshold].index.tolist()
         if perfect_corr and col not in already_in:
             already_in.update(set(perfect_corr))
             perfect_corr.append(col)
@@ -39,13 +38,13 @@ def find_correlation(df, threshold=0.9):
     return select_flat
 
 
-def find_low_var(df, threshold=1e-5):
+def find_low_var(data, threshold=1e-5):
     """
     Return column names of feature columns with zero or very low variance
 
     Parameters
     ------------
-    df : pandas DataFrame
+    data : pandas DataFrame
         DataFrame
     threshold : float
         low variance threshold
@@ -55,35 +54,31 @@ def find_low_var(df, threshold=1e-5):
     columns : list
         list of columns to remove
     """
-    if not isinstance(df, pd.DataFrame):
+    if not isinstance(data, pd.DataFrame):
         raise ValueError("not a pandas DataFrame")
-    var = df[utils.get_featuredata(df)].var(axis=0)
+    var = data[utils.get_featuredata(data)].var(axis=0)
     below_thresh = var[var < threshold].index.tolist()
-    is_nan = utils.is_all_nan(df)
+    is_nan = utils.is_all_nan(data)
     columns = list(below_thresh) + list(is_nan)
     return columns
 
 
-def feature_importance(df, neg_cmpd, pos_cmpd,
-                            compound_col="Metadata_compound", sort=False):
+def feature_importance(data, neg_cmpd, pos_cmpd,
+                       compound_col="Metadata_compound", sort=False):
     """
     Return features importances, based on separating the positive and negative
     controls in a random forest classifier.
 
     Parameters
     -----------
-    df: pandas DataFrame
+    data: pandas DataFrame
         DataFrame
-
     neg_cmpd : string
         name of negative control in compound_col
-
     pos_cmpd : string
         name of positive control in compound_col
-
     compound_col (default="Metadata_compound") : string
         name of column in df that contains compound labels
-
     sort : boolean (default=False)
         if True will sort the list of features on importance otherwise will
         return them in the original order
@@ -93,7 +88,7 @@ def feature_importance(df, neg_cmpd, pos_cmpd,
     importances : list
         list of lists, feature name and importances
     """
-    X, Y = _split_classes(df, neg_cmpd, pos_cmpd, compound_col)
+    X, Y = _split_classes(data, neg_cmpd, pos_cmpd, compound_col)
     # create classifier
     clf = RandomForestClassifier(n_jobs=-1)
     clf.fit(X, Y)
@@ -108,24 +103,20 @@ def feature_importance(df, neg_cmpd, pos_cmpd,
     return importances
 
 
-def select_features(df, neg_cmpd, pos_cmpd, compound_col="Metadata_compound",
+def select_features(data, neg_cmpd, pos_cmpd, compound_col="Metadata_compound",
                     C=0.01):
     """
     Return selected features basd on L1 linear svc.
 
     Parameters
     -----------
-    df : pandas DataFrame
-
+    data : pandas DataFrame
     neg_cmpd : string
         name of negative control in compound_col
-
     pos_cmpd : string
         name of positive control in compound_col
-
     compound_col : string
-        name of column in df that contains compound labels
-
+        name of column in data that contains compound labels
     C : float (default=0.01)
         Sparsity, lower the number the fewer features are selected
 
@@ -134,7 +125,7 @@ def select_features(df, neg_cmpd, pos_cmpd, compound_col="Metadata_compound",
     selected_features : list
         Selected features
     """
-    X, Y = _split_classes(df, neg_cmpd, pos_cmpd, compound_col)
+    X, Y = _split_classes(data, neg_cmpd, pos_cmpd, compound_col)
     lin_svc = LinearSVC(C=C, penalty="l1", dual=False).fit(X, Y)
     model = SelectFromModel(lin_svc, prefit=True)
     feature_mask = np.array(model.get_support())
@@ -144,42 +135,38 @@ def select_features(df, neg_cmpd, pos_cmpd, compound_col="Metadata_compound",
 
 
 
-def _split_classes(df, neg_cmpd, pos_cmpd, compound_col):
+def _split_classes(data, neg_cmpd, pos_cmpd, compound_col):
     """
     Internal function used to separate featuredata and compound labels for
     classification.
 
     Parameters
     -----------
-    df : pandas DataFrame
-
+    data : pandas DataFrame
     neg_cmpd : string
         name of negative control in compound_col
-
     pos_cmpd : string
         name of positive control in compound_col
-
     compound_col : string
         name of column in df that contains compound labels
 
     Returns
     --------
-
     classes: list
         [X, Y], where X is the dataframe containing feature columns, and Y
         is the list of integers matching to postive or negative controls.
     """
-    if not isinstance(df, pd.DataFrame):
+    if not isinstance(data, pd.DataFrame):
         raise ValueError("is not a pandas DataFrame")
-    if compound_col not in df.columns:
-        raise ValueError("{} is not a column in df".format(compound_col))
-    if neg_cmpd not in df[compound_col].tolist():
+    if compound_col not in data.columns:
+        raise ValueError("{} is not a column in data".format(compound_col))
+    if neg_cmpd not in data[compound_col].tolist():
         raise ValueError("{} is not in column {}".format(neg_cmpd, compound_col))
-    if pos_cmpd not in df[compound_col].tolist():
+    if pos_cmpd not in data[compound_col].tolist():
         raise ValueError("{} is not in column {}".format(pos_cmpd, compound_col))
     #split data into just positive and negative controls
     controls = [neg_cmpd, pos_cmpd]
-    df_cntrl = df[df[compound_col].isin(controls)].copy()
+    df_cntrl = data[data[compound_col].isin(controls)].copy()
     # convert compound labels to integers. pos_cmpd=1, neg_cmpd=0
     cntrl_int = pd.Categorical(df_cntrl[compound_col]).codes.tolist()
     df_cntrl[compound_col] = cntrl_int

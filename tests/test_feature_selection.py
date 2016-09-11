@@ -143,7 +143,7 @@ def test_feature_importance_returns_all_feature_columns():
     x.columns = ["x"+str(i)for i in range(1,11)]
     x["Metadata_compound"] = ["pos", "neg"]*50
     out = feature_selection.feature_importance(
-        df=x,
+        data=x,
         neg_cmpd="neg",
         pos_cmpd="pos",
         compound_col="Metadata_compound")
@@ -158,7 +158,7 @@ def test_feature_importance_sort():
     x.columns = ["x"+str(i)for i in range(1,11)]
     x["Metadata_compound"] = ["pos", "neg"]*50
     out = feature_selection.feature_importance(
-        df=x,
+        data=x,
         neg_cmpd="neg",
         pos_cmpd="pos",
         compound_col="Metadata_compound",
@@ -176,7 +176,7 @@ def test_feature_importance_returns_colnames():
     x.columns = ["x"+str(i)for i in range(1,11)]
     x["Metadata_compound"] = ["pos", "neg"]*50
     out = feature_selection.feature_importance(
-        df=x,
+        data=x,
         neg_cmpd="neg",
         pos_cmpd="pos",
         compound_col="Metadata_compound")
@@ -193,7 +193,7 @@ def test_select_features():
     x.columns = ["x"+str(i)for i in range(1,11)]
     x["Metadata_compound"] = ["pos", "neg"]*50
     out = feature_selection.select_features(
-        df=x,
+        data=x,
         neg_cmpd="neg",
         pos_cmpd="pos",
         compound_col="Metadata_compound")

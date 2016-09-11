@@ -5,27 +5,41 @@ from nose.tools import raises
 
 np.random.seed(0)
 
-# example dataset for get_outlier_index
-x = np.random.random(100).tolist()
-y = np.random.random(100).tolist()
-# add outlying values to last row
-x.append(100)
-y.append(500)
-df3 = pd.DataFrame(list(zip(x, y)))
-df3.columns = ["x", "y"]
-
-
 @raises(ValueError)
 def test_get_outlier_index_errors_wrong_method():
+    # example dataset for get_outlier_index
+    x = np.random.random(100).tolist()
+    y = np.random.random(100).tolist()
+    # add outlying values to last row
+    x.append(100)
+    y.append(500)
+    df3 = pd.DataFrame(list(zip(x, y)))
+    df3.columns = ["x", "y"]
     outliers.get_outlier_index(df3, method="wrong")
 
 
 @raises(ValueError)
 def test_get_outlier_index_errors_non_dataframe():
+    # example dataset for get_outlier_index
+    x = np.random.random(100).tolist()
+    y = np.random.random(100).tolist()
+    # add outlying values to last row
+    x.append(100)
+    y.append(500)
+    df3 = pd.DataFrame(list(zip(x, y)))
+    df3.columns = ["x", "y"]
     outliers.get_outlier_index(df3["x"].tolist())
 
 
 def test_get_outlier_index_values():
+    # example dataset for get_outlier_index
+    x = np.random.random(100).tolist()
+    y = np.random.random(100).tolist()
+    # add outlying values to last row
+    x.append(100)
+    y.append(500)
+    df3 = pd.DataFrame(list(zip(x, y)))
+    df3.columns = ["x", "y"]
     out = outliers.get_outlier_index(df3)
     assert len(out) == 1
     assert out == [100] # 0-based indexing

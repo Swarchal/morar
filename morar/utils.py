@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 
-def get_featuredata(df, metadata_string="Metadata", prefix=True):
+
+def get_featuredata(data, metadata_string="Metadata", prefix=True):
     """
     identifies columns in a dataframe that are not labelled with the
     metadata prefix. Its assumed everything not labelled metadata is
@@ -10,7 +11,7 @@ def get_featuredata(df, metadata_string="Metadata", prefix=True):
     Parameters
     ----------
 
-    df : pandas DataFrame
+    data : pandas DataFrame
         DataFrame
 
     metadata_string : string (default="Metadata")
@@ -27,19 +28,19 @@ def get_featuredata(df, metadata_string="Metadata", prefix=True):
         List of feature column labels
     """
     if prefix:
-        f_cols = [i for i in df.columns if not i.startswith(metadata_string)]
+        f_cols = [i for i in data.columns if not i.startswith(metadata_string)]
     elif prefix == False:
-        f_cols = [i for i in df.columns if not metadata_string in i]
+        f_cols = [i for i in data.columns if metadata_string not in i]
     return f_cols
 
 
-def get_metadata(df, metadata_string="Metadata", prefix=True):
+def get_metadata(data, metadata_string="Metadata", prefix=True):
     """
     identifies column in a dataframe that are labelled with the metadata_prefix
 
     Parameters
     ----------
-    df : pandas DataFrame
+    data : pandas DataFrame
         DataFrame
 
     metadata_string : string (default="Metadata")
@@ -56,14 +57,14 @@ def get_metadata(df, metadata_string="Metadata", prefix=True):
         list of metadata column labels
     """
     if prefix:
-        m_cols = [i for i in df.columns if i.startswith(metadata_string)]
-    elif prefix == False:
-        m_cols = [i for i in df.columns if metadata_string in i]
+        m_cols = [i for i in data.columns if i.startswith(metadata_string)]
+    elif prefix is False:
+        m_cols = [i for i in data.columns if metadata_string in i]
     return m_cols
 
 
 
-def is_all_nan(df):
+def is_all_nan(data):
     """
     Returns column name if all values in that column are np.nan
 
@@ -77,8 +78,8 @@ def is_all_nan(df):
     out_cols : list
         column names containing all np.nan values
     """
-    is_null = df.isnull().sum()
-    nrows = df.shape[0]
+    is_null = data.isnull().sum()
+    nrows = data.shape[0]
     out_cols = []
     for i in is_null.index:
         if is_null[i] == nrows:
@@ -86,14 +87,14 @@ def is_all_nan(df):
     return out_cols
 
 
-def get_image_quality(df):
+def get_image_quality(data):
     """
     Returns list of column names from the CelLProfiler ImageQuality module
     that are present in df.
 
     Parameters
     ----------
-    df : pandas DataFrame
+    data : pandas DataFrame
         DataFrame
 
     Returns
@@ -101,9 +102,9 @@ def get_image_quality(df):
     im_qc_cols : list
         list of ImageQuality columns contained in df
     """
-    if not isinstance(df, pd.DataFrame):
+    if not isinstance(data, pd.DataFrame):
         raise ValueError("not a pandas DataFrame")
-    colnames = df.columns.tolist()
+    colnames = data.columns.tolist()
     im_qc_cols = [col for col in colnames if "ImageQuality" in col]
     if len(im_qc_cols) == 0:
         raise ValueError("no ImageQuality measurements found")

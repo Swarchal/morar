@@ -2,21 +2,23 @@ from morar import utils
 import numpy as np
 import pandas as pd
 
-def aggregate(df, on, method="median", **kwargs):
+"""
+Functions(s) for aggregating data from fine level data to higher-level
+measurements such as object-level to image or well level data
+"""
+
+def aggregate(data, on, method="median", **kwargs):
     """
     Aggregate dataset
 
     Parameters
     -----------
-    df : pandas DataFrame
+    data : pandas DataFrame
         DataFrame
-
     on : string or list of strings
         column(s) with which to group by and aggregate the dataset.
-
     method : string (default="median")
         method to average each group. options = "median" or "mean"
-
     **kwargs : additional args to utils.get_metadata / utils.get_featuredata
 
     Returns
@@ -24,17 +26,17 @@ def aggregate(df, on, method="median", **kwargs):
     agg_df : pandas DataFrame
         aggregated dataframe, with a row per value of 'on'
     """
-    _check_inputs(df, on, method)
+    _check_inputs(data, on, method)
     # keep track of original column order
-    df_cols = df.columns.tolist()
-    grouped = df.groupby(on, as_index=False)
+    df_cols = data.columns.tolist()
+    grouped = data.groupby(on, as_index=False)
     if method == "mean":
         agg = grouped.aggregate(np.mean)
     if method == "median":
         agg = grouped.aggregate(np.median)
-    df_metadata = df[utils.get_metadata(df, **kwargs)].copy()
+    df_metadata = data[utils.get_metadata(data, **kwargs)].copy()
     # add indexing column to metadata if not already present
-    df_metadata[on] = df[on]
+    df_metadata[on] = data[on]
     # drop metadata to the same level as aggregated data
     df_metadata.drop_duplicates(subset=on, inplace=True)
     # merge aggregated and feature data
@@ -43,18 +45,18 @@ def aggregate(df, on, method="median", **kwargs):
     # merge untracked columns with merged data
     merged_df = merged_df[df_cols]
     # re-arrange to columns are in original order
-    assert len(merged_df.columns) == len(df.columns)
+    assert len(merged_df.columns) == len(data.columns)
     return merged_df
 
 
-def _check_inputs(df, on, method):
+def _check_inputs(data, on, method):
     """ internal function for aggregate() to check validity of inputs """
     valid_methods = ["median", "mean"]
-    if not isinstance(df, pd.DataFrame):
+    if not isinstance(data, pd.DataFrame):
         raise ValueError("not a a pandas DataFrame")
     if method not in valid_methods:
         raise ValueError("{} is not a valid method, options: median or mean".format(method))
-    df_columns = df.columns.tolist()
+    df_columns = data.columns.tolist()
     if isinstance(on, str):
         if on not in df_columns:
             raise ValueError("{} not a column in df".format(on))
