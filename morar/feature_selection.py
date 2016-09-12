@@ -57,7 +57,7 @@ def find_low_var(data, threshold=1e-5):
     if not isinstance(data, pd.DataFrame):
         raise ValueError("not a pandas DataFrame")
     var = data[utils.get_featuredata(data)].var(axis=0)
-    below_thresh = var[var < threshold].index.tolist()
+    below_thresh = var[var <= threshold].index.tolist()
     is_nan = utils.is_all_nan(data)
     columns = list(below_thresh) + list(is_nan)
     return columns
