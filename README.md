@@ -5,6 +5,8 @@
 
 Python package for phenotypic screening data.
 
+Examples can be found [here](https://nbviewer.jupyter.org/github/Swarchal/notebooks/blob/master/morar_demo.ipynb).
+
 **Tasks:**
 - aggregation
     - `morar.aggregate`
@@ -17,4 +19,3 @@ Python package for phenotypic screening data.
 - feature selection
     - `morar.feature_selection`
 
-Examples can be found [here](https://nbviewer.jupyter.org/github/Swarchal/notebooks/blob/master/morar_demo.ipynb).
