@@ -4,7 +4,6 @@ import numpy as np
 from nose.tools import raises
 
 
-
 @raises(ValueError)
 def test_check_control_within_function():
     # dataframe with missing controls in one plate
@@ -108,9 +107,44 @@ def test_normalise_non_default_cols():
     colnames = ["A", "B", "C", "meta_plate", "meta_cmpd"]
     non_default_df = pd.DataFrame(list(zip(x, y, z, plate, compound)),
                                   columns=colnames)
-    out = normalise.normalise(non_default_df, metadata_string="meta",
-                              compound="meta_cmpd", plate_id="meta_plate")
+    out = normalise.normalise(non_default_df, compound="meta_cmpd",
+                              plate_id="meta_plate", metadata_string="meta")
     assert isinstance(out, pd.DataFrame)
+
+
+def test_normalise_extra_metadata_cols():
+    # dataframe with weird columns names
+    x = np.random.randn(50).tolist()
+    y = np.random.randn(50).tolist()
+    z = np.random.randn(50).tolist()
+    plate = ["plate1"]*10 + ["plate2"]*10 + ["plate3"]*10 + ["plate4"]*10 + ["plate5"]*10
+    compound = (["drug"]*8 + ["DMSO"]*2)*5
+    extra_metadata = ["A", "B"]*25
+    colnames = ["A", "B", "C", "meta_plate", "meta_cmpd", "metadata_extra"]
+    df = pd.DataFrame(list(zip(x, y, z, plate, compound, extra_metadata)))
+    df.columns = colnames
+    out = normalise.normalise(df, metadata_string="meta", compound="meta_cmpd",
+                              plate_id="meta_plate")
+    assert df.shape == out.shape
+    assert df.columns.tolist() == out.columns.tolist()
+
+
+def test_robust_normalise_extra_metadata_cols():
+    # dataframe with weird columns names
+    x = np.random.randn(50).tolist()
+    y = np.random.randn(50).tolist()
+    z = np.random.randn(50).tolist()
+    plate = ["plate1"]*10 + ["plate2"]*10 + ["plate3"]*10 + ["plate4"]*10 + ["plate5"]*10
+    compound = (["drug"]*8 + ["DMSO"]*2)*5
+    extra_metadata = ["A", "B"]*25
+    colnames = ["A", "B", "C", "meta_plate", "meta_cmpd", "metadata_extra"]
+    df = pd.DataFrame(list(zip(x, y, z, plate, compound, extra_metadata)))
+    df.columns = colnames
+    out = normalise.robust_normalise(df, metadata_string="meta",
+                                     compound="meta_cmpd",
+                                     plate_id="meta_plate")
+    assert df.shape == out.shape
+    assert df.columns.tolist() == out.columns.tolist()
 
 
 def test_robust_normalise_returns_dataframe():
@@ -137,8 +171,7 @@ def test_robust_normalise_returns_correct_size():
     df = pd.DataFrame(list(zip(x, y, z, plate, compound)), columns=colnames)
     out = normalise.robust_normalise(df, plate_id="Metadata_plate")
     assert isinstance(out, pd.DataFrame)
-    assert df.shape[0] == out.shape[0]
-    # TODO check for correct number of columns
+    assert df.shape == out.shape
 
 
 def test_robust_normalise_non_default_cols():
@@ -154,4 +187,4 @@ def test_robust_normalise_non_default_cols():
     out = normalise.robust_normalise(non_default_df, metadata_string="meta",
                                      compound="meta_cmpd", plate_id="meta_plate")
     assert isinstance(out, pd.DataFrame)
-    assert out.shape[0] == non_default_df.shape[0]
+    assert out.shape == non_default_df.shape
