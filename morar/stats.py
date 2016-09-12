@@ -30,7 +30,6 @@ def glog(x, c=1.0):
     ----------
     x : scalar or array-like
         numbers with which to calculate
-
     c float (default=0.1)
         bias (normally leave as default)
 
@@ -69,7 +68,6 @@ def scale_features(data, **kwargs):
     ----------
     df : pandas DataFrame
         DataFrame
-
     **kwargs : additional arguments to utils.get_featuredata/get_metadata
 
     Returns
@@ -90,14 +88,12 @@ def scale_features(data, **kwargs):
 def hampel(x, sigma=6):
     """
     Hampel filter without window
-
     (1) = positive outlier, (-1) = negative outlier, (0) = nominal value
 
     Parameters
     -----------
     x : array-like
         values values with which to calculate
-
     sigma : int (default=6)
         number of median absolute deviations away from the sample median to
         define an outlier
@@ -107,7 +103,6 @@ def hampel(x, sigma=6):
     outliers : numpy array
         array of same size as the input, outliers indicated as -1 or 1, nominal
         values as 0.
-
     """
     x = np.array(x).astype(np.float)
     med_x = np.median(x)

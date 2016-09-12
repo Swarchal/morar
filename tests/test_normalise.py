@@ -73,7 +73,7 @@ def test_normalise_returns_correct_size():
 
 def test_normalise_divide_returns_correct_values():
     # simple dataframe to check actual values
-    x = [4,4,4,2,2]
+    x = [4, 4, 4, 2, 2]
     compound = (["drug"]*3 + ["DMSO"]*2)
     plate = ["plate_1"]*5
     colnames = ["f1", "Metadata_compound", "Metadata_plate"]
@@ -81,12 +81,12 @@ def test_normalise_divide_returns_correct_values():
     out = normalise.normalise(simple_df, plate_id="Metadata_plate",
                               method="divide")
     assert isinstance(out, pd.DataFrame)
-    assert out["f1"].tolist() == [2,2,2,1,1]
+    assert out["f1"].tolist() == [2, 2, 2, 1, 1]
 
 
 def test_normalise_subtract_returns_correct_values():
     # simple dataframe to check actual values
-    x = [4,4,4,2,2]
+    x = [4, 4, 4, 2, 2]
     compound = (["drug"]*3 + ["DMSO"]*2)
     plate = ["plate_1"]*5
     colnames = ["f1", "Metadata_compound", "Metadata_plate"]
@@ -94,7 +94,7 @@ def test_normalise_subtract_returns_correct_values():
     out = normalise.normalise(simple_df, plate_id="Metadata_plate",
                               method="subtract")
     assert isinstance(out, pd.DataFrame)
-    assert out["f1"].tolist() == [2,2,2,0,0]
+    assert out["f1"].tolist() == [2, 2, 2, 0, 0]
 
 
 def test_normalise_non_default_cols():

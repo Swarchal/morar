@@ -2,9 +2,11 @@ from morar import stats
 from morar import utils
 import pandas as pd
 
+# stop copy warning as not using chained assignment
+pd.options.mode.chained_assignment = None  # default='warn'
 
 def _check_control(data, plate_id, compound="Metadata_compound",
-                  neg_compound="DMSO"):
+                   neg_compound="DMSO"):
     """
     check each plate contains at least 1 negative control value. Raise an error
     if this is not the case.
@@ -63,11 +65,12 @@ def normalise(data, plate_id, compound="Metadata_compound",
     grouped = data.groupby(plate_id, as_index=False)
     # calculate the average negative control values for each plate
     for _, group in grouped:
-        dmso_med = group[group[compound] == neg_compound][f_cols].median()
+        dmso_med_ = group[group[compound] == neg_compound]
+        dmso_med = dmso_med_.loc[:, f_cols].median()
         if method == "subtract":
-            group[f_cols] = group[f_cols].sub(dmso_med)
+            group.loc[:, f_cols] = group[f_cols].sub(dmso_med)
         if method == "divide":
-            group[f_cols] = group[f_cols].divide(dmso_med)
+            group.loc[:, f_cols] = group[f_cols].divide(dmso_med)
         # concatenate group to overall dataframe
         df_out = pd.concat([df_out, group])
     # check we have not lost any rows
