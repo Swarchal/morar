@@ -16,3 +16,5 @@ Python package for phenotypic screening data.
     - `morar.stats`
 - feature selection
     - `morar.feature_selection`
+
+Examples can be found [here](https://nbviewer.jupyter.org/github/Swarchal/notebooks/blob/master/morar_demo.ipynb).
