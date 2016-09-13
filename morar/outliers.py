@@ -8,7 +8,7 @@ Function(s) for finding outliers. Outliers are normally caused by out-of-focus
 images or debris within wells which can cause extreme values upon segmentation.
 """
 
-def get_outlier_index(data, method="values", sigma=6):
+def get_outlier_index(data, method="values", sigma=6, adjust=True):
     """
     Returns index of outlying row(s)
 
@@ -16,15 +16,16 @@ def get_outlier_index(data, method="values", sigma=6):
     ----------
     data: pandas dataframe
         DataFrame
-
     method : string (default="values")
         either 'simple' which is based on hampels robust outlier
         test on feature values, or 'ImageQualty' which uses the
         ImageQualty metrics - FocusScore and PowerLogLogSlope.
-
     sigma : int (default=6)
         number of median absolute deviations away from the sample median to
         define an outlier.
+    adjust: boolean (default=True)
+        If true will adjust the sigma value to take into account multiple
+        measurements. `sigma_adj = sigma * n_feature_columns`
 
     Returns
     -------
@@ -38,6 +39,9 @@ def get_outlier_index(data, method="values", sigma=6):
         raise ValueError("invalid argument. Options: simple, ImageQuality")
     if method == "values":
         feature_cols = utils.get_featuredata(data)
+        # FIXME really crude correction
+        if adjust:
+            sigma = sigma * len(feature_cols)
         hampel_out = data[feature_cols].apply(stats.hampel, sigma=sigma)
         hampel_abs = hampel_out.apply(lambda x: sum(abs(x)), axis=1)
         return hampel_abs[hampel_abs > 0].index.tolist()

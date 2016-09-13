@@ -31,6 +31,35 @@ def test_get_outlier_index_errors_non_dataframe():
     outliers.get_outlier_index(df3["x"].tolist())
 
 
+def test_get_outlier_index_adjust():
+    # example dataset for get_outlier_index
+    x = np.random.random(100).tolist()
+    y = np.random.random(100).tolist()
+    # add outlying values to last row
+    x.append(100)
+    y.append(500)
+    df3 = pd.DataFrame(list(zip(x, y)))
+    df3.columns = ["x", "y"]
+    out = outliers.get_outlier_index(df3, adjust=True)
+    assert len(out) == 1
+    assert out == [100] # 0-based indexing
+
+
+def test_get_outlier_index_adjust2():
+    # example dataset for get_outlier_index
+    x = np.random.random(100).tolist()
+    y = np.random.random(100).tolist()
+    # add outlying values to last row
+    x.append(1)
+    y.append(3)
+    df3 = pd.DataFrame(list(zip(x, y)))
+    df3.columns = ["x", "y"]
+    out = outliers.get_outlier_index(df3, adjust=False)
+    assert len(out) == 1
+    assert out == [100] # 0-based indexing
+
+
+
 def test_get_outlier_index_values():
     # example dataset for get_outlier_index
     x = np.random.random(100).tolist()
