@@ -90,35 +90,42 @@ def test_is_all_nan():
 
 
 
-# create simple dataframe with ImageQuality columns
-x = [1, 2, 3]
-y = [2, 4, 1]
-z = [2, 5, 1]
-
-df = pd.DataFrame(list(zip(x, y, z)))
-df.columns = ["vals", "ImageQuality_test", "other"]
 
 
 def test_get_image_quality():
+    # create simple dataframe with ImageQuality columns
+    x = [1, 2, 3]
+    y = [2, 4, 1]
+    z = [2, 5, 1]
+    df = pd.DataFrame(list(zip(x, y, z)))
+    df.columns = ["vals", "ImageQuality_test", "other"]
     out = utils.get_image_quality(df)
     print(out)
     assert out == ["ImageQuality_test"]
 
 
-# column has ImageQuality in middle of string
-df2 = pd.DataFrame(list(zip(x, y, z)))
-df2.columns = ["vals", "ImageQuality_test", "Cells_ImageQuality"]
-
-
 def test_get_image_quality_not_beginning():
+    # column has ImageQuality in middle of string
+    # create simple dataframe with ImageQuality columns
+    x = [1, 2, 3]
+    y = [2, 4, 1]
+    z = [2, 5, 1]
+    df2 = pd.DataFrame(list(zip(x, y, z)))
+    df2.columns = ["vals", "ImageQuality_test", "Cells_ImageQuality"]
     out = utils.get_image_quality(df2)
     assert out == ["ImageQuality_test", "Cells_ImageQuality"]
 
 
-test_list = df["ImageQuality_test"].tolist()
 
 @raises(ValueError)
 def test_get_image_quality_fails_non_dataframe():
+    # create simple dataframe with ImageQuality columns
+    x = [1, 2, 3]
+    y = [2, 4, 1]
+    z = [2, 5, 1]
+    df = pd.DataFrame(list(zip(x, y, z)))
+    df.columns = ["vals", "ImageQuality_test", "other"]
+    test_list = df["ImageQuality_test"].tolist()
     utils.get_image_quality(test_list)
 
 
@@ -163,12 +170,21 @@ def test_impute_with_metadata():
 
 
 @raises(ValueError)
-def test_drop_missing_bad_threshold():
+def test_drop_missing_bad_threshold_high():
     x = [1, 2, 3, np.nan]
     y = [1, 2, 3, 4]
     dataframe = pd.DataFrame(list(zip(x, y)))
     dataframe.columns = ["x", "y"]
     utils.drop_missing(dataframe, threshold=10)
+
+
+@raises(ValueError)
+def test_drop_missing_bad_threshold_low():
+    x = [1, 2, 3, np.nan]
+    y = [1, 2, 3, 4]
+    dataframe = pd.DataFrame(list(zip(x, y)))
+    dataframe.columns = ["x", "y"]
+    utils.drop_missing(dataframe, threshold=-5)
 
 
 def test_drop_missing_correct():
