@@ -5,10 +5,10 @@ python:
     - "3.5"
     - "3.5-dev" # 3.5 development branch
     - "nightly" # currently points to 3.6-dev
-# command to install dependencies
 virtual env:
     - system_site_packages: true
 before_install:
+    # install compilers for scipy install
     - sudo apt-get install gfortran libblas-dev liblapack-dev
 install:
     - sudo apt-get update
@@ -16,8 +16,7 @@ install:
     - pip install pandas
     - python setup.py install
     - pip install codecov
-# command to run tests
 script:
-    - nosetests --with-coverage --cover-package=morar
+    - nosetests -v --with-coverage --cover-package=morar
 after_success:
     - codecov
