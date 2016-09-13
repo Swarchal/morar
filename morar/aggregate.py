@@ -27,6 +27,7 @@ def aggregate(data, on, method="median", **kwargs):
         aggregated dataframe, with a row per value of 'on'
     """
     _check_inputs(data, on, method)
+    _check_featuredata(data, on, **kwargs)
     # keep track of original column order
     df_cols = data.columns.tolist()
     grouped = data.groupby(on, as_index=False)
@@ -64,3 +65,16 @@ def _check_inputs(data, on, method):
         for col in on:
             if col not in df_columns:
                 raise ValueError("{} not a column in df".format(col))
+
+
+def _check_featuredata(data, on, **kwargs):
+    """
+    Check feature data is numerical
+    """
+    feature_cols = utils.get_featuredata(data, **kwargs)
+    cols_to_check = [col for col in feature_cols if col not in [on]]
+    df_to_check = data[cols_to_check]
+    is_number = np.vectorize(lambda x: np.issubdtype(x, np.number))
+    if any(is_number(df_to_check.dtypes) == False):
+        raise ValueError("non-numeric column found in feature data")
+

@@ -154,6 +154,7 @@ def test_aggregate_multiple_metadata_non_numeric():
     assert out["Metadata_group"].dtype == "O"
     assert out.isnull().sum().sum() == 0
 
+
 def test_aggregate_handles_non_standard_metadata_tags():
     x = np.random.random(1000)
     y = np.random.random(1000)
@@ -177,3 +178,21 @@ def test_aggregate_real_dataset():
     out = aggregate.aggregate(df, on="Image_ImageNumber", prefix=False)
     n_imagesets = len(set(df.Image_ImageNumber))
     assert out.shape[0] == n_imagesets
+
+
+@raises(ValueError)
+def test_aggregate_non_metadata_string_cols():
+    x = np.random.random(1000)
+    y = np.random.random(1000)
+    z = np.random.random(1000)
+    metadata_imagenumber = ["a", "b", "c", "d", "e"]*200
+    string_col = ["X", "Y"]*500
+    metadata_other = np.random.random(1000)
+    metadata_other_text = ["foo", "bar"]*500
+    df = pd.DataFrame(list(zip(x, y, z, metadata_imagenumber, string_col,
+                               metadata_other, metadata_other_text)))
+    df.columns = ["x", "y", "z", "Img_Metadata_imagenumber",
+                  "string_col", "Img_Metadata_other",
+                  "Img_Metadata_other_text"]
+    aggregate.aggregate(df, on="Img_Metadata_imagenumber", prefix=False)
+
