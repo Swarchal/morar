@@ -1,6 +1,10 @@
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import Imputer
 
+"""
+Utility functions
+"""
 
 def get_featuredata(data, metadata_string="Metadata", prefix=True):
     """
@@ -110,3 +114,29 @@ def get_image_quality(data):
         raise ValueError("no ImageQuality measurements found")
     else:
         return im_qc_cols
+
+
+def impute(data, method="median", **kwargs):
+    """
+    Impute missing feature values by using the feature average.
+
+    Parameters
+    ----------
+    data : pandas DataFrame
+        DataFrame
+    method : string (default="median")
+        method with which to calculate the feature average. Options: "mean",
+        "median".
+    **kwargs : additional args to utils.get_metadata / utils.get_featuredata
+        and sklearn.preprocessing.Imputer
+
+    Returns
+    -------
+    data_out : pandas DataFrame
+        DataFrame with imputed missing values
+    """
+    imp = Imputer(strategy=method, **kwargs)
+    data_feature = data[get_featuredata(data, **kwargs)].copy()
+    imputed_data = imp.fit_transform(data_feature)
+    data[get_featuredata(data, **kwargs)] = imputed_data
+    return data

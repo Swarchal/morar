@@ -59,7 +59,6 @@ def test_get_outlier_index_adjust2():
     assert out == [100] # 0-based indexing
 
 
-
 def test_get_outlier_index_values():
     # example dataset for get_outlier_index
     x = np.random.random(100).tolist()

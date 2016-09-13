@@ -129,3 +129,34 @@ def test_get_image_quality_no_im_qc_cols():
     df = pd.DataFrame(list(zip(x, y)))
     df.columns = ["x", "y"]
     utils.get_image_quality(df)
+
+
+def test_impute():
+    x = [1, 2, 3, np.nan]
+    y = [2, 4, 9, 10]
+    dataframe = pd.DataFrame(list(zip(x, y)))
+    dataframe.columns = ["x", "y"]
+    out = utils.impute(dataframe)
+    assert (out["x"].values.tolist() == [1, 2, 3, 2])
+    assert out.shape == dataframe.shape
+    assert out.columns.tolist() == dataframe.columns.tolist()
+
+
+def test_impute_mean():
+    x = [1, 10, np.nan]
+    y = [1,2,3]
+    dataframe = pd.DataFrame(list(zip(x, y)))
+    dataframe.columns = ["x", "y"]
+    out = utils.impute(dataframe, method="mean")
+    assert out["x"].values.tolist() == [1, 10, 5.5]
+
+
+def test_impute_with_metadata():
+    x = [1, 2, 3, 4, np.nan]
+    y = [1, 2, 3, 4, 5]
+    metadata_something = ["a", "b", "c", "d", "e"]
+    dataframe = pd.DataFrame(list(zip(x, y, metadata_something)))
+    dataframe.columns = ["x", "y", "Metadata_x"]
+    out = utils.impute(dataframe)
+    assert out.columns.tolist() == dataframe.columns.tolist()
+    assert out.shape == dataframe.shape
