@@ -20,6 +20,18 @@ def test_aggregate_errors_wrong_column():
 
 
 @raises(ValueError)
+def test_aggregate_errors_wrong_column_in_list():
+    x = np.random.random(1000)
+    y = np.random.random(1000)
+    z = np.random.random(1000)
+    metadata_imagenumber = list(range(1,21))*50
+    metadata_group = ["a", "b"]*500
+    df = pd.DataFrame(list(zip(x, y, z, metadata_imagenumber, metadata_group)))
+    df.columns = ["x", "y", "z", "Metadata_imagenumber", "Metadata_group"]
+    aggregate.aggregate(df, on=["Metadata_imagenumber", "Metadata_invalid"])
+
+
+@raises(ValueError)
 def test_aggregate_errors_non_dataframe():
     x = np.random.random(1000)
     y = np.random.random(1000)
