@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import Imputer
+from nose.tools import raises
 
 """
 Utility functions
@@ -140,3 +141,32 @@ def impute(data, method="median", **kwargs):
     imputed_data = imp.fit_transform(data_feature)
     data[get_featuredata(data, **kwargs)] = imputed_data
     return data
+
+
+def drop_missing(data, threshold=1.0):
+    """
+    Remove missing data.
+
+    1. Remove columns that contain a proportion of NaN values greater than
+    threshold.
+    2. Remove rows that contain any NaN values.
+
+    Parameters
+    ----------
+    data : pandas DataFrame
+        DataFrame
+    threshold : float (default=1.0)
+        Proportion of NaN values in a column before column is removed
+        completely
+
+    Returns
+    --------
+    dropped : pandas DataFrame
+    """
+    if threshold < 0 or threshold > 1.0:
+        raise ValueError("threshold outside expected limits (0 to 1.0)")
+    prop_nan = np.array(data.isnull().sum(), dtype="float") / data.shape[0]
+    nan_col_index = np.where(prop_nan >= threshold)[0]
+    nan_cols = data.columns[nan_col_index]
+    data_col_drop = data.drop(nan_cols, axis=1)
+    return data_col_drop.dropna()

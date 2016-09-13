@@ -160,3 +160,46 @@ def test_impute_with_metadata():
     out = utils.impute(dataframe)
     assert out.columns.tolist() == dataframe.columns.tolist()
     assert out.shape == dataframe.shape
+
+
+@raises(ValueError)
+def test_drop_missing_bad_threshold():
+    x = [1, 2, 3, np.nan]
+    y = [1, 2, 3, 4]
+    dataframe = pd.DataFrame(list(zip(x, y)))
+    dataframe.columns = ["x", "y"]
+    utils.drop_missing(dataframe, threshold=10)
+
+
+def test_drop_missing_correct():
+    x = [np.nan]*10
+    xx = [np.nan]*10
+    y = list(range(10))
+    z = list(range(10))
+    dataframe = pd.DataFrame(list(zip(x, xx, y, z)))
+    dataframe.columns = ["x", "xx", "y", "z"]
+    out = utils.drop_missing(dataframe)
+    assert out.shape[0] == dataframe.shape[0]
+    assert out.columns.tolist() == ["y", "z"]
+
+
+def test_drop_missing_corrrect_rows():
+    x = [np.nan]*50
+    y = np.random.random(50)
+    z = list(range(49)) + [np.nan]
+    dataframe = pd.DataFrame(list(zip(x, y, z)))
+    dataframe.columns = ["x", "y", "z"]
+    out = utils.drop_missing(dataframe)
+    assert out.columns.tolist() == ["y", "z"]
+    assert out.shape[0] == 49
+
+
+def test_drop_missing_threshold():
+    x = list(range(50)) + [np.nan]*50
+    y = [np.nan]*100
+    z = np.random.random(100)
+    dataframe = pd.DataFrame(list(zip(x, y, z)))
+    dataframe.columns = ["x", "y", "z"]
+    out = utils.drop_missing(dataframe, threshold=0.2)
+    assert out.columns.tolist() == ["z"]
+    assert out.shape[0] == dataframe.shape[0]
