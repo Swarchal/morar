@@ -142,7 +142,7 @@ def impute(data, method="median", **kwargs):
     return data
 
 
-def drop_missing(data, threshold=1.0):
+def drop(data, threshold=1.0):
     """
     Remove missing data.
 

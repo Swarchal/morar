@@ -116,7 +116,6 @@ def test_get_image_quality_not_beginning():
     assert out == ["ImageQuality_test", "Cells_ImageQuality"]
 
 
-
 @raises(ValueError)
 def test_get_image_quality_fails_non_dataframe():
     # create simple dataframe with ImageQuality columns
@@ -170,52 +169,52 @@ def test_impute_with_metadata():
 
 
 @raises(ValueError)
-def test_drop_missing_bad_threshold_high():
+def test_drop_bad_threshold_high():
     x = [1, 2, 3, np.nan]
     y = [1, 2, 3, 4]
     dataframe = pd.DataFrame(list(zip(x, y)))
     dataframe.columns = ["x", "y"]
-    utils.drop_missing(dataframe, threshold=10)
+    utils.drop(dataframe, threshold=10)
 
 
 @raises(ValueError)
-def test_drop_missing_bad_threshold_low():
+def test_drop_bad_threshold_low():
     x = [1, 2, 3, np.nan]
     y = [1, 2, 3, 4]
     dataframe = pd.DataFrame(list(zip(x, y)))
     dataframe.columns = ["x", "y"]
-    utils.drop_missing(dataframe, threshold=-5)
+    utils.drop(dataframe, threshold=-5)
 
 
-def test_drop_missing_correct():
+def test_drop_correct():
     x = [np.nan]*10
     xx = [np.nan]*10
     y = list(range(10))
     z = list(range(10))
     dataframe = pd.DataFrame(list(zip(x, xx, y, z)))
     dataframe.columns = ["x", "xx", "y", "z"]
-    out = utils.drop_missing(dataframe)
+    out = utils.drop(dataframe)
     assert out.shape[0] == dataframe.shape[0]
     assert out.columns.tolist() == ["y", "z"]
 
 
-def test_drop_missing_corrrect_rows():
+def test_drop_corrrect_rows():
     x = [np.nan]*50
     y = np.random.random(50)
     z = list(range(49)) + [np.nan]
     dataframe = pd.DataFrame(list(zip(x, y, z)))
     dataframe.columns = ["x", "y", "z"]
-    out = utils.drop_missing(dataframe)
+    out = utils.drop(dataframe)
     assert out.columns.tolist() == ["y", "z"]
     assert out.shape[0] == 49
 
 
-def test_drop_missing_threshold():
+def test_drop_threshold():
     x = list(range(50)) + [np.nan]*50
     y = [np.nan]*100
     z = np.random.random(100)
     dataframe = pd.DataFrame(list(zip(x, y, z)))
     dataframe.columns = ["x", "y", "z"]
-    out = utils.drop_missing(dataframe, threshold=0.2)
+    out = utils.drop(dataframe, threshold=0.2)
     assert out.columns.tolist() == ["z"]
     assert out.shape[0] == dataframe.shape[0]
