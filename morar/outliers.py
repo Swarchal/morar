@@ -8,7 +8,7 @@ Function(s) for finding outliers. Outliers are normally caused by out-of-focus
 images or debris within wells which can cause extreme values upon segmentation.
 """
 
-def get_outlier_index(data, method="values", sigma=6, adjust=True):
+def get_outlier_index(data, method="values", sigma=6, adjust=True, **kwargs):
     """
     Returns index of outlying row(s)
 
@@ -26,6 +26,7 @@ def get_outlier_index(data, method="values", sigma=6, adjust=True):
     adjust: boolean (default=True)
         If true will adjust the sigma value to take into account multiple
         measurements. `sigma_adj = sigma * n_feature_columns`
+    **kwargs: additional arguments to utils.get_featuredata
 
     Returns
     -------
@@ -38,7 +39,7 @@ def get_outlier_index(data, method="values", sigma=6, adjust=True):
     if method not in accepted_methods:
         raise ValueError("invalid argument. Options: simple, ImageQuality")
     if method == "values":
-        feature_cols = utils.get_featuredata(data)
+        feature_cols = utils.get_featuredata(data, **kwargs)
         # FIXME really crude correction
         if adjust:
             sigma = sigma * len(feature_cols)

@@ -33,7 +33,7 @@ def get_featuredata(data, metadata_string="Metadata", prefix=True):
     """
     if prefix:
         f_cols = [i for i in data.columns if not i.startswith(metadata_string)]
-    elif prefix == False:
+    elif prefix is False:
         f_cols = [i for i in data.columns if metadata_string not in i]
     return f_cols
 

@@ -35,6 +35,7 @@ def test_get_feature_data_prefix_options():
     ans = ["colA", "colB"]
     assert out == ans
 
+
 def test_get_featuredata_different_case():
     x = [1,2,3,4]
     y = [4,3,2,1]
@@ -87,9 +88,6 @@ def test_is_all_nan():
     out = utils.is_all_nan(df)
     print(out)
     assert out == ["x"]
-
-
-
 
 
 def test_get_image_quality():
