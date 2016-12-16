@@ -24,7 +24,7 @@ def find_correlation(data, threshold=0.9):
         listof column names to be removed
     """
     corr_mat = data.corr()
-    corr_mat.loc[:, :] =  np.tril(corr_mat, k=-1)
+    corr_mat.loc[:, :] = np.tril(corr_mat, k=-1)
     already_in = set()
     result = []
     for col in corr_mat:

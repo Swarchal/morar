@@ -56,7 +56,8 @@ def _check_inputs(data, on, method):
     if not isinstance(data, pd.DataFrame):
         raise ValueError("not a a pandas DataFrame")
     if method not in valid_methods:
-        raise ValueError("{} is not a valid method, options: median or mean".format(method))
+        msg = "{} is not a valid method, options: median or mean".format(method)
+        raise ValueError(msg)
     df_columns = data.columns.tolist()
     if isinstance(on, str):
         if on not in df_columns:
