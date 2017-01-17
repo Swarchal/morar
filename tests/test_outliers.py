@@ -68,7 +68,7 @@ def test_get_outlier_index_values():
     y.append(500)
     df3 = pd.DataFrame(list(zip(x, y)))
     df3.columns = ["x", "y"]
-    out = outliers.get_outlier_index(df3)
+    out = outliers.get_outlier_index(df3, method="values")
     assert len(out) == 1
     assert out == [100] # 0-based indexing
 

@@ -37,7 +37,7 @@ def get_outlier_index(data, method="values", sigma=6, adjust=True, **kwargs):
         raise ValueError("not a pandas DataFrame")
     accepted_methods = ["values", "ImageQuality"]
     if method not in accepted_methods:
-        raise ValueError("invalid argument. Options: simple, ImageQuality")
+        raise ValueError("invalid argument. Options: values, ImageQuality")
     if method == "values":
         feature_cols = utils.get_featuredata(data, **kwargs)
         # FIXME really crude correction
