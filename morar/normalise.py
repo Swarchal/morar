@@ -26,7 +26,7 @@ def _check_control(data, plate_id, compound="Metadata_compound",
         group_cmps = list(set(group[compound]))
         if neg_compound not in group_cmps:
             msg = "{} does not contain any negative control values".format(name)
-            raise ValueError(msg)
+            raise RuntimeError(msg)
 
 
 def normalise(data, plate_id, compound="Metadata_compound",
