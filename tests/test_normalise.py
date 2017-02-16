@@ -4,7 +4,7 @@ import numpy as np
 from nose.tools import raises
 
 
-@raises(ValueError)
+@raises(RuntimeError)
 def test_check_control_within_function():
     # dataframe with missing controls in one plate
     x = np.random.randn(50).tolist()
