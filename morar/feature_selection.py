@@ -23,7 +23,7 @@ def find_correlation(data, threshold=0.9):
     select_flat : list
         listof column names to be removed
     """
-    corr_mat = data.corr()
+    corr_mat = data[utils.get_featuredata(data)].corr()
     corr_mat.loc[:, :] = np.tril(corr_mat, k=-1)
     already_in = set()
     result = []
