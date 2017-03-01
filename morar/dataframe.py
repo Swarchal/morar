@@ -12,7 +12,13 @@ class DataFrame(pd.DataFrame):
 
     """
     morar.DataFrame inherits pandas dataframe with a few extra methods
+    FIXME: any pandas method that returns a new object is a pandas.DataFrame
+           rather than a morar.DataFrame
     """
+
+    def __init__(self, data):
+        pd.DataFrame.__init__(self, data)
+
 
     def get_featuredata(self, **kwargs):
         """return featuredata"""
