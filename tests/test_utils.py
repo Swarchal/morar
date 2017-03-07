@@ -1,7 +1,7 @@
 from morar import utils
 import pandas as pd
 import numpy as np
-from nose.tools import raises
+import pytest
 
 def test_get_featuredata_simple():
     x = [1,2,3,4]
@@ -114,7 +114,6 @@ def test_get_image_quality_not_beginning():
     assert out == ["ImageQuality_test", "Cells_ImageQuality"]
 
 
-@raises(ValueError)
 def test_get_image_quality_fails_non_dataframe():
     # create simple dataframe with ImageQuality columns
     x = [1, 2, 3]
@@ -123,16 +122,17 @@ def test_get_image_quality_fails_non_dataframe():
     df = pd.DataFrame(list(zip(x, y, z)))
     df.columns = ["vals", "ImageQuality_test", "other"]
     test_list = df["ImageQuality_test"].tolist()
-    utils.get_image_quality(test_list)
+    with pytest.raises(ValueError):
+        utils.get_image_quality(test_list)
 
 
-@raises(ValueError)
 def test_get_image_quality_no_im_qc_cols():
     x = [1,2,3,4]
     y = [2,3,4,5]
     df = pd.DataFrame(list(zip(x, y)))
     df.columns = ["x", "y"]
-    utils.get_image_quality(df)
+    with pytest.raises(ValueError):
+        utils.get_image_quality(df)
 
 
 def test_impute():
@@ -166,22 +166,22 @@ def test_impute_with_metadata():
     assert out.shape == dataframe.shape
 
 
-@raises(ValueError)
 def test_drop_bad_threshold_high():
     x = [1, 2, 3, np.nan]
     y = [1, 2, 3, 4]
     dataframe = pd.DataFrame(list(zip(x, y)))
     dataframe.columns = ["x", "y"]
-    utils.drop(dataframe, threshold=10)
+    with pytest.raises(ValueError):
+        utils.drop(dataframe, threshold=10)
 
 
-@raises(ValueError)
 def test_drop_bad_threshold_low():
     x = [1, 2, 3, np.nan]
     y = [1, 2, 3, 4]
     dataframe = pd.DataFrame(list(zip(x, y)))
     dataframe.columns = ["x", "y"]
-    utils.drop(dataframe, threshold=-5)
+    with pytest.raises(ValueError):
+        utils.drop(dataframe, threshold=-5)
 
 
 def test_drop_correct():

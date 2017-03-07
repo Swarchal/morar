@@ -1,10 +1,9 @@
 from morar import normalise
 import pandas as pd
 import numpy as np
-from nose.tools import raises
+import pytest
 
 
-@raises(RuntimeError)
 def test_check_control_within_function():
     # dataframe with missing controls in one plate
     x = np.random.randn(50).tolist()
@@ -15,11 +14,10 @@ def test_check_control_within_function():
     colnames = ["A", "B", "C", "Metadata_plate", "Metadata_compound"]
     missing_control_df = pd.DataFrame(list(zip(x, y, z, plate, compound)),
                                       columns=colnames)
-    normalise.normalise(missing_control_df, plate_id="Metadata_plate")
-    # assert for ValueError
+    with pytest.raises(RuntimeError):
+        normalise.normalise(missing_control_df, plate_id="Metadata_plate")
 
 
-@raises(ValueError)
 def test_normalise_errors_invalid_method():
     # create test DataFrame
     x = np.random.randn(50).tolist()
@@ -29,7 +27,8 @@ def test_normalise_errors_invalid_method():
     compound = (["drug"]*8 + ["DMSO"]*2)*5
     colnames = ["A", "B", "C", "Metadata_plate", "Metadata_compound"]
     df = pd.DataFrame(list(zip(x, y, z, plate, compound)), columns=colnames)
-    normalise.normalise(df, plate_id="Metadata_plate", method="invalid")
+    with pytest.raises(ValueError):
+        normalise.normalise(df, plate_id="Metadata_plate", method="invalid")
 
 
 def test_normalise_returns_dataframe_subtract():
@@ -188,3 +187,4 @@ def test_robust_normalise_non_default_cols():
                                      compound="meta_cmpd", plate_id="meta_plate")
     assert isinstance(out, pd.DataFrame)
     assert out.shape == non_default_df.shape
+

@@ -1,14 +1,13 @@
 from morar import aggregate
 import numpy as np
 import pandas as pd
-from nose.tools import raises
+import pytest
 import os
 
 np.random.seed(0)
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 my_data_path = os.path.join(THIS_DIR, 'test_data/single_cell_test_data.csv')
 
-@raises(ValueError)
 def test_aggregate_errors_wrong_column():
     x = np.random.random(1000)
     y = np.random.random(1000)
@@ -16,10 +15,10 @@ def test_aggregate_errors_wrong_column():
     metadata_imagenumber = list(range(1,21))*50
     df = pd.DataFrame(list(zip(x, y, z, metadata_imagenumber)))
     df.columns = ["x", "y", "z", "Metadata_imagenumber"]
-    aggregate.aggregate(df, on="incorrect")
+    with pytest.raises(ValueError):
+        aggregate.aggregate(df, on="incorrect")
 
 
-@raises(ValueError)
 def test_aggregate_errors_wrong_column_in_list():
     x = np.random.random(1000)
     y = np.random.random(1000)
@@ -28,10 +27,10 @@ def test_aggregate_errors_wrong_column_in_list():
     metadata_group = ["a", "b"]*500
     df = pd.DataFrame(list(zip(x, y, z, metadata_imagenumber, metadata_group)))
     df.columns = ["x", "y", "z", "Metadata_imagenumber", "Metadata_group"]
-    aggregate.aggregate(df, on=["Metadata_imagenumber", "Metadata_invalid"])
+    with pytest.raises(ValueError):
+        aggregate.aggregate(df, on=["Metadata_imagenumber", "Metadata_invalid"])
 
 
-@raises(ValueError)
 def test_aggregate_errors_non_dataframe():
     x = np.random.random(1000)
     y = np.random.random(1000)
@@ -39,9 +38,10 @@ def test_aggregate_errors_non_dataframe():
     metadata_imagenumber = list(range(1,21))*50
     df = pd.DataFrame(list(zip(x, y, z, metadata_imagenumber)))
     df.columns = ["x", "y", "z", "Metadata_imagenumber"]
-    aggregate.aggregate(x, on="Metadata_imagenumber")
+    with pytest.raises(ValueError):
+        aggregate.aggregate(x, on="Metadata_imagenumber")
 
-@raises(ValueError)
+
 def test_aggregate_errors_invalid_method():
     x = np.random.random(1000)
     y = np.random.random(1000)
@@ -49,7 +49,8 @@ def test_aggregate_errors_invalid_method():
     metadata_imagenumber = list(range(1,21))*50
     df = pd.DataFrame(list(zip(x, y, z, metadata_imagenumber)))
     df.columns = ["x", "y", "z", "Metadata_imagenumber"]
-    aggregate.aggregate(df, on="Metdata_imagenumber", method="invalid")
+    with pytest.raises(ValueError):
+        aggregate.aggregate(df, on="Metdata_imagenumber", method="invalid")
 
 
 def test_aggregate_correct_shape():
@@ -180,7 +181,6 @@ def test_aggregate_real_dataset():
     assert out.shape[0] == n_imagesets
 
 
-@raises(ValueError)
 def test_aggregate_non_metadata_string_cols():
     x = np.random.random(1000)
     y = np.random.random(1000)
@@ -194,5 +194,6 @@ def test_aggregate_non_metadata_string_cols():
     df.columns = ["x", "y", "z", "Img_Metadata_imagenumber",
                   "string_col", "Img_Metadata_other",
                   "Img_Metadata_other_text"]
-    aggregate.aggregate(df, on="Img_Metadata_imagenumber", prefix=False)
+    with pytest.raises(ValueError):
+        aggregate.aggregate(df, on="Img_Metadata_imagenumber", prefix=False)
 

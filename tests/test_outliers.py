@@ -1,11 +1,11 @@
 from morar import outliers
 import pandas as pd
 import numpy as np
-from nose.tools import raises
+import pytest
 
 np.random.seed(0)
 
-@raises(ValueError)
+
 def test_get_outlier_index_errors_wrong_method():
     # example dataset for get_outlier_index
     x = np.random.random(100).tolist()
@@ -15,10 +15,10 @@ def test_get_outlier_index_errors_wrong_method():
     y.append(500)
     df3 = pd.DataFrame(list(zip(x, y)))
     df3.columns = ["x", "y"]
-    outliers.get_outlier_index(df3, method="wrong")
+    with pytest.raises(ValueError):
+        outliers.get_outlier_index(df3, method="wrong")
 
 
-@raises(ValueError)
 def test_get_outlier_index_errors_non_dataframe():
     # example dataset for get_outlier_index
     x = np.random.random(100).tolist()
@@ -28,7 +28,8 @@ def test_get_outlier_index_errors_non_dataframe():
     y.append(500)
     df3 = pd.DataFrame(list(zip(x, y)))
     df3.columns = ["x", "y"]
-    outliers.get_outlier_index(df3["x"].tolist())
+    with pytest.raises(ValueError):
+        outliers.get_outlier_index(df3["x"].tolist())
 
 
 def test_get_outlier_index_adjust():

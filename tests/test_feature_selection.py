@@ -1,8 +1,8 @@
 from morar import feature_selection
 from morar import utils
-from nose.tools import raises
 import numpy as np
 import pandas as pd
+import pytest
 from sklearn.datasets import make_classification
 
 np.random.seed(0)
@@ -20,9 +20,9 @@ def test_find_low_var():
     assert out == ["b"]
 
 
-@raises(ValueError)
 def test_find_low_var_errors():
-    feature_selection.find_low_var(df["a"].tolist())
+    with pytest.raises(ValueError):
+        feature_selection.find_low_var(df["a"].tolist())
 
 
 def test_find_low_var_threshold():
@@ -93,46 +93,46 @@ def test_find_correlation_large_n():
     assert out[0] != ["z"]
 
 
-@raises(ValueError)
 def test_feature_importance_errors_incorrect_compound_col():
     x = np.random.random(100)
     y = np.random.random(100)
     z = ["pos", "neg"]*50
     df = pd.DataFrame(list(zip(x, y, z)))
     df.columns = ["x", "y", "Metadata_compound"]
-    feature_selection.feature_importance(df, "pos", "neg",
-                                         compound_col="incorrect")
+    with pytest.raises(ValueError):
+        feature_selection.feature_importance(df, "pos", "neg",
+                                            compound_col="incorrect")
 
-@raises(ValueError)
 def test_feature_importance_errors_wrong_control_names():
     x = np.random.random(100)
     y = np.random.random(100)
     z = ["pos", "neg"]*50
     df = pd.DataFrame(list(zip(x, y, z)))
     df.columns = ["x", "y", "Metadata_compound"]
-    feature_selection.feature_importance(df, "pos", "incorrect",
-                                         compound_col="Metadata_compound")
+    with pytest.raises(ValueError):
+        feature_selection.feature_importance(df, "pos", "incorrect",
+                                            compound_col="Metadata_compound")
 
-@raises(ValueError)
 def test_feature_importance_errors_wrong_control_names2():
     x = np.random.random(100)
     y = np.random.random(100)
     z = ["pos", "neg"]*50
     df = pd.DataFrame(list(zip(x, y, z)))
     df.columns = ["x", "y", "Metadata_compound"]
-    feature_selection.feature_importance(df, "incorrect", "neg",
-                                         compound_col="Metadata_compound")
+    with pytest.raises(ValueError):
+        feature_selection.feature_importance(df, "incorrect", "neg",
+                                            compound_col="Metadata_compound")
 
 
-@raises(ValueError)
 def test_feature_importance_errors_non_dataframe():
     x = np.random.random(100)
     y = np.random.random(100)
     z = ["pos", "neg"]*50
     df = pd.DataFrame(list(zip(x, y, z)))
     df.columns = ["x", "y", "Metadata_compound"]
-    feature_selection.feature_importance(x, "pos", "neg",
-                                         compound_col="incorrect")
+    with pytest.raises(ValueError):
+        feature_selection.feature_importance(x, "pos", "neg",
+                                            compound_col="incorrect")
 
 
 def test_feature_importance_returns_all_feature_columns():
@@ -199,3 +199,4 @@ def test_select_features():
         compound_col="Metadata_compound")
     assert isinstance(out, list)
     assert len(out) < len(x.columns.tolist())
+
