@@ -216,3 +216,13 @@ def test_drop_threshold():
     out = utils.drop(dataframe, threshold=0.2)
     assert out.columns.tolist() == ["z"]
     assert out.shape[0] == dataframe.shape[0]
+
+
+def test_merge_to_cols():
+    x = [1, 2, 3, None, None]
+    y = [None, None, None, 4, 5]
+    df = pd.DataFrame({"x" : x, "y" : y})
+    new_col = utils.merge_two_cols(df, "x", "y")
+    assert isinstance(new_col, pd.Series)
+    assert new_col.tolist() == [1, 2, 3, 4, 5]
+

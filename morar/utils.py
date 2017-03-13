@@ -204,6 +204,10 @@ def merge_two_cols(data, col1, col2):
         name of column 1
     col2 : string
         name of column 2
+
+    Returns:
+    --------
+    pandas Series
     """
     new_col = pd.concat([data[col1].dropna(), data[col2].dropna()])
     new_col_indexed = new_col.reindex_like(data)
