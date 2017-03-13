@@ -190,3 +190,23 @@ def inflate_cols(dataframe):
 def collapse_cols(dataframe, sep="_"):
     """Given a dataframe, will collapse multi-indexed columns names"""
     return [sep.join(col).strip() for col in dataframe.columns.values]
+
+
+def merge_two_cols(data, col1, col2):
+    """
+    merge two mutually exclusive columns
+
+    Parameters:
+    -----------
+    data : pandas DataFrame
+        DataFrame containing two columns
+    col1 : string
+        name of column 1
+    col2 : string
+        name of column 2
+    """
+    new_col = pd.concat([data[col1].dropna(), data[col2].dropna()])
+    new_col_indexed = new_col.reindex_like(data)
+    assert len(new_col_indexed) == data.shape[0]
+    return new_col_indexed
+
