@@ -156,6 +156,7 @@ def _split_classes(data, neg_cmpd, pos_cmpd, compound_col):
         [X, Y], where X is the dataframe containing feature columns, and Y
         is the list of integers matching to postive or negative controls.
     """
+
     if not isinstance(data, pd.DataFrame):
         raise ValueError("is not a pandas DataFrame")
     if compound_col not in data.columns:
@@ -174,3 +175,48 @@ def _split_classes(data, neg_cmpd, pos_cmpd, compound_col):
     X = df_cntrl[utils.get_featuredata(df_cntrl)]
     Y = df_cntrl[compound_col].tolist()
     return [X, Y]
+
+
+
+def find_unwanted(data, extra=None):
+    """
+    Return list of typically unwanted columns such as object number of
+    object X,Y position
+
+    Parameters:
+    -----------
+    data : pd.DataFrame
+        data
+    extra : string or list of strings
+        Any columns containing strings in extra will also be listed
+
+    Returns:
+    --------
+    List of column names
+    """
+    to_remove = set()
+    colnames = data.columns.tolist()
+    unwanted = ["Location_Center",
+                "Object_Number",
+                "_Children_",
+                "AreaShape_Center_",
+                "Parent_",
+                "Location_MaxIntensity",
+                "Location_Center",
+                "AngleBetweenNeighbors",
+                "ImageNumber",
+                "EulerNumber",
+                "_Location_"]
+    if extra is not None:
+        if isinstance(extra, str):
+            unwanted.append(extra)
+        elif isinstance(extra, list):
+            unwanted.extend(extra)
+        else:
+            TypeError("extra needs to be a list or a string")
+    for column in colnames:
+        for name in unwanted:
+            if name in column:
+                to_remove.add(column)
+    return list(to_remove)
+
