@@ -234,11 +234,11 @@ def img_to_metadata(data, prefix="Metadata_"):
     """
     new_names = []
     colnames = data.columns.tolist()
+    feature_data_prefix = ("Granularity", "Correlation", "Count")
     for name in colnames:
-        if name.startswith("Granularity") or name.startswith("Correlation"):
+        if name.startswith(feature_data_prefix):
             new_names.append(name)
         else:
-            name = prefix + name
-            new_names.append(name)
+            new_names.append(prefix + name)
     return new_names
 
