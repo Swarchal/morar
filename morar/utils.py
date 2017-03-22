@@ -214,3 +214,31 @@ def merge_two_cols(data, col1, col2):
     assert len(new_col_indexed) == data.shape[0]
     return new_col_indexed
 
+
+def img_to_metadata(data, prefix="Metadata_"):
+    """
+    Prepend image column names with a prefix unless it's a feature measurement.
+    I.e everything except image correlations and Granularity
+
+    Parameters:
+    -----------
+    data : pd.DataFrame
+        data
+    prefix : string (default="Metadata_")
+        string with which to prefix metadata columns
+
+
+    Returns:
+    ---------
+    List of new column names
+    """
+    new_names = []
+    colnames = data.columns.tolist()
+    for name in colnames:
+        if name.startswith("Granularity") or name.startswith("Correlation"):
+            new_names.append(name)
+        else:
+            name = prefix + name
+            new_names.append(name)
+    return new_names
+
