@@ -265,7 +265,8 @@ def test_img_to_metadata():
                 'Granularity_10_W1',
                 'Granularity_10_W4',
                 'Granularity_10_W5',
-                'Granularity_11_W1']
+                'Granularity_11_W1',
+                "Metadata_well"]
     dat = np.random.randn(10, len(colnames))
     test_df = pd.DataFrame(dat, columns=colnames)
     ans = utils.img_to_metadata(test_df, prefix="Metadata_")
@@ -305,6 +306,7 @@ def test_img_to_metadata():
                 'Granularity_10_W1',
                 'Granularity_10_W4',
                 'Granularity_10_W5',
-                'Granularity_11_W1']
+                'Granularity_11_W1',
+                "Metadata_well"]
     assert ans == expected
 
