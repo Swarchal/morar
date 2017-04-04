@@ -5,19 +5,19 @@ import numpy as np
 np.random.seed(0)
 
 def test_mad_returns_correct_answer():
-    data_in = [1,1,2,2,4,6,9]
+    data_in = [1, 1, 2, 2, 4, 6, 9]
     correct = 1.0
     assert stats.mad(data_in) == correct
 
 
 def test_mad_all_ones():
-    data_in = [1,1,1,1,1,1]
+    data_in = [1, 1, 1, 1, 1, 1]
     correct = 0.0
     assert stats.mad(data_in) == correct
 
 
 def test_mad_skewed():
-    data_in = [1,1,1,1,1,1,999]
+    data_in = [1, 1, 1, 1, 1, 1, 999]
     correct = 0.0
     assert stats.mad(data_in) == correct
 
@@ -29,16 +29,16 @@ def test_mad_negatives():
 
 
 def test_mad_dataframe_row():
-    x = [1,2,3]
-    y = [4,10, 5]
+    x = [1, 2, 3]
+    y = [4, 10, 5]
     z = [0.4, 8, 0.6]
     df = pd.DataFrame(list(zip(x, y, z)), columns=["x", "y", "z"])
     assert isinstance(stats.mad(df.ix[0]), float)
 
 
 def test_mad_dataframe_apply():
-    x = [1,2,3]
-    y = [1,10, 5]
+    x = [1, 2, 3]
+    y = [1, 10, 5]
     z = [1, 8, 0.6]
     df = pd.DataFrame(list(zip(x, y, z)), columns=["x", "y", "z"])
     out = list(df.apply(lambda x: stats.mad(x), axis=1).values)
@@ -48,7 +48,7 @@ def test_mad_dataframe_apply():
 
 
 def test_glog():
-    x = [1,2,3,4,5,6,7,100]
+    x = [1, 2, 3, 4, 5, 6, 7, 100]
     out = stats.glog(x)
     assert isinstance(out, np.ndarray)
 
@@ -75,19 +75,19 @@ def test_glog_dataframe():
 
 
 def test_zscore_returns_same_size():
-    x = [1,2,3,4,5]
+    x = [1, 2, 3, 4, 5]
     out = stats.z_score(x)
     assert len(x) == len(out)
 
 
 def test_zscore_means_to_zero():
-    x = [1,2,3,4,5,6,3,2,4,5,3,2,3,4]
+    x = [1, 2, 3, 4, 5, 6, 3, 2, 4, 5, 3, 2, 3, 4]
     out = stats.z_score(x)
     assert abs(out.mean() - 0) < 1e-6
 
 
 def test_zscore_sd_to_1():
-    x = [1,2,3,4,5,6,3,2,4,5,3,2,3,4]
+    x = [1, 2, 3, 4, 5, 6, 3, 2, 4, 5, 3, 2, 3, 4]
     out = stats.z_score(x)
     assert abs(out.std() - 1) < 1e-6
 
