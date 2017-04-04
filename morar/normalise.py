@@ -55,7 +55,7 @@ def normalise(data, plate_id, compound="Metadata_compound",
     """
     valid_methods = ["subtract", "divide"]
     if method not in valid_methods:
-        raise ValueError("Invalid method, options: 'subtract', 'divide'")
+        raise ValueError("Invalid method, options: {}".format(valid_methods))
     # check there are some negative controls on each plate
     _check_control(data, plate_id, compound, neg_compound)
     # identify feature columns
