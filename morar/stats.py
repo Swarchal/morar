@@ -1,3 +1,7 @@
+"""
+statistical functions
+"""
+
 from morar import utils
 import numpy as np
 import pandas as pd

@@ -1,10 +1,10 @@
-import numpy as np
-import pandas as pd
-from sklearn.preprocessing import Imputer
-
 """
 Utility functions
 """
+
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import Imputer
 
 def get_featuredata(data, metadata_string="Metadata", prefix=True):
     """

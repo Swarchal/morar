@@ -1,3 +1,7 @@
+"""
+Functions used for feature selection.
+"""
+
 from morar import utils
 import numpy as np
 import pandas as pd
