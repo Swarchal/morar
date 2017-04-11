@@ -120,3 +120,49 @@ def hampel(x, sigma=6):
         elif val < h_neg:
             out[i] = -1
     return out
+
+
+def l1_norm(x, y):
+    """
+    l1 norm between two vectors
+
+    Parameters:
+    -----------
+    x : array-like
+    y : array-like
+
+    Returns:
+    ---------
+    float, l1_norm
+    """
+    return np.sum(np.abs(np.asarray(x) - np.asarray(y)))
+
+
+def cohens_d(pos_control, neg_control):
+    """
+    Cohen's d measure. The standardised difference between the positive and
+    negative control means.
+
+    Parameters:
+    ------------
+    pos_control : numeric array-like
+    neg_control : numeric array-like
+
+    Returns:
+    ---------
+    float
+    """
+    pos = np.asarray(pos_control)
+    neg = np.asarray(neg_control)
+    # if groups sizes are within 10% of each other, then use the simple
+    # sigma prime calculation
+    if abs(len(pos) - len(neg)) < 0.1 * len(pos):
+        sigma_prime = np.sqrt((pos.var() - neg.var()) / 2)
+    else:
+        # if the groups are considerably different sizes then have to
+        # adjust sigma prime to account for this
+        n_pos, n_neg = len(pos), len(neg)
+        sigma_prime = np.sqrt((n_pos * pos.var() + n_neg * neg.var()) / \
+                              (n_pos + n_neg - 2))
+    d = (pos.mean() - neg.mean()) / sigma_prime
+    return d

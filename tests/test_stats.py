@@ -145,3 +145,22 @@ def test_hampel_sigma():
     out = stats.hampel(x_new, sigma=20)
     ans = np.zeros(101)
     assert all(out == ans)
+
+
+
+def test_l1_norm():
+    """morar.stats.l1_norm(x, y)"""
+    x = [1, 2, 1]
+    y = [1, 1, 1]
+    out = stats.l1_norm(x, y)
+    assert out == 1
+
+
+def test_cohens_d():
+    """morar.stats.cohens_d(pos_control, neg_control)"""
+    # mu = 10000, sigma=10
+    pos_control = np.random.normal(1000, 10, 1000)
+    # mu = 100, sigma=10
+    neg_control = np.random.normal(100, 10, 1000)
+    ans = stats.cohens_d(pos_control, neg_control)
+    assert isinstance(ans, np.float)
