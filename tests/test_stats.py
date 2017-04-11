@@ -1,5 +1,6 @@
 from morar import stats
 import pandas as pd
+import pytest
 import numpy as np
 
 np.random.seed(0)
@@ -164,3 +165,15 @@ def test_cohens_d():
     neg_control = np.random.normal(100, 10, 1000)
     ans = stats.cohens_d(pos_control, neg_control)
     assert isinstance(ans, np.float)
+    assert ans > 0
+
+
+def test_cohens_d_detects_wrong_controls():
+    """morar.stats.cohens_d(pos_control, neg_control)"""
+    # mu = 10000, sigma=10
+    neg_control = np.random.normal(1000, 10, 1000)
+    # mu = 100, sigma=10
+    pos_control = np.random.normal(100, 10, 1000)
+    with pytest.raises(ValueError):
+        stats.cohens_d(pos_control, neg_control)
+

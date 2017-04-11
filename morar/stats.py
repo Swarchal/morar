@@ -154,15 +154,18 @@ def cohens_d(pos_control, neg_control):
     """
     pos = np.asarray(pos_control)
     neg = np.asarray(neg_control)
+    # check the controls values are as expected
+    if neg.mean() > pos.mean():
+        msg = "mean of negative control is greater than positive control"
+        raise ValueError(msg)
     # if groups sizes are within 10% of each other, then use the simple
     # sigma prime calculation
     if abs(len(pos) - len(neg)) < 0.1 * len(pos):
-        sigma_prime = np.sqrt((pos.var() - neg.var()) / 2)
+        jacob_cohen = np.sqrt((pos.var() - neg.var()) / 2)
     else:
         # if the groups are considerably different sizes then have to
         # adjust sigma prime to account for this
         n_pos, n_neg = len(pos), len(neg)
-        sigma_prime = np.sqrt((n_pos * pos.var() + n_neg * neg.var()) / \
+        jacob_cohen = np.sqrt((n_pos * pos.var() + n_neg * neg.var()) / \
                               (n_pos + n_neg - 2))
-    d = (pos.mean() - neg.mean()) / sigma_prime
-    return d
+    return (pos.mean() - neg.mean()) / jacob_cohen
