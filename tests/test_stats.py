@@ -177,3 +177,13 @@ def test_cohens_d_detects_wrong_controls():
     with pytest.raises(ValueError):
         stats.cohens_d(pos_control, neg_control)
 
+
+def test_cohens_d_unequal_group_sizes():
+    """morar.stats.cohens_d(pos_control, neg_control)"""
+    # mu = 10000, sigma=10
+    pos_control = np.random.normal(1000, 10, 1000)
+    # mu = 100, sigma=10
+    neg_control = np.random.normal(100, 10, 2000)
+    ans = stats.cohens_d(pos_control, neg_control)
+    assert isinstance(ans, np.float)
+    assert ans > 0
