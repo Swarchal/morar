@@ -79,7 +79,7 @@ class DataFrame(pd.DataFrame):
         ---------
         morar.DataFrame with calculated principal components and metadata
         If var=True (default), also returns a list, where the second element is
-        the exaplained variance of the principal components as calculated by
+        the explained variance of the principal components as calculated by
         `sklearn.decomposition.PCA.explained_variance_`
         """
         pca = PCA(**kwargs)
