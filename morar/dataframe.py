@@ -19,37 +19,41 @@ class DataFrame(pd.DataFrame):
     def __init__(self, data):
         pd.DataFrame.__init__(self, data)
 
+
     @property
-    def featuredata(self, **kwargs):
+    def featuredata(self):
         """return featuredata"""
-        featuredata_cols = utils.get_featuredata(self, **kwargs)
-        return self[featuredata_cols]
+        featuredata_cols = utils.get_featuredata(self)
+        return DataFrame(self[featuredata_cols])
+
 
     @property
-    def featurecols(self, **kwargs):
+    def featurecols(self):
         """return of list feature data column names"""
-        return utils.get_featuredata(self, **kwargs)
+        return utils.get_featuredata(self)
+
 
     @property
-    def metadata(self, **kwargs):
+    def metadata(self):
         """return metadata"""
-        metadata_cols = utils.get_metadata(self, **kwargs)
-        return self[metadata_cols]
+        metadata_cols = utils.get_metadata(self)
+        return DataFrame(self[metadata_cols])
+
 
     @property
-    def metacols(self, **kwargs):
+    def metacols(self):
         """return list of metadata column names"""
-        return utils.get_metadata(self, **kwargs)
+        return utils.get_metadata(self)
 
 
     def scale_features(self, **kwargs):
         """return dataframe of scaled feature data (via z-score)"""
-        return stats.scale_features(self, **kwargs)
+        return DataFrame(stats.scale_features(self, **kwargs))
 
 
     def normalise(self, **kwargs):
         """normalise data via morar.normalise.normalise"""
-        return normalise.normalise(self, **kwargs)
+        return DataFrame(normalise.normalise(self, **kwargs))
 
 
     def query(self, string, **kwargs):
@@ -66,34 +70,24 @@ class DataFrame(pd.DataFrame):
         return DataFrame(result)
 
 
-    def pca(self, var=True, **kwargs):
+    def pca(self, **kwargs):
         """
         return principal components morar.Dataframe and explained variance
 
-        Parameters:
-        -----------
-        var : bool (default=True)
-            whether or not to return the explained variance of the components
-
         Returns:
         ---------
-        morar.DataFrame with calculated principal components and metadata
-        If var=True (default), also returns a list, where the second element is
-        the explained variance of the principal components as calculated by
-        `sklearn.decomposition.PCA.explained_variance_`
+        [morar.DataFrame, array]
+        morar.DataFrame with calculated principal components and metadata as
+        the first element of the list.
+        Also returns the explained variance of the principal components as calculated by
+        `sklearn.decomposition.PCA.explained_variance_`.
         """
         pca = PCA(**kwargs)
-        featuredata = self.get_featuredata(**kwargs)
-        metadata = self.get_metadata(**kwargs)
+        featuredata = self.featuredata
+        metadata = self.metadata
         pca_out = pca.fit_transform(featuredata)
         pc_cols = ["PC" + str(i) for i in range(1, pca_out.shape[1]+1)]
         only_pc = pd.DataFrame(pca_out, columns=pc_cols, index=metadata.index)
         pca_df = DataFrame(pd.concat([only_pc, metadata], axis=1))
-        if var is True:
-            return [pca_df, pca.explained_variance_]
-        elif var is False:
-            return pca_df
-        else:
-            msg = "expected bool for variance, received {}".format(type(var))
-            raise ValueError(msg)
+        return [pca_df, pca.explained_variance_]
 
