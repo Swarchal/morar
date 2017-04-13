@@ -54,20 +54,35 @@ def test_scale_features():
     """morar.dataframe.DataFrame.scale_features()"""
     output = M_TEST_DF.scale_features()
     assert isinstance(output, morar.dataframe.DataFrame)
-    # TODO
-    # check the two feature columns are actually scaled, i.e mean and std of 1
+    # get just the featuredata
+    f_data = output.featuredata
+    for column in f_data:
+        assert f_data[column].mean() < 1e-6
+        # with this few observations then variance doesn't quite equal 1
+        assert abs(f_data[column].std() - 1) < 0.1
+        assert abs(f_data[column].std() - 1) < 0.1
 
 
 def test_query():
     """morar.dataframe.DataFrame.query()"""
-    pass
+    # return just cell_line_A
+    query_str = "Metadata_cell_line == 'cell_line_A'"
+    output = M_TEST_DF.query(query_str)
+    assert isinstance(output, morar.dataframe.DataFrame)
+    assert output.shape[0] == 5
+    assert output.Metadata_cell_line.unique().tolist() == ["cell_line_A"]
 
 
 def test_merge():
     """morar.dataframe.DataFrame.merge()"""
+    # TODO
     pass
 
 
 def test_pca():
     """morar.dataframe.DataFrame.pca()"""
-    pass
+    pca_df, var = M_TEST_DF.pca()
+    assert isinstance(pca_df, morar.dataframe.DataFrame)
+    assert M_TEST_DF.shape == pca_df.shape
+    assert pca_df.featurecols == ["PC1", "PC2"]
+    assert abs(np.sum(var) - 1) < 0.1
