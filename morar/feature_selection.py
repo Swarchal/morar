@@ -99,7 +99,7 @@ def feature_importance(data, neg_cmpd, pos_cmpd,
     # extract feature importance from model
     importances = clf.feature_importances_
     col_names = X.columns.tolist()
-    importances = list(zip(col_names, importances))
+    importances = zip(col_names, importances)
     # convert to list of lists rather than list of tuples
     importances = [list(elem) for elem in importances]
     if sort:
@@ -217,7 +217,7 @@ def find_unwanted(data, extra=None):
         elif isinstance(extra, list):
             unwanted.extend(extra)
         else:
-            TypeError("extra needs to be a list or a string")
+            raise TypeError("extra needs to be a list or a string")
     for column in colnames:
         for name in unwanted:
             if name in column:
