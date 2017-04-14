@@ -161,7 +161,7 @@ def cohens_d(pos_control, neg_control):
     # if groups sizes are within 10% of each other, then use the simple
     # sigma prime calculation
     if abs(len(pos) - len(neg)) < 0.1 * len(pos):
-        jacob_cohen = np.sqrt((pos.var() - neg.var()) / 2)
+        jacob_cohen = np.sqrt((pos.var() + neg.var()) / 2)
     else:
         # if the groups are considerably different sizes then have to
         # adjust sigma prime to account for this
