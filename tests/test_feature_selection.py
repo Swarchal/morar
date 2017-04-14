@@ -202,6 +202,7 @@ def test_select_features():
 
 
 def test_find_unwanted():
+    """morar.feature_selection.find_unwanted()"""
     colnames = ['Nuclei_Intensity_IntegratedIntensityEdge_W1',
                 'Nuclei_Intensity_IntegratedIntensity_W1',
                 'Nuclei_Intensity_LowerQuartileIntensity_W1',
@@ -241,6 +242,7 @@ def test_find_unwanted():
     assert sorted(ans) == sorted(unwanted)
 
 def test_find_unwanted_extra():
+    """morar.feature_selection.find_unwanted()"""
     colnames = ['Nuclei_Intensity_IntegratedIntensityEdge_W1',
                 'Nuclei_Intensity_IntegratedIntensity_W1',
                 'Nuclei_Intensity_LowerQuartileIntensity_W1',
@@ -281,7 +283,36 @@ def test_find_unwanted_extra():
                 'Nuclei_Intensity_StdIntensity_W1']
     assert sorted(ans) == sorted(unwanted)
 
-
-
-
+def test_find_unwanted_extra_error():
+    """morar.feature_selection.find_unwanted()"""
+    colnames = ['Nuclei_Intensity_IntegratedIntensityEdge_W1',
+                'Nuclei_Intensity_IntegratedIntensity_W1',
+                'Nuclei_Intensity_LowerQuartileIntensity_W1',
+                'Nuclei_Intensity_MADIntensity_W1',
+                'Nuclei_Intensity_MassDisplacement_W1',
+                'Nuclei_Intensity_MaxIntensityEdge_W1',
+                'Nuclei_Intensity_MaxIntensity_W1',
+                'Nuclei_Intensity_MeanIntensityEdge_W1',
+                'Nuclei_Intensity_MeanIntensity_W1',
+                'Nuclei_Intensity_MedianIntensity_W1',
+                'Nuclei_Intensity_MinIntensityEdge_W1',
+                'Nuclei_Intensity_MinIntensity_W1',
+                'Nuclei_Intensity_StdIntensityEdge_W1',
+                'Nuclei_Intensity_StdIntensity_W1',
+                'Nuclei_Intensity_UpperQuartileIntensity_W1',
+                'Nuclei_Location_CenterMassIntensity_X_W1',
+                'Nuclei_Location_CenterMassIntensity_Y_W1',
+                'Nuclei_Location_Center_X',
+                'Nuclei_Location_Center_Y',
+                'Nuclei_Location_MaxIntensity_X_W1',
+                'Nuclei_Location_MaxIntensity_Y_W1',
+                'Nuclei_Number_Object_Number',
+                'Nuclei_Texture_AngularSecondMoment_W1_3_0',
+                'Nuclei_Texture_AngularSecondMoment_W1_3_135',
+                'Nuclei_Texture_AngularSecondMoment_W1_3_45',
+                'Nuclei_Texture_AngularSecondMoment_W1_3_90']
+    dat = np.random.randn(10, len(colnames))
+    test_df = pd.DataFrame(dat, columns=colnames)
+    with pytest.raises(TypeError):
+        feature_selection.find_unwanted(test_df, extra=5)
 
