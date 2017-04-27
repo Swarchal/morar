@@ -108,12 +108,12 @@ def hampel(x, sigma=6):
         array of same size as the input, outliers indicated as -1 or 1, nominal
         values as 0.
     """
-    x = np.array(x).astype(np.float)
+    x = np.array(x)
     med_x = np.median(x)
     mad_x = mad(x)
     h_pos = med_x + sigma * mad_x
     h_neg = med_x - sigma * mad_x
-    out = np.zeros(len(x))
+    out = np.zeros(len(x)).astype(np.int)
     for i, val in enumerate(x):
         if val > h_pos:
             out[i] = 1
@@ -169,3 +169,5 @@ def cohens_d(pos_control, neg_control):
         jacob_cohen = np.sqrt((n_pos * pos.var() + n_neg * neg.var()) / \
                               (n_pos + n_neg - 2))
     return (pos.mean() - neg.mean()) / jacob_cohen
+
+

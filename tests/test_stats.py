@@ -120,8 +120,8 @@ def test_hampel():
     x = np.random.random(100)
     x_new = np.append(x, 100)
     out = stats.hampel(x_new)
-    ans = np.zeros(100)
-    ans = np.append(ans, 1.0)
+    ans = np.zeros(100).astype(np.int)
+    ans = np.append(ans, 1)
     assert len(out) == 101
     assert sum(out) == 1.0
     assert all(out == ans)
@@ -131,7 +131,7 @@ def test_hampel_negative():
     x = np.random.random(100)
     x_new = np.append(x, -100)
     out = stats.hampel(x_new)
-    ans = np.zeros(100)
+    ans = np.zeros(100).astype(np.int)
     ans = np.append(ans, -1.0)
     assert len(out) == 101
     assert sum(out) == -1.0
@@ -141,12 +141,11 @@ def test_hampel_negative():
 def test_hampel_sigma():
     x = np.random.random(100)
     # append a value slightly higher than the others
-    x_new = np.append(x, 3)
+    x_new = np.append(x, 10)
     # v. high sigma value
-    out = stats.hampel(x_new, sigma=20)
-    ans = np.zeros(101)
+    out = stats.hampel(x_new, sigma=100)
+    ans = np.zeros(101).astype(np.int)
     assert all(out == ans)
-
 
 
 def test_l1_norm():
