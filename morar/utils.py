@@ -215,7 +215,7 @@ def merge_two_cols(data, col1, col2):
     return new_col_indexed
 
 
-def img_to_metadata(data, prefix="Metadata_"):
+def img_to_metadata(data, prefix="Metadata_", extra=None):
     """
     Prepend image column names with a prefix unless it's a feature measurement.
     I.e everything except image correlations and Granularity
@@ -226,6 +226,8 @@ def img_to_metadata(data, prefix="Metadata_"):
         data
     prefix : string (default="Metadata_")
         string with which to prefix metadata columns
+    extra : string or list of strings (default=None)
+        optional extra feature data prefixes
 
 
     Returns:
@@ -235,6 +237,14 @@ def img_to_metadata(data, prefix="Metadata_"):
     new_names = []
     colnames = data.columns.tolist()
     feature_data_prefix = ("Granularity", "Correlation", "Count", "Metadata")
+    if extra is not None:
+        # add extra prefix(es) to the list
+        if isinstance(extra, str):
+            feature_data_prefix = tuple(list(feature_data_prefix) + [extra])
+        elif isinstance(extra, list):
+            feature_data_prefix = tuple(list(feature_data_prefix) + extra)
+        else:
+            raise TypeError("extra needs to be a string or a list")
     for name in colnames:
         if name.startswith(feature_data_prefix):
             new_names.append(name)
