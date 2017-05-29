@@ -130,28 +130,32 @@ def robust_normalise(data, plate_id, compound="Metadata_compound",
 def _norm_group(group, neg_compound, compound, f_cols):
     """simple normalisation funcion for use with p_normalise"""
     dmso_med = group[group[compound] == neg_compound][f_cols].median()
-    group[f_cols] = group[f_cols].sub(dmso_med)
-    return group
+    copy = group.copy()
+    copy[f_cols] = copy[f_cols].sub(dmso_med)
+    return copy
 
 
-def _apply_parallel(grouped_df, func, neg_compound, compound, f_cols):
+def _apply_parallel(grouped_df, func, neg_compound, compound, f_cols, n_jobs):
     """internal parallel gubbins for p_normalise"""
     n_cpu = multiprocessing.cpu_count()
-    output = Parallel(n_jobs=n_cpu)(delayed(func)(
+    output = Parallel(n_jobs=n_jobs)(delayed(func)(
         group, neg_compound, compound, f_cols) for _, group in grouped_df)
     return pd.concat(output)
 
 
 def p_normalise(data, plate_id, compound="Metadata_compound",
-                neg_compound="DMSO", **kwargs):
+                neg_compound="DMSO", n_jobs=-1, **kwargs):
     """
     parallelised version of normalise, currently only works with subtraction
     normalisation.
     """
     _check_control(data, plate_id, compound, neg_compound)
+    if n_jobs == -1:
+        # use all available cpu cores
+        n_jobs = multiprocessing.cpu_count()
     f_cols = utils.get_featuredata(data, **kwargs)
     grouped = data.groupby(plate_id, as_index=False)
     return _apply_parallel(grouped_df=grouped, func=_norm_group,
                            neg_compound=neg_compound, compound=compound,
-                           f_cols=f_cols)
+                           f_cols=f_cols, n_jobs=n_jobs)
 
