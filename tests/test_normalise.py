@@ -188,3 +188,16 @@ def test_robust_normalise_non_default_cols():
     assert isinstance(out, pd.DataFrame)
     assert out.shape == non_default_df.shape
 
+
+def test_parallel_normalise():
+    x = np.random.randn(50).tolist()
+    y = np.random.randn(50).tolist()
+    z = np.random.randn(50).tolist()
+    plate = ["plate1"]*10 + ["plate2"]*10 + ["plate3"]*10 + ["plate4"]*10 + ["plate5"]*10
+    compound = (["drug"]*8 + ["DMSO"]*2)*5
+    colnames = ["A", "B", "C", "Metadata_plate", "Metadata_compound"]
+    df = pd.DataFrame(list(zip(x, y, z, plate, compound)), columns=colnames)
+    standard_output = normalise.normalise(df, plate_id="Metadata_plate")
+    parallel_output = normalise.p_normalise(df, plate_id="Metadata_plate")
+    assert standard_output.equals(parallel_output)
+

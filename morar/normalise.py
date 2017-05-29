@@ -1,6 +1,8 @@
 from morar import stats
 from morar import utils
 import pandas as pd
+from joblib import Parallel, delayed
+import multiprocessing
 
 # stop copy warning as not using chained assignment
 pd.options.mode.chained_assignment = None  # default='warn'
@@ -67,11 +69,11 @@ def normalise(data, plate_id, compound="Metadata_compound",
     # calculate the average negative control values for each plate
     for _, group in grouped:
         dmso_med_ = group[group[compound] == neg_compound]
-        dmso_med = dmso_med_.loc[:, f_cols].median()
+        dmso_med = dmso_med_[f_cols].median()
         if method == "subtract":
-            group.loc[:, f_cols] = group[f_cols].sub(dmso_med)
+            group[f_cols] = group[f_cols].sub(dmso_med)
         if method == "divide":
-            group.loc[:, f_cols] = group[f_cols].divide(dmso_med)
+            group[f_cols] = group[f_cols].divide(dmso_med)
         # concatenate group to overall dataframe
         df_out = pd.concat([df_out, group])
     # check we have not lost any rows
@@ -123,3 +125,33 @@ def robust_normalise(data, plate_id, compound="Metadata_compound",
     # check we have not lost any rows
     assert data.shape == df_out.shape
     return df_out
+
+
+def _norm_group(group, neg_compound, compound, f_cols):
+    """simple normalisation funcion for use with p_normalise"""
+    dmso_med = group[group[compound] == neg_compound][f_cols].median()
+    group[f_cols] = group[f_cols].sub(dmso_med)
+    return group
+
+
+def _apply_parallel(grouped_df, func, neg_compound, compound, f_cols):
+    """internal parallel gubbins for p_normalise"""
+    n_cpu = multiprocessing.cpu_count()
+    output = Parallel(n_jobs=n_cpu)(delayed(func)(
+        group, neg_compound, compound, f_cols) for _, group in grouped_df)
+    return pd.concat(output)
+
+
+def p_normalise(data, plate_id, compound="Metadata_compound",
+                neg_compound="DMSO", **kwargs):
+    """
+    parallelised version of normalise, currently only works with subtraction
+    normalisation.
+    """
+    _check_control(data, plate_id, compound, neg_compound)
+    f_cols = utils.get_featuredata(data, **kwargs)
+    grouped = data.groupby(plate_id, as_index=False)
+    return _apply_parallel(grouped_df=grouped, func=_norm_group,
+                           neg_compound=neg_compound, compound=compound,
+                           f_cols=f_cols)
+
