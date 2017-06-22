@@ -8,6 +8,14 @@ from morar import stats
 from morar import normalise
 from sklearn.decomposition import PCA
 
+
+def to_morar_df(func):
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+        return DataFrame(result)
+    return wrapper
+
+
 class DataFrame(pd.DataFrame):
 
     """
@@ -70,6 +78,20 @@ class DataFrame(pd.DataFrame):
         return DataFrame(result)
 
 
+    def dropna(self, **kwargs):
+        """dropna via pandas.DataFrame.dropna"""
+        pd_data = pd.DataFrame(self)
+        result = pd_data.dropna(**kwargs)
+        return DataFrame(result)
+
+
+    def drop(self, **kwargs):
+        """drop via pandas.DataFrame.drop"""
+        pd_data = pd.DataFrame(self)
+        result = pd_data.drop(**kwargs)
+        return DataFrame(result)
+
+
     def pca(self, **kwargs):
         """
         return principal components morar.Dataframe and explained variance
@@ -79,8 +101,8 @@ class DataFrame(pd.DataFrame):
         [morar.DataFrame, array]
         morar.DataFrame with calculated principal components and metadata as
         the first element of the list.
-        Also returns the explained variance of the principal components as calculated by
-        `sklearn.decomposition.PCA.explained_variance_`.
+        Also returns the explained variance of the principal components as
+        calculated by `sklearn.decomposition.PCA.explained_variance_`.
         """
         pca = PCA(**kwargs)
         featuredata = self.featuredata
