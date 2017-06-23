@@ -9,7 +9,7 @@ virtual env:
 before_install:
     # clear package index otherwise get package cannot be found errors
     # install compilers for scipy install
-    - sudo rm -fv /var/lib/apt/lists/*
+    - sudo rm -rfv /var/lib/apt/lists/*
     - sudo apt-get update
     - sudo apt-get install gfortran libblas-dev liblapack-dev
 install:
