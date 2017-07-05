@@ -80,15 +80,20 @@ class DataFrame(pd.DataFrame):
 
     def dropna(self, **kwargs):
         """dropna via pandas.DataFrame.dropna"""
-        pd_data = pd.DataFrame(self)
-        result = pd_data.dropna(**kwargs)
+        if "inplace" in kwargs:
+            msg = "inplace modifications do not work with morar.DataFrame"
+            raise NotImplementedError(msg)
+        result = pd.DataFrame.drop(self, **kwargs)
         return DataFrame(result)
 
 
-    def drop(self, **kwargs):
+    def drop(self, label, **kwargs):
         """drop via pandas.DataFrame.drop"""
-        pd_data = pd.DataFrame(self)
-        result = pd_data.drop(**kwargs)
+        if "inplace" in kwargs:
+            msg = "inplace modifications do not work with morar.DataFrame"
+            raise NotImplementedError(msg)
+        pandas_df = pd.DataFrame(self)
+        result = pandas_df.drop(label, **kwargs)
         return DataFrame(result)
 
 
