@@ -157,24 +157,31 @@ def s_normalise(data, plate_id, compound="Metadata_compound",
     return df_out
 
 
-def _norm_group(group, neg_compound, compound, f_cols):
-    """simple normalisation funcion for use with p_normalise"""
+def _norm_group(group, neg_compound, compound, f_cols, method):
+    """normalisation funcion for use with p_normalise"""
     dmso_med = group[group[compound] == neg_compound][f_cols].median()
     copy = group.copy()
-    copy[f_cols] = copy[f_cols].sub(dmso_med)
+    if method == "subtraction":
+        copy[f_cols] = copy[f_cols].sub(dmso_med)
+    elif method == "division":
+        copy[f_cols] = copy[f_cols].div(dmso_med)
+    else:
+        raise ValueError("{} not a valid method".format(method))
     return copy
 
 
-def _apply_parallel(grouped_df, func, neg_compound, compound, f_cols, n_jobs):
+
+def _apply_parallel(grouped_df, func, neg_compound, compound, f_cols, n_jobs,
+                    method):
     """internal parallel gubbins for p_normalise"""
     n_cpu = multiprocessing.cpu_count()
     output = Parallel(n_jobs=n_jobs)(delayed(func)(
-        group, neg_compound, compound, f_cols) for _, group in grouped_df)
+        group, neg_compound, compound, f_cols, method) for _, group in grouped_df)
     return pd.concat(output)
 
 
 def p_normalise(data, plate_id, compound="Metadata_compound",
-                neg_compound="DMSO", n_jobs=-1, **kwargs):
+                neg_compound="DMSO", n_jobs=-1, method="subtraction", **kwargs):
     """
     parallelised version of normalise, currently only works with subtraction
     normalisation.
@@ -183,12 +190,9 @@ def p_normalise(data, plate_id, compound="Metadata_compound",
     if n_jobs == -1:
         # use all available cpu cores
         n_jobs = multiprocessing.cpu_count()
-    if "method" in kwargs:
-        msg = "only implemented subtraction based normalisation in parallel"
-        raise NotImplementedError(msg)
     f_cols = utils.get_featuredata(data, **kwargs)
     grouped = data.groupby(plate_id, as_index=False)
     return _apply_parallel(grouped_df=grouped, func=_norm_group,
                            neg_compound=neg_compound, compound=compound,
-                           f_cols=f_cols, n_jobs=n_jobs)
+                           f_cols=f_cols, n_jobs=n_jobs, method=method)
 
