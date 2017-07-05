@@ -77,7 +77,7 @@ def robust_normalise(data, plate_id, compound="Metadata_compound",
     return df_out
 
 
-def normalise(data, plate_id, parallel=True, **kwargs):
+def normalise(data, plate_id, parallel=False, **kwargs):
     """
     Normalise values against negative controls values per plate.
 
