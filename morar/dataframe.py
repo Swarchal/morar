@@ -83,7 +83,8 @@ class DataFrame(pd.DataFrame):
         if "inplace" in kwargs:
             msg = "inplace modifications do not work with morar.DataFrame"
             raise NotImplementedError(msg)
-        result = pd.DataFrame.drop(self, **kwargs)
+        pandas_df = pd.DataFrame(self)
+        result = pandas_df.dropna(**kwargs)
         return DataFrame(result)
 
 
