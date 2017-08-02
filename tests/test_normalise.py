@@ -198,6 +198,7 @@ def test_parallel_normalise():
     colnames = ["A", "B", "C", "Metadata_plate", "Metadata_compound"]
     df = pd.DataFrame(list(zip(x, y, z, plate, compound)), columns=colnames)
     standard_output = normalise.normalise(df, plate_id="Metadata_plate")
-    parallel_output = normalise.p_normalise(df, plate_id="Metadata_plate")
+    parallel_output = normalise.normalise(df, plate_id="Metadata_plate",
+                                          parallel=True)
     assert standard_output.equals(parallel_output)
 
