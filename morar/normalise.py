@@ -170,7 +170,6 @@ def _norm_group(group, neg_compound, compound, f_cols, method):
     return copy
 
 
-
 def _apply_parallel(grouped_df, func, neg_compound, compound, f_cols, n_jobs,
                     method):
     """internal parallel gubbins for p_normalise"""
@@ -187,7 +186,7 @@ def p_normalise(data, plate_id, compound="Metadata_compound",
     normalisation.
     """
     _check_control(data, plate_id, compound, neg_compound)
-    if n_jobs == -1:
+    if n_jobs < 0:
         # use all available cpu cores
         n_jobs = multiprocessing.cpu_count()
     f_cols = utils.get_featuredata(data, **kwargs)
