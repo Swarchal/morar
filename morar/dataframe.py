@@ -80,9 +80,7 @@ class DataFrame(pd.DataFrame):
 
     def dropna(self, **kwargs):
         """dropna via pandas.DataFrame.dropna"""
-        if "inplace" in kwargs:
-            msg = "inplace modifications do not work with morar.DataFrame"
-            raise NotImplementedError(msg)
+        _check_inplace(kwargs)
         pandas_df = pd.DataFrame(self)
         result = pandas_df.dropna(**kwargs)
         return DataFrame(result)
@@ -90,9 +88,7 @@ class DataFrame(pd.DataFrame):
 
     def drop(self, label, **kwargs):
         """drop via pandas.DataFrame.drop"""
-        if "inplace" in kwargs:
-            msg = "inplace modifications do not work with morar.DataFrame"
-            raise NotImplementedError(msg)
+        _check_inplace(kwargs)
         pandas_df = pd.DataFrame(self)
         result = pandas_df.drop(label, **kwargs)
         return DataFrame(result)
@@ -119,3 +115,8 @@ class DataFrame(pd.DataFrame):
         pca_df = DataFrame(pd.concat([only_pc, metadata], axis=1))
         return [pca_df, pca.explained_variance_]
 
+
+def _check_inplace(**kwargs):
+    if "inplace" in kwargs:
+        msg = "inplace modifications do not work with morar.DataFrames"
+        raise NotImplementedError(msg)
