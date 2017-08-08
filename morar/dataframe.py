@@ -6,6 +6,7 @@ import pandas as pd
 from morar import utils
 from morar import stats
 from morar import normalise
+from morar.aggregate import aggregate
 from sklearn.decomposition import PCA
 
 
@@ -59,6 +60,11 @@ class DataFrame(pd.DataFrame):
         return DataFrame(stats.scale_features(self, **kwargs))
 
 
+    def agg(self, **kwargs):
+        """return aggregated dataframe via morar.aggregate.aggregate"""
+        return DataFrame(aggregate(self, **kwargs))
+
+
     def normalise(self, **kwargs):
         """normalise data via morar.normalise.normalise"""
         return DataFrame(normalise.normalise(self, **kwargs))
@@ -88,7 +94,7 @@ class DataFrame(pd.DataFrame):
 
     def drop(self, label, **kwargs):
         """drop via pandas.DataFrame.drop"""
-        _check_inplace(kwargs)
+        #_check_inplace(kwargs)
         pandas_df = pd.DataFrame(self)
         result = pandas_df.drop(label, **kwargs)
         return DataFrame(result)

@@ -1,6 +1,7 @@
 """
 test morar.dataframe.DataFrame
 """
+import os
 import morar
 import numpy as np
 import pandas as pd
@@ -8,6 +9,8 @@ import pandas as pd
 np.random.seed(42)
 CELL_AREA = np.random.randn(10)
 NUCLEI_SHAPE = np.random.randn(10)
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+my_data_path = os.path.join(THIS_DIR, 'test_data/single_cell_test_data.csv')
 
 # create example dataframe
 TEST_DICT = {
@@ -77,6 +80,21 @@ def test_merge():
     """morar.dataframe.DataFrame.merge()"""
     # TODO
     pass
+
+
+def test_normalise():
+    """morar.dataframe.DataFrame.normalise()"""
+    # TODO
+    pass
+
+
+def test_aggregate():
+    """morar.dataframe.DataFrame.aggregate()"""
+    # TODO
+    df = morar.DataFrame(pd.read_csv(my_data_path))
+    out = df.agg(on="Image_ImageNumber", prefix=False)
+    n_imagesets = len(set(df.Image_ImageNumber))
+    assert out.shape[0] == n_imagesets
 
 
 def test_pca():
