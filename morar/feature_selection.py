@@ -67,6 +67,22 @@ def find_low_var(data, threshold=1e-5):
     return columns
 
 
+def find_replicate_var(data, grouping, sorted_by_var=True):
+    """
+    Return within replicate variance of featuredata
+    """
+    variances = []
+    feature_cols = utils.get_featuredata(data)
+    for _, group in data.groupby(grouping):
+        variance = group[feature_cols].var()
+        variances.append(variance)
+    var_mean = np.nanmean(np.vstack(variances), axis=1)
+    feature_var = list(zip(feature_cols, var_mean))
+    if sorted_by_var:
+        feature_var.sort(key=lambda x: x[1])
+    return feature_var
+
+
 def feature_importance(data, neg_cmpd, pos_cmpd,
                        compound_col="Metadata_compound", sort=False):
     """
@@ -202,6 +218,7 @@ def find_unwanted(data, extra=None):
     colnames = data.columns.tolist()
     unwanted = ["Location_Center",
                 "Object_Number",
+                "ObjectNumber",
                 "_Children_",
                 "AreaShape_Center_",
                 "Parent_",
