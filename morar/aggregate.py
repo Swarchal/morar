@@ -7,7 +7,7 @@ Functions(s) for aggregating data from fine level data to higher-level
 measurements such as object-level to image or well level data
 """
 
-def aggregate(data, on, method="median", **kwargs):
+def aggregate(data, on, method="median", metadata_string="Metadata_", prefix=True):
     """
     Aggregate dataset
 
@@ -27,7 +27,7 @@ def aggregate(data, on, method="median", **kwargs):
         aggregated dataframe, with a row per value of 'on'
     """
     _check_inputs(data, on, method)
-    _check_featuredata(data, on, **kwargs)
+    _check_featuredata(data, on, metadata_string, prefix)
     # keep track of original column order
     df_cols = data.columns.tolist()
     grouped = data.groupby(on, as_index=False)
@@ -35,7 +35,7 @@ def aggregate(data, on, method="median", **kwargs):
         agg = grouped.aggregate(np.mean)
     if method == "median":
         agg = grouped.aggregate(np.median)
-    df_metadata = data[utils.get_metadata(data, **kwargs)].copy()
+    df_metadata = data[utils.get_metadata(data, metadata_string, prefix)].copy()
     # add indexing column to metadata if not already present
     df_metadata[on] = data[on]
     # drop metadata to the same level as aggregated data
@@ -68,14 +68,17 @@ def _check_inputs(data, on, method):
                 raise ValueError("{} not a column in df".format(col))
 
 
-def _check_featuredata(data, on, **kwargs):
+def _check_featuredata(data, on, metadata_string, prefix):
     """
     Check feature data is numerical
     """
-    feature_cols = utils.get_featuredata(data, **kwargs)
+    feature_cols = utils.get_featuredata(data, metadata_string, prefix)
     cols_to_check = [col for col in feature_cols if col not in [on]]
     df_to_check = data[cols_to_check]
     is_number = np.vectorize(lambda x: np.issubdtype(x, np.number))
     if any(is_number(df_to_check.dtypes) == False):
-        raise ValueError("non-numeric column found in feature data")
+        # return column name
+        nn_col = df_to_check.columns[is_number(df_to_check.dtypes) == False]
+        err_msg = "{} is a non-numeric featuredata columns".format(nn_col)
+        raise ValueError(err_msg)
 

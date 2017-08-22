@@ -14,4 +14,4 @@ setup(name='morar',
                         "scipy>=0.9",
                         'scikit-learn>=0.16',
                         'joblib>=0.10'],
-      zip_safe=False)
+      zip_safe=True)

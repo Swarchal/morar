@@ -53,9 +53,46 @@ def test_metadata():
     assert cols_sorted == sorted(["Metadata_compound", "Metadata_cell_line"])
 
 
+def test_different_metadata_prefix():
+    """morar.dataframe.DataFrame(self, metadata_prefix)"""
+    # change the metadata prefix on the test dataframe
+    test_df = M_TEST_DF.copy()
+    metadata_prefix = "Image_Metadata_"
+    new_col_names = [i.replace("Metadata_", metadata_prefix) for i in test_df.columns]
+    test_df.columns = new_col_names
+    test_df = morar.DataFrame(test_df, metadata_string=metadata_prefix)
+    metacols = test_df.metacols
+    featurecols = test_df.featurecols
+    assert all(i.startswith(metadata_prefix) for i in metacols)
+    assert all(not i.startswith(metadata_prefix) for i in featurecols)
+    assert len(metacols) > 0
+    assert len(featurecols) > 0
+
+
 def test_scale_features():
     """morar.dataframe.DataFrame.scale_features()"""
     output = M_TEST_DF.scale_features()
+    assert isinstance(output, morar.dataframe.DataFrame)
+    # get just the featuredata
+    f_data = output.featuredata
+    for column in f_data:
+        assert f_data[column].mean() < 1e-6
+        # with this few observations then variance doesn't quite equal 1
+        assert abs(f_data[column].std() - 1) < 0.1
+        assert abs(f_data[column].std() - 1) < 0.1
+
+
+def test_scale_feature_diff_metadata_prefix():
+    """morar.dataframe.DataFrame.scale_features() with diff metadata prefix"""
+    test_df = M_TEST_DF.copy()
+    metadata_prefix = "Image_Metadata_"
+    new_col_names = [i.replace("Metadata_", metadata_prefix) for i in test_df.columns]
+    test_df.columns = new_col_names
+    test_df = morar.DataFrame(test_df, metadata_string="Image_Metadata_")
+    output = test_df.scale_features()
+    print(output)
+    print(test_df.metadata_string)
+    print(test_df.prefix)
     assert isinstance(output, morar.dataframe.DataFrame)
     # get just the featuredata
     f_data = output.featuredata
@@ -90,11 +127,22 @@ def test_normalise():
 
 def test_aggregate():
     """morar.dataframe.DataFrame.aggregate()"""
-    # TODO
-    df = morar.DataFrame(pd.read_csv(my_data_path))
-    out = df.agg(on="Image_ImageNumber", prefix=False)
+    df = morar.DataFrame(pd.read_csv(my_data_path), prefix=False)
+    out = df.agg(on="Image_ImageNumber")
     n_imagesets = len(set(df.Image_ImageNumber))
     assert out.shape[0] == n_imagesets
+
+
+def test_aggregate_diff_metadata_prefix():
+    """morar.dataframe.DataFrame.aggregate()"""
+    df = pd.read_csv(my_data_path)
+    df.columns = [i.replace("Image_Metadata_", "Image_metadata_") for i in df.columns]
+    df = morar.DataFrame(df, metadata_string="Image_metadata_")
+    out = df.agg(on="Image_ImageNumber")
+    n_imagesets = len(df.Image_ImageNumber.unique())
+    assert out.shape[0] == n_imagesets
+    # check the output inherits metadata strings
+    assert out.metadata_string == "Image_metadata_"
 
 
 def test_pca():

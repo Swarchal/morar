@@ -4,6 +4,19 @@ import numpy as np
 import pytest
 
 
+def test_check_control():
+    """normalise._check_control"""
+    x = np.random.randn(50).tolist()
+    y = np.random.randn(50).tolist()
+    z = np.random.randn(50).tolist()
+    plate = ["plate1"]*10 + ["plate2"]*10 + ["plate3"]*10 + ["plate4"]*10 + ["plate5"]*10
+    compound = (["drug"]*8 + ["DMSO"]*2)*5
+    colnames = ["A", "B", "C", "Metadata_plate", "Metadata_compound"]
+    df = pd.DataFrame(list(zip(x, y, z, plate, compound)), columns=colnames)
+    normalise._check_control(data=df, compound="Metadata_compound",
+                             plate_id="Metadata_plate", neg_compound="DMSO")
+
+
 def test_check_control_within_function():
     # dataframe with missing controls in one plate
     x = np.random.randn(50).tolist()

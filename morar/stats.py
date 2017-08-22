@@ -64,7 +64,7 @@ def z_score(x):
     return (x_np - x_np.mean()) / x_np.std()
 
 
-def scale_features(data, **kwargs):
+def scale_features(data, metadata_string="Metadata_", prefix=True):
     """
     scale and centre features with a z-score
 
@@ -80,8 +80,8 @@ def scale_features(data, **kwargs):
         dataframe of same dimensions as df, with scaled feature values
     """
     data_columns = data.columns.tolist()
-    feature_data = data[utils.get_featuredata(data, **kwargs)]
-    metadata = data[utils.get_metadata(data, **kwargs)]
+    feature_data = data[utils.get_featuredata(data, metadata_string, prefix)]
+    metadata = data[utils.get_metadata(data, metadata_string, prefix)]
     scaled_featuredata = feature_data.apply(z_score)
     scaled_both = pd.concat([scaled_featuredata, metadata], axis=1)
     # return columns to original order

@@ -1,8 +1,8 @@
 from morar import stats
 from morar import utils
 import pandas as pd
-from joblib import Parallel, delayed
 import multiprocessing
+from joblib import Parallel, delayed
 
 # stop copy warning as not using chained assignment
 pd.options.mode.chained_assignment = None  # default='warn'
@@ -25,14 +25,15 @@ def _check_control(data, plate_id, compound="Metadata_compound",
         name of negative control compound in compound col
     """
     for name, group in data.groupby(plate_id):
-        group_cmps = list(set(group[compound]))
+        group_cmps = group[compound].unique()
         if neg_compound not in group_cmps:
             msg = "{} does not contain any negative control values".format(name)
             raise RuntimeError(msg)
 
 
 def robust_normalise(data, plate_id, compound="Metadata_compound",
-                     neg_compound="DMSO", **kwargs):
+                     neg_compound="DMSO", metadata_string="Metadata_",
+                     prefix=True):
     """
     Method used in the Carpenter lab. Substract the median feature value for
     each plate negative control from the treatment feature value and divide by
@@ -56,7 +57,7 @@ def robust_normalise(data, plate_id, compound="Metadata_compound",
         DataFrame of normalised feature values
     """
     _check_control(data, plate_id, compound, neg_compound)
-    f_cols = utils.get_featuredata(data, **kwargs)
+    f_cols = utils.get_featuredata(data, metadata_string, prefix)
     grouped = data.groupby(plate_id, as_index=False)
     df_out = pd.DataFrame()
     # calculate the average negative control values per plate_id
@@ -108,7 +109,8 @@ def normalise(data, plate_id, parallel=False, **kwargs):
 
 
 def s_normalise(data, plate_id, compound="Metadata_compound",
-                neg_compound="DMSO", method="subtract", **kwargs):
+                neg_compound="DMSO", method="subtract",
+                metadata_string="Metadata_", prefix=True):
     """
     Normalise values against negative controls values per plate.
 
@@ -137,7 +139,7 @@ def s_normalise(data, plate_id, compound="Metadata_compound",
     # check there are some negative controls on each plate
     _check_control(data, plate_id, compound, neg_compound)
     # identify feature columns
-    f_cols = utils.get_featuredata(data, **kwargs)
+    f_cols = utils.get_featuredata(data, metadata_string, prefix)
     # dataframe for output
     df_out = pd.DataFrame()
     # group by plate
@@ -180,7 +182,8 @@ def _apply_parallel(grouped_df, func, neg_compound, compound, f_cols, n_jobs,
 
 
 def p_normalise(data, plate_id, compound="Metadata_compound",
-                neg_compound="DMSO", n_jobs=-1, method="subtraction", **kwargs):
+                neg_compound="DMSO", n_jobs=-1, method="subtraction",
+                metadata_string="Metadata_", prefix=True):
     """
     parallelised version of normalise, currently only works with subtraction
     normalisation.
@@ -189,7 +192,7 @@ def p_normalise(data, plate_id, compound="Metadata_compound",
     if n_jobs < 0:
         # use all available cpu cores
         n_jobs = multiprocessing.cpu_count()
-    f_cols = utils.get_featuredata(data, **kwargs)
+    f_cols = utils.get_featuredata(data, metadata_string, prefix)
     grouped = data.groupby(plate_id, as_index=False)
     return _apply_parallel(grouped_df=grouped, func=_norm_group,
                            neg_compound=neg_compound, compound=compound,

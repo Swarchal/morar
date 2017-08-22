@@ -132,7 +132,7 @@ def impute(data, method="median", **kwargs):
 
     Returns
     -------
-    data_out : pandas DataFrame
+    data_out : DataFrame
         DataFrame with imputed missing values
     """
     imp = Imputer(strategy=method, **kwargs)
@@ -160,7 +160,7 @@ def drop(data, threshold=1.0):
 
     Returns
     --------
-    dropped : pandas DataFrame
+    dropped : DataFrame
     """
     if threshold < 0 or threshold > 1.0:
         raise ValueError("threshold outside expected limits (0 to 1.0)")
@@ -176,6 +176,10 @@ def inflate_cols(dataframe):
     Given a DataFrame with collapsed multi-index columns this will
     return a pandas DataFrame index. that can be used like so:
         df.columns = inflate_columns(df)
+
+    Returns:
+    --------
+    DataFrame
     """
     header_1, header_2 = [], []
     for colname in dataframe.columns:

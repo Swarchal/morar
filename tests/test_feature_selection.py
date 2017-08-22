@@ -47,6 +47,16 @@ def test_find_low_var_nan():
     assert (out == ["x", "z"]) or (out == ["z", "x"])
 
 
+def test_find_replicate_var():
+    """morar.feature_selection.find_replicate_var"""
+    # TODO create dataframe with groups and replicates with known variance
+    # TODO calculate feature variance
+    # TODO check against unknown
+    # TODO check sorted sorts by variance
+    pass
+    #assert 2 + 2 == 5 # TODO
+
+
 def test_find_correlation():
     x = range(1000)
     noise = np.random.randn(1000)
@@ -103,6 +113,7 @@ def test_feature_importance_errors_incorrect_compound_col():
         feature_selection.feature_importance(df, "pos", "neg",
                                             compound_col="incorrect")
 
+
 def test_feature_importance_errors_wrong_control_names():
     x = np.random.random(100)
     y = np.random.random(100)
@@ -112,6 +123,7 @@ def test_feature_importance_errors_wrong_control_names():
     with pytest.raises(ValueError):
         feature_selection.feature_importance(df, "pos", "incorrect",
                                             compound_col="Metadata_compound")
+
 
 def test_feature_importance_errors_wrong_control_names2():
     x = np.random.random(100)
