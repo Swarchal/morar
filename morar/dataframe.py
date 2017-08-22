@@ -35,7 +35,9 @@ class DataFrame(pd.DataFrame):
     def featuredata(self):
         """return featuredata"""
         featuredata_cols = utils.get_featuredata(self, self.metadata_string, self.prefix)
-        return DataFrame(self[featuredata_cols])
+        return DataFrame(self[featuredata_cols],
+                         metadata_string=self.metadata_string,
+                         prefix=self.prefix)
 
 
     @property
@@ -48,7 +50,9 @@ class DataFrame(pd.DataFrame):
     def metadata(self):
         """return metadata"""
         metadata_cols = utils.get_metadata(self, self.metadata_string, self.prefix)
-        return DataFrame(self[metadata_cols])
+        return DataFrame(self[metadata_cols],
+                         metadata_string=self.metadata_string,
+                         prefix=self.prefix)
 
 
     @property
