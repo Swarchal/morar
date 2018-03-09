@@ -30,7 +30,6 @@ class DataFrame(pd.DataFrame):
         self.metadata_string = metadata_string
         self.prefix = prefix
 
-
     @property
     def featuredata(self):
         """return featuredata"""
@@ -39,12 +38,10 @@ class DataFrame(pd.DataFrame):
                          metadata_string=self.metadata_string,
                          prefix=self.prefix)
 
-
     @property
     def featurecols(self):
         """return of list feature data column names"""
         return utils.get_featuredata(self, self.metadata_string, self.prefix)
-
 
     @property
     def metadata(self):
@@ -54,12 +51,10 @@ class DataFrame(pd.DataFrame):
                          metadata_string=self.metadata_string,
                          prefix=self.prefix)
 
-
     @property
     def metacols(self):
         """return list of metadata column names"""
         return utils.get_metadata(self, self.metadata_string, self.prefix)
-
 
     def scale_features(self):
         """return dataframe of scaled feature data (via z-score)"""
@@ -67,7 +62,6 @@ class DataFrame(pd.DataFrame):
                                   prefix=self.prefix)
         return DataFrame(df, metadata_string=self.metadata_string,
                          prefix=self.prefix)
-
 
     def agg(self, **kwargs):
         """return aggregated dataframe via morar.aggregate.aggregate"""
@@ -85,7 +79,6 @@ class DataFrame(pd.DataFrame):
         return DataFrame(df, metadata_string=self.metadata_string,
                          prefix=self.metadata_prefix)
 
-
     def query(self, string, **kwargs):
         """pass query as in pd.DataFrame.query(string)"""
         pd_data = pd.DataFrame(self)
@@ -93,14 +86,12 @@ class DataFrame(pd.DataFrame):
         return DataFrame(result, metadata_string=self.metadata_string,
                          prefix=self.prefix)
 
-
     def merge(self, right, **kwargs):
         """merge via pandas.DataFrame.merge"""
         pd_data = pd.DataFrame(self)
         result = pd_data.merge(right, **kwargs)
         return DataFrame(result, metadata_string=self.metadata_string,
                          prefix=self.prefix)
-
 
     def dropna(self, **kwargs):
         """dropna via pandas.DataFrame.dropna"""
@@ -110,7 +101,6 @@ class DataFrame(pd.DataFrame):
         return DataFrame(result, metadata_string=self.metadata_string,
                          prefix=self.prefix)
 
-
     def drop(self, label, **kwargs):
         """drop via pandas.DataFrame.drop"""
         _check_inplace(**kwargs)
@@ -118,7 +108,6 @@ class DataFrame(pd.DataFrame):
         result = pandas_df.drop(label, **kwargs)
         return DataFrame(result, metadata_string=self.metadata_string,
                          prefix=self.prefix)
-
 
     def pca(self, **kwargs):
         """
