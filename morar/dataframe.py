@@ -132,6 +132,29 @@ class DataFrame(pd.DataFrame):
                            prefix=self.prefix)
         return [pca_df, pca.explained_variance_]
 
+    def impute(self, method="median", **kwargs):
+        """
+        Impute missing values by using the feature average.
+
+        Paramters:
+        ----------
+        method: string (default = "median")
+            method with which to calculate the feature average.
+            Options = ("mean", "median")
+        **kwargs:
+            additional methods to be passed to
+            sklearn.preprocessing.Imputer
+
+        Returns:
+        --------
+        pandas.DataFrame
+        A dataframe with imputed missing values
+        """
+        imputed_df = utils.impute(self, method, **kwargs)
+        return DataFrame(imputed_df, metadata_string=self.metadata_string,
+                         prefix=self.metadata_prefix)
+
+
 
 def _check_inplace(**kwargs):
     if "inplace" in kwargs:
