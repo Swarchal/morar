@@ -90,7 +90,7 @@ def scale_features(data, metadata_string="Metadata_", prefix=True):
     return scaled_both
 
 
-def hampel(x, sigma=6):
+def hampel(x, sigma=6, axis=0):
     """
     Hampel filter without window
     (1) = positive outlier, (-1) = negative outlier, (0) = nominal value
