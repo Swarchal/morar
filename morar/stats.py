@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 
-def mad(data):
+def mad(data, axis=0):
     """
     median absolute deviation
 
@@ -15,6 +15,7 @@ def mad(data):
     ----------
     data : array-like
         numbers with which to calculate
+    axis : int (default=0)
 
     Returns
     -------
@@ -22,7 +23,7 @@ def mad(data):
         median absolute deviation
     """
     arr = np.ma.array(data).compressed().astype(np.float)
-    med = np.median(arr)
+    med = np.median(arr, axis=axis)
     return np.median(np.abs(arr - med))
 
 
@@ -101,6 +102,8 @@ def hampel(x, sigma=6):
     sigma : int (default=6)
         number of median absolute deviations away from the sample median to
         define an outlier
+    axis : int (default=0)
+        axis to apply filter to if x is not one dimensional.
 
     Returns
     --------
@@ -109,16 +112,13 @@ def hampel(x, sigma=6):
         values as 0.
     """
     x = np.array(x)
-    med_x = np.median(x)
-    mad_x = mad(x)
-    h_pos = med_x + sigma * mad_x
-    h_neg = med_x - sigma * mad_x
-    out = np.zeros(len(x)).astype(np.int)
-    for i, val in enumerate(x):
-        if val > h_pos:
-            out[i] = 1
-        elif val < h_neg:
-            out[i] = -1
+    median_x = np.median(x, axis=axis)
+    mad_x = mad(x, axis=axis)
+    h_pos = median_x + sigma * mad_x
+    l_neg = median_x - sigma * mad_x
+    out = np.zeros_like(x, dtype=int)
+    out[x > h_pos] = 1
+    out[x < l_neg] = -1
     return out
 
 
