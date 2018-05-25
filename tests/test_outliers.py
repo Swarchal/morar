@@ -43,7 +43,7 @@ def test_get_outlier_index_adjust():
     df3.columns = ["x", "y"]
     out = outliers.get_outlier_index(df3, adjust=True)
     assert len(out) == 1
-    assert out == [100] # 0-based indexing
+    assert out == [100]  # 0-based indexing
 
 
 def test_get_outlier_index_adjust2():
@@ -57,7 +57,7 @@ def test_get_outlier_index_adjust2():
     df3.columns = ["x", "y"]
     out = outliers.get_outlier_index(df3, adjust=False)
     assert len(out) == 1
-    assert out == [100] # 0-based indexing
+    assert out == [100]  # 0-based indexing
 
 
 def test_get_outlier_index_values():
@@ -71,7 +71,7 @@ def test_get_outlier_index_values():
     df3.columns = ["x", "y"]
     out = outliers.get_outlier_index(df3, method="values")
     assert len(out) == 1
-    assert out == [100] # 0-based indexing
+    assert out == [100]  # 0-based indexing
 
 
 def test_get_outlier_index_ImageQuality():
@@ -94,7 +94,8 @@ def test_get_outlier_index_ImageQuality():
         "ImageQuality_PowerLogLogSlope_ch2",
         "ImageQuality_FocusScore_ch1",
         "ImageQuality_FocusScore_ch2",
-        "vals1", "vals2"
+        "vals1",
+        "vals2",
     ]
     out = outliers.get_outlier_index(df, method="ImageQuality", sigma=6)
     assert len(out) == 2

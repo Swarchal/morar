@@ -5,6 +5,7 @@ import numpy as np
 
 np.random.seed(0)
 
+
 def test_mad_returns_correct_answer():
     data_in = [1, 1, 2, 2, 4, 6, 9]
     correct = 1.0
@@ -108,7 +109,7 @@ def test_scale_features_no_metadata():
 def test_scale_features_with_metadata():
     x = np.random.normal(loc=5, scale=1, size=1000)
     y = np.random.normal(loc=10, scale=5, size=1000)
-    metadata_plate = ["A"]*1000
+    metadata_plate = ["A"] * 1000
     df = pd.DataFrame(list(zip(x, y, metadata_plate)))
     df.columns = ["x", "y", "Metadata_plate"]
     out = stats.scale_features(df)

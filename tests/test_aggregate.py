@@ -6,13 +6,14 @@ import os
 
 np.random.seed(0)
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-my_data_path = os.path.join(THIS_DIR, 'test_data/single_cell_test_data.csv')
+my_data_path = os.path.join(THIS_DIR, "test_data/single_cell_test_data.csv")
+
 
 def test_aggregate_errors_wrong_column():
     x = np.random.random(1000)
     y = np.random.random(1000)
     z = np.random.random(1000)
-    metadata_imagenumber = list(range(1,21))*50
+    metadata_imagenumber = list(range(1, 21)) * 50
     df = pd.DataFrame(list(zip(x, y, z, metadata_imagenumber)))
     df.columns = ["x", "y", "z", "Metadata_imagenumber"]
     with pytest.raises(ValueError):
@@ -23,8 +24,8 @@ def test_aggregate_errors_wrong_column_in_list():
     x = np.random.random(1000)
     y = np.random.random(1000)
     z = np.random.random(1000)
-    metadata_imagenumber = list(range(1,21))*50
-    metadata_group = ["a", "b"]*500
+    metadata_imagenumber = list(range(1, 21)) * 50
+    metadata_group = ["a", "b"] * 500
     df = pd.DataFrame(list(zip(x, y, z, metadata_imagenumber, metadata_group)))
     df.columns = ["x", "y", "z", "Metadata_imagenumber", "Metadata_group"]
     with pytest.raises(ValueError):
@@ -35,7 +36,7 @@ def test_aggregate_errors_non_dataframe():
     x = np.random.random(1000)
     y = np.random.random(1000)
     z = np.random.random(1000)
-    metadata_imagenumber = list(range(1,21))*50
+    metadata_imagenumber = list(range(1, 21)) * 50
     df = pd.DataFrame(list(zip(x, y, z, metadata_imagenumber)))
     df.columns = ["x", "y", "z", "Metadata_imagenumber"]
     with pytest.raises(ValueError):
@@ -46,7 +47,7 @@ def test_aggregate_errors_invalid_method():
     x = np.random.random(1000)
     y = np.random.random(1000)
     z = np.random.random(1000)
-    metadata_imagenumber = list(range(1,21))*50
+    metadata_imagenumber = list(range(1, 21)) * 50
     df = pd.DataFrame(list(zip(x, y, z, metadata_imagenumber)))
     df.columns = ["x", "y", "z", "Metadata_imagenumber"]
     with pytest.raises(ValueError):
@@ -57,7 +58,7 @@ def test_aggregate_correct_shape():
     x = np.random.random(1000)
     y = np.random.random(1000)
     z = np.random.random(1000)
-    metadata_imagenumber = list(range(1,21))*50
+    metadata_imagenumber = list(range(1, 21)) * 50
     df = pd.DataFrame(list(zip(x, y, z, metadata_imagenumber)))
     df.columns = ["x", "y", "z", "Metadata_imagenumber"]
     out = aggregate(df, on="Metadata_imagenumber")
@@ -70,7 +71,7 @@ def test_aggregate_on_string():
     x = np.random.random(1000)
     y = np.random.random(1000)
     z = np.random.random(1000)
-    metadata_imagenumber = ["a", "b", "c", "d", "e"]*200
+    metadata_imagenumber = ["a", "b", "c", "d", "e"] * 200
     df = pd.DataFrame(list(zip(x, y, z, metadata_imagenumber)))
     df.columns = ["x", "y", "z", "Metadata_imagenumber"]
     out = aggregate(df, on="Metadata_imagenumber")
@@ -84,8 +85,8 @@ def test_aggregate_on_multiple_columns():
     x = np.random.random(1000)
     y = np.random.random(1000)
     z = np.random.random(1000)
-    metadata_imagenumber = ["a", "b", "c", "d", "e"]*200
-    metadata_group = ["X", "Y"]*500
+    metadata_imagenumber = ["a", "b", "c", "d", "e"] * 200
+    metadata_group = ["X", "Y"] * 500
     df = pd.DataFrame(list(zip(x, y, z, metadata_imagenumber, metadata_group)))
     df.columns = ["x", "y", "z", "Metadata_imagenumber", "Metadata_group"]
     out = aggregate(df, on=["Metadata_imagenumber", "Metadata_group"])
@@ -96,8 +97,8 @@ def test_aggregate_on_multiple_columns():
 
 
 def test_aggregate_methods():
-    x = [1,2,10, 1,5,10]
-    y = [1,2,1,  2,5,1 ]
+    x = [1, 2, 10, 1, 5, 10]
+    y = [1, 2, 1, 2, 5, 1]
     names = ["a", "a", "a", "b", "b", "b"]
     df = pd.DataFrame(list(zip(x, y, names)))
     df.columns = ["x", "y", "group"]
@@ -118,16 +119,24 @@ def test_aggregate_methods():
     assert out_median.isnull().sum().sum() == 0
 
 
-
 def test_aggregate_multiple_metadata():
     x = np.random.random(1000)
     y = np.random.random(1000)
     z = np.random.random(1000)
-    metadata_imagenumber = ["a", "b", "c", "d", "e"]*200
-    metadata_group = ["X", "Y"]*500
+    metadata_imagenumber = ["a", "b", "c", "d", "e"] * 200
+    metadata_group = ["X", "Y"] * 500
     metadata_other = np.random.random(1000)
-    df = pd.DataFrame(list(zip(x, y, z, metadata_imagenumber, metadata_group, metadata_other)))
-    df.columns = ["x", "y", "z", "Metadata_imagenumber", "Metadata_group", "Metadata_other"]
+    df = pd.DataFrame(
+        list(zip(x, y, z, metadata_imagenumber, metadata_group, metadata_other))
+    )
+    df.columns = [
+        "x",
+        "y",
+        "z",
+        "Metadata_imagenumber",
+        "Metadata_group",
+        "Metadata_other",
+    ]
     out = aggregate(df, on=["Metadata_imagenumber", "Metadata_group"])
     assert out.columns.tolist() == df.columns.tolist()
     assert out.shape[0] == 10
@@ -138,14 +147,32 @@ def test_aggregate_multiple_metadata_non_numeric():
     x = np.random.random(1000)
     y = np.random.random(1000)
     z = np.random.random(1000)
-    metadata_imagenumber = ["a", "b", "c", "d", "e"]*200
-    metadata_group = ["X", "Y"]*500
+    metadata_imagenumber = ["a", "b", "c", "d", "e"] * 200
+    metadata_group = ["X", "Y"] * 500
     metadata_other = np.random.random(1000)
-    metadata_other_text = ["foo", "bar"]*500
-    df = pd.DataFrame(list(zip(x, y, z, metadata_imagenumber, metadata_group,
-                               metadata_other, metadata_other_text)))
-    df.columns = ["x", "y", "z", "Metadata_imagenumber", "Metadata_group",
-                  "Metadata_other", "Metadata_other_text"]
+    metadata_other_text = ["foo", "bar"] * 500
+    df = pd.DataFrame(
+        list(
+            zip(
+                x,
+                y,
+                z,
+                metadata_imagenumber,
+                metadata_group,
+                metadata_other,
+                metadata_other_text,
+            )
+        )
+    )
+    df.columns = [
+        "x",
+        "y",
+        "z",
+        "Metadata_imagenumber",
+        "Metadata_group",
+        "Metadata_other",
+        "Metadata_other_text",
+    ]
     out = aggregate(df, on=["Metadata_imagenumber"])
     assert out.columns.tolist() == df.columns.tolist()
     assert out.shape[0] == 5
@@ -160,15 +187,32 @@ def test_aggregate_handles_non_standard_metadata_tags():
     x = np.random.random(1000)
     y = np.random.random(1000)
     z = np.random.random(1000)
-    metadata_imagenumber = ["a", "b", "c", "d", "e"]*200
-    metadata_group = ["X", "Y"]*500
+    metadata_imagenumber = ["a", "b", "c", "d", "e"] * 200
+    metadata_group = ["X", "Y"] * 500
     metadata_other = np.random.random(1000)
-    metadata_other_text = ["foo", "bar"]*500
-    df = pd.DataFrame(list(zip(x, y, z, metadata_imagenumber, metadata_group,
-                               metadata_other, metadata_other_text)))
-    df.columns = ["x", "y", "z", "Img_Metadata_imagenumber",
-                  "Img_Metadata_group", "Img_Metadata_other",
-                  "Img_Metadata_other_text"]
+    metadata_other_text = ["foo", "bar"] * 500
+    df = pd.DataFrame(
+        list(
+            zip(
+                x,
+                y,
+                z,
+                metadata_imagenumber,
+                metadata_group,
+                metadata_other,
+                metadata_other_text,
+            )
+        )
+    )
+    df.columns = [
+        "x",
+        "y",
+        "z",
+        "Img_Metadata_imagenumber",
+        "Img_Metadata_group",
+        "Img_Metadata_other",
+        "Img_Metadata_other_text",
+    ]
     out = aggregate(df, on="Img_Metadata_imagenumber", prefix=False)
     assert out.columns.tolist() == df.columns.tolist()
     assert out.shape[0] == 5
@@ -185,15 +229,31 @@ def test_aggregate_non_metadata_string_cols():
     x = np.random.random(1000)
     y = np.random.random(1000)
     z = np.random.random(1000)
-    metadata_imagenumber = ["a", "b", "c", "d", "e"]*200
-    string_col = ["X", "Y"]*500
+    metadata_imagenumber = ["a", "b", "c", "d", "e"] * 200
+    string_col = ["X", "Y"] * 500
     metadata_other = np.random.random(1000)
-    metadata_other_text = ["foo", "bar"]*500
-    df = pd.DataFrame(list(zip(x, y, z, metadata_imagenumber, string_col,
-                               metadata_other, metadata_other_text)))
-    df.columns = ["x", "y", "z", "Img_Metadata_imagenumber",
-                  "string_col", "Img_Metadata_other",
-                  "Img_Metadata_other_text"]
+    metadata_other_text = ["foo", "bar"] * 500
+    df = pd.DataFrame(
+        list(
+            zip(
+                x,
+                y,
+                z,
+                metadata_imagenumber,
+                string_col,
+                metadata_other,
+                metadata_other_text,
+            )
+        )
+    )
+    df.columns = [
+        "x",
+        "y",
+        "z",
+        "Img_Metadata_imagenumber",
+        "string_col",
+        "Img_Metadata_other",
+        "Img_Metadata_other_text",
+    ]
     with pytest.raises(ValueError):
         aggregate(df, on="Img_Metadata_imagenumber", prefix=False)
-

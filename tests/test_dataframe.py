@@ -10,14 +10,14 @@ np.random.seed(42)
 CELL_AREA = np.random.randn(10)
 NUCLEI_SHAPE = np.random.randn(10)
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-my_data_path = os.path.join(THIS_DIR, 'test_data/single_cell_test_data.csv')
+my_data_path = os.path.join(THIS_DIR, "test_data/single_cell_test_data.csv")
 
 # create example dataframe
 TEST_DICT = {
-    "cell_area"          : CELL_AREA,
-    "nuclei_shape"       : NUCLEI_SHAPE,
-    "Metadata_compound"  : ["drug_{}".format(i) for i in "AABBCCDDEE"],
-    "Metadata_cell_line" : ["cell_line_A", "cell_line_B"] * 5
+    "cell_area": CELL_AREA,
+    "nuclei_shape": NUCLEI_SHAPE,
+    "Metadata_compound": ["drug_{}".format(i) for i in "AABBCCDDEE"],
+    "Metadata_cell_line": ["cell_line_A", "cell_line_B"] * 5,
 }
 TEST_DF = pd.DataFrame(TEST_DICT)
 M_TEST_DF = morar.DataFrame(TEST_DF)
