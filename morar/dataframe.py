@@ -95,7 +95,7 @@ class DataFrame(pd.DataFrame):
 
     def dropna(self, **kwargs):
         """dropna via pandas.DataFrame.dropna"""
-        _check_inplace(kwargs)
+        _check_inplace(**kwargs)
         pandas_df = pd.DataFrame(self)
         result = pandas_df.dropna(**kwargs)
         return DataFrame(result, metadata_string=self.metadata_string,
