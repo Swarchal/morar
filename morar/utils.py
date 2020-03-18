@@ -8,7 +8,7 @@ import pandas as pd
 # keep this for backwards compatibility for now
 try:
     from sklearn.preprocessing import Imputer
-except AttributeError:
+except ImportError:
     from sklearn.impute import SimpleImputer as Imputer
 
 
