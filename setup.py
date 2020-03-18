@@ -1,5 +1,11 @@
 from setuptools import setup
 
+
+def read_requirements():
+      with open("requirements.txt", "r") as f:
+            return [i.strip() for i in f.readlines()]
+
+
 setup(name='morar',
       version='0.1',
       url='http://github.com/swarchal/morar',
@@ -10,9 +16,5 @@ setup(name='morar',
       packages=['morar'],
       python_requires=">=3.5",
       tests_require='pytest',
-      install_requires=['pandas>=0.16',
-                        'numpy>=1.0',
-                        "scipy>=0.9",
-                        'scikit-learn>=0.16',
-                        'joblib>=0.10'],
+      install_requires=read_requirements(),
       zip_safe=True)
