@@ -35,7 +35,7 @@ def test_mad_dataframe_row():
     y = [4, 10, 5]
     z = [0.4, 8, 0.6]
     df = pd.DataFrame(list(zip(x, y, z)), columns=["x", "y", "z"])
-    assert isinstance(stats.mad(df.ix[0]), float)
+    assert isinstance(stats.mad(df.iloc[0]), float)
 
 
 def test_mad_dataframe_apply():

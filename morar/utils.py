@@ -4,7 +4,13 @@ Utility functions
 
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import Imputer
+# preprocessing.Imputer was deprecated in 0.20
+# keep this for backwards compatibility for now
+try:
+    from sklearn.preprocessing import Imputer
+except AttributeError:
+    from sklearn.impute import SimpleImputer as Imputer
+
 
 def get_featuredata(data, metadata_string="Metadata", prefix=True):
     """
