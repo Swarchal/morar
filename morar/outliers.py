@@ -8,6 +8,7 @@ Function(s) for finding outliers. Outliers are normally caused by out-of-focus
 images or debris within wells which can cause extreme values upon segmentation.
 """
 
+
 def get_outlier_index(data, method="values", sigma=6, adjust=True, **kwargs):
     """
     Returns index of outlying row(s)

@@ -2,9 +2,11 @@
 test morar.dataframe.DataFrame
 """
 import os
-import morar
+
 import numpy as np
 import pandas as pd
+
+import morar
 
 np.random.seed(42)
 CELL_AREA = np.random.randn(10)
@@ -127,9 +129,11 @@ def test_normalise():
 
 def test_aggregate():
     """morar.dataframe.DataFrame.aggregate()"""
-    df = morar.DataFrame(pd.read_csv(my_data_path), prefix=False)
-    out = df.agg(on="Image_ImageNumber")
-    n_imagesets = len(set(df.Image_ImageNumber))
+    df = pd.read_csv(my_data_path)
+    df = df.rename(columns={"Image_ImageNumber": "Metadata_Image_ImageNumber"})
+    df = morar.DataFrame(df, prefix=False)
+    out = df.agg(on="Metadata_Image_ImageNumber")
+    n_imagesets = len(set(df.Metadata_Image_ImageNumber))
     assert out.shape[0] == n_imagesets
 
 
@@ -137,9 +141,10 @@ def test_aggregate_diff_metadata_prefix():
     """morar.dataframe.DataFrame.aggregate()"""
     df = pd.read_csv(my_data_path)
     df.columns = [i.replace("Image_Metadata_", "Image_metadata_") for i in df.columns]
+    df = df.rename(columns={"Image_ImageNumber": "Image_metadata_ImageNumber"})
     df = morar.DataFrame(df, metadata_string="Image_metadata_")
-    out = df.agg(on="Image_ImageNumber")
-    n_imagesets = len(df.Image_ImageNumber.unique())
+    out = df.agg(on="Image_metadata_ImageNumber")
+    n_imagesets = len(df.Image_metadata_ImageNumber.unique())
     assert out.shape[0] == n_imagesets
     # check the output inherits metadata strings
     assert out.metadata_string == "Image_metadata_"

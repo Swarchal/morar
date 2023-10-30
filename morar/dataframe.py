@@ -14,6 +14,7 @@ def to_morar_df(func):
     def wrapper(*args, **kwargs):
         result = func(*args, **kwargs)
         return DataFrame(result)
+
     return wrapper
 
 
@@ -33,10 +34,14 @@ class DataFrame(pd.DataFrame):
     @property
     def featuredata(self):
         """return featuredata"""
-        featuredata_cols = utils.get_featuredata(self, self.metadata_string, self.prefix)
-        return DataFrame(self[featuredata_cols],
-                         metadata_string=self.metadata_string,
-                         prefix=self.prefix)
+        featuredata_cols = utils.get_featuredata(
+            self, self.metadata_string, self.prefix
+        )
+        return DataFrame(
+            self[featuredata_cols],
+            metadata_string=self.metadata_string,
+            prefix=self.prefix,
+        )
 
     @property
     def featurecols(self):
@@ -47,9 +52,11 @@ class DataFrame(pd.DataFrame):
     def metadata(self):
         """return metadata"""
         metadata_cols = utils.get_metadata(self, self.metadata_string, self.prefix)
-        return DataFrame(self[metadata_cols],
-                         metadata_string=self.metadata_string,
-                         prefix=self.prefix)
+        return DataFrame(
+            self[metadata_cols],
+            metadata_string=self.metadata_string,
+            prefix=self.prefix,
+        )
 
     @property
     def metacols(self):
@@ -58,56 +65,62 @@ class DataFrame(pd.DataFrame):
 
     def scale_features(self):
         """return dataframe of scaled feature data (via z-score)"""
-        df = stats.scale_features(self, metadata_string=self.metadata_string,
-                                  prefix=self.prefix)
-        return DataFrame(df, metadata_string=self.metadata_string,
-                         prefix=self.prefix)
+        df = stats.scale_features(
+            self, metadata_string=self.metadata_string, prefix=self.prefix
+        )
+        return DataFrame(df, metadata_string=self.metadata_string, prefix=self.prefix)
 
     def agg(self, **kwargs):
         """return aggregated dataframe via morar.aggregate.aggregate"""
-        agg_df = aggregate(self, metadata_string=self.metadata_string,
-                           prefix=self.prefix, **kwargs)
-        return DataFrame(agg_df, metadata_string=self.metadata_string,
-                         prefix=self.prefix)
-
+        agg_df = aggregate(
+            self, metadata_string=self.metadata_string, prefix=self.prefix, **kwargs
+        )
+        return DataFrame(
+            agg_df, metadata_string=self.metadata_string, prefix=self.prefix
+        )
 
     def normalise(self, **kwargs):
         """normalise data via morar.normalise.normalise"""
-        df = normalise.normalise(self,
-                                 metadata_string=self.metadata_string,
-                                 prefix=self.prefix **kwargs)
-        return DataFrame(df, metadata_string=self.metadata_string,
-                         prefix=self.metadata_prefix)
+        df = normalise.normalise(
+            self, metadata_string=self.metadata_string, prefix=self.prefix**kwargs
+        )
+        return DataFrame(
+            df, metadata_string=self.metadata_string, prefix=self.metadata_prefix
+        )
 
     def query(self, string, **kwargs):
         """pass query as in pd.DataFrame.query(string)"""
         pd_data = pd.DataFrame(self)
         result = pd_data.query(string, **kwargs)
-        return DataFrame(result, metadata_string=self.metadata_string,
-                         prefix=self.prefix)
+        return DataFrame(
+            result, metadata_string=self.metadata_string, prefix=self.prefix
+        )
 
     def merge(self, right, **kwargs):
         """merge via pandas.DataFrame.merge"""
         pd_data = pd.DataFrame(self)
         result = pd_data.merge(right, **kwargs)
-        return DataFrame(result, metadata_string=self.metadata_string,
-                         prefix=self.prefix)
+        return DataFrame(
+            result, metadata_string=self.metadata_string, prefix=self.prefix
+        )
 
     def dropna(self, **kwargs):
         """dropna via pandas.DataFrame.dropna"""
         _check_inplace(**kwargs)
         pandas_df = pd.DataFrame(self)
         result = pandas_df.dropna(**kwargs)
-        return DataFrame(result, metadata_string=self.metadata_string,
-                         prefix=self.prefix)
+        return DataFrame(
+            result, metadata_string=self.metadata_string, prefix=self.prefix
+        )
 
     def drop(self, label, **kwargs):
         """drop via pandas.DataFrame.drop"""
         _check_inplace(**kwargs)
         pandas_df = pd.DataFrame(self)
         result = pandas_df.drop(label, **kwargs)
-        return DataFrame(result, metadata_string=self.metadata_string,
-                         prefix=self.prefix)
+        return DataFrame(
+            result, metadata_string=self.metadata_string, prefix=self.prefix
+        )
 
     def pca(self, **kwargs):
         """
@@ -125,11 +138,13 @@ class DataFrame(pd.DataFrame):
         featuredata = self.featuredata
         metadata = self.metadata
         pca_out = pca.fit_transform(featuredata)
-        pc_cols = ["PC" + str(i) for i in range(1, pca_out.shape[1]+1)]
+        pc_cols = ["PC" + str(i) for i in range(1, pca_out.shape[1] + 1)]
         only_pc = pd.DataFrame(pca_out, columns=pc_cols, index=metadata.index)
-        pca_df = DataFrame(pd.concat([only_pc, metadata], axis=1),
-                           metadata_string=self.metadata_string,
-                           prefix=self.prefix)
+        pca_df = DataFrame(
+            pd.concat([only_pc, metadata], axis=1),
+            metadata_string=self.metadata_string,
+            prefix=self.prefix,
+        )
         return [pca_df, pca.explained_variance_]
 
     def impute(self, method="median", **kwargs):
@@ -151,9 +166,11 @@ class DataFrame(pd.DataFrame):
         A dataframe with imputed missing values
         """
         imputed_df = utils.impute(self, method, **kwargs)
-        return DataFrame(imputed_df, metadata_string=self.metadata_string,
-                         prefix=self.metadata_prefix)
-
+        return DataFrame(
+            imputed_df,
+            metadata_string=self.metadata_string,
+            prefix=self.metadata_prefix,
+        )
 
 
 def _check_inplace(**kwargs):

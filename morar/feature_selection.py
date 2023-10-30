@@ -9,6 +9,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import LinearSVC
 from sklearn.feature_selection import SelectFromModel
 
+
 def find_correlation(data, threshold=0.9):
     """
     Given a numeric pd.DataFrame, this will find highly correlated features,
@@ -83,8 +84,9 @@ def find_replicate_var(data, grouping, sorted_by_var=True):
     return feature_var
 
 
-def feature_importance(data, neg_cmpd, pos_cmpd,
-                       compound_col="Metadata_compound", sort=False):
+def feature_importance(
+    data, neg_cmpd, pos_cmpd, compound_col="Metadata_compound", sort=False
+):
     """
     Return features importances, based on separating the positive and negative
     controls in a random forest classifier.
@@ -123,8 +125,7 @@ def feature_importance(data, neg_cmpd, pos_cmpd,
     return importances
 
 
-def select_features(data, neg_cmpd, pos_cmpd, compound_col="Metadata_compound",
-                    C=0.01):
+def select_features(data, neg_cmpd, pos_cmpd, compound_col="Metadata_compound", C=0.01):
     """
     Return selected features basd on L1 linear svc.
 
@@ -152,7 +153,6 @@ def select_features(data, neg_cmpd, pos_cmpd, compound_col="Metadata_compound",
     feature_names = np.array(X.columns.tolist())
     selected_features = list(feature_names[feature_mask])
     return selected_features
-
 
 
 def _split_classes(data, neg_cmpd, pos_cmpd, compound_col):
@@ -185,7 +185,7 @@ def _split_classes(data, neg_cmpd, pos_cmpd, compound_col):
         raise ValueError("{} is not in column {}".format(neg_cmpd, compound_col))
     if pos_cmpd not in data[compound_col].tolist():
         raise ValueError("{} is not in column {}".format(pos_cmpd, compound_col))
-    #split data into just positive and negative controls
+    # split data into just positive and negative controls
     controls = [neg_cmpd, pos_cmpd]
     df_cntrl = data[data[compound_col].isin(controls)].copy()
     # convert compound labels to integers. pos_cmpd=1, neg_cmpd=0
@@ -195,7 +195,6 @@ def _split_classes(data, neg_cmpd, pos_cmpd, compound_col):
     X = df_cntrl[utils.get_featuredata(df_cntrl)]
     Y = df_cntrl[compound_col].tolist()
     return [X, Y]
-
 
 
 def find_unwanted(data, extra=None):
@@ -216,18 +215,20 @@ def find_unwanted(data, extra=None):
     """
     to_remove = set()
     colnames = data.columns.tolist()
-    unwanted = ["Location_Center",
-                "Object_Number",
-                "ObjectNumber",
-                "_Children_",
-                "AreaShape_Center_",
-                "Parent_",
-                "Location_MaxIntensity",
-                "Location_Center",
-                "AngleBetweenNeighbors",
-                "ImageNumber",
-                "EulerNumber",
-                "_Location_"]
+    unwanted = [
+        "Location_Center",
+        "Object_Number",
+        "ObjectNumber",
+        "_Children_",
+        "AreaShape_Center_",
+        "Parent_",
+        "Location_MaxIntensity",
+        "Location_Center",
+        "AngleBetweenNeighbors",
+        "ImageNumber",
+        "EulerNumber",
+        "_Location_",
+    ]
     if extra is not None:
         if isinstance(extra, str):
             unwanted.append(extra)
@@ -240,4 +241,3 @@ def find_unwanted(data, extra=None):
             if name in column:
                 to_remove.add(column)
     return list(to_remove)
-

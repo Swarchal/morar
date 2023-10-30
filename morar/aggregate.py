@@ -1,13 +1,23 @@
-from morar import utils
+from collections.abc import Callable
+
 import numpy as np
 import pandas as pd
+
+from morar import utils
 
 """
 Functions(s) for aggregating data from fine level data to higher-level
 measurements such as object-level to image or well level data
 """
 
-def aggregate(data, on, method="median", metadata_string="Metadata_", prefix=True):
+
+def aggregate(
+    data: pd.DataFrame,
+    on: str | list[str],
+    method: str | Callable = "median",
+    metadata_string: str = "Metadata_",
+    prefix: bool = True,
+) -> pd.DataFrame:
     """
     Aggregate dataset
 
@@ -28,30 +38,23 @@ def aggregate(data, on, method="median", metadata_string="Metadata_", prefix=Tru
     """
     _check_inputs(data, on, method)
     _check_featuredata(data, on, metadata_string, prefix)
+    if isinstance(on, str):
+        on = [on]
     # keep track of original column order
-    df_cols = data.columns.tolist()
-    grouped = data.groupby(on, as_index=False)
-    if method == "mean":
-        agg = grouped.aggregate(np.mean)
-    if method == "median":
-        agg = grouped.aggregate(np.median)
-    df_metadata = data[utils.get_metadata(data, metadata_string, prefix)].copy()
-    # add indexing column to metadata if not already present
-    df_metadata[on] = data[on]
-    # drop metadata to the same level as aggregated data
-    df_metadata.drop_duplicates(subset=on, inplace=True)
-    # merge aggregated and feature data
-    merged_df = pd.merge(agg, df_metadata, on=on, how="outer",
-                         suffixes=("remove_me", ""))
-    # merge untracked columns with merged data
-    merged_df = merged_df[df_cols]
-    # re-arrange to columns are in original order
-    assert len(merged_df.columns) == len(data.columns)
-    return merged_df
+    orig_cols = data.columns.tolist()
+    fcols = utils.get_featuredata(data, metadata_string, prefix)
+    fcols.extend(on)
+    mcols = utils.get_metadata(data, metadata_string, prefix)
+    for i in on:
+        assert i in mcols, "on must be one or more metadata columns"
+    fdata_agg = data[fcols].groupby(on).agg(method).reset_index().drop(columns=on)
+    mdata_agg = data[mcols].groupby(on).agg("first").reset_index()
+    agg_merged = pd.concat([fdata_agg, mdata_agg], axis=1)
+    return agg_merged[orig_cols]
 
 
 def _check_inputs(data, on, method):
-    """ internal function for aggregate() to check validity of inputs """
+    """internal function for aggregate() to check validity of inputs"""
     valid_methods = ["median", "mean"]
     if not isinstance(data, pd.DataFrame):
         raise ValueError("not a a pandas DataFrame")
@@ -81,4 +84,3 @@ def _check_featuredata(data, on, metadata_string, prefix):
         nn_col = df_to_check.columns[is_number(df_to_check.dtypes) == False]
         err_msg = "{} is a non-numeric featuredata columns".format(nn_col)
         raise ValueError(err_msg)
-

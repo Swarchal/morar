@@ -4,6 +4,7 @@ Utility functions
 
 import numpy as np
 import pandas as pd
+
 # preprocessing.Imputer was deprecated in 0.20
 # keep this for backwards compatibility for now
 try:
@@ -71,7 +72,6 @@ def get_metadata(data, metadata_string="Metadata", prefix=True):
     elif prefix is False:
         m_cols = [i for i in data.columns if metadata_string in i]
     return m_cols
-
 
 
 def is_all_nan(data):
@@ -261,4 +261,3 @@ def img_to_metadata(data, prefix="Metadata_", extra=None):
         else:
             new_names.append(prefix + name)
     return new_names
-

@@ -1,7 +1,8 @@
-from morar import stats
+import numpy as np
 import pandas as pd
 import pytest
-import numpy as np
+
+from morar import stats
 
 np.random.seed(0)
 
@@ -121,7 +122,7 @@ def test_hampel():
     x = np.random.random(100)
     x_new = np.append(x, 100)
     out = stats.hampel(x_new)
-    ans = np.zeros(100).astype(np.int)
+    ans = np.zeros(100).astype(int)
     ans = np.append(ans, 1)
     assert len(out) == 101
     assert sum(out) == 1.0
@@ -132,7 +133,7 @@ def test_hampel_negative():
     x = np.random.random(100)
     x_new = np.append(x, -100)
     out = stats.hampel(x_new)
-    ans = np.zeros(100).astype(np.int)
+    ans = np.zeros(100).astype(int)
     ans = np.append(ans, -1.0)
     assert len(out) == 101
     assert sum(out) == -1.0
@@ -145,7 +146,7 @@ def test_hampel_sigma():
     x_new = np.append(x, 10)
     # v. high sigma value
     out = stats.hampel(x_new, sigma=100)
-    ans = np.zeros(101).astype(np.int)
+    ans = np.zeros(101).astype(int)
     assert all(out == ans)
 
 
@@ -164,7 +165,7 @@ def test_cohens_d():
     # mu = 100, sigma=10
     neg_control = np.random.normal(100, 10, 1000)
     ans = stats.cohens_d(pos_control, neg_control)
-    assert isinstance(ans, np.float)
+    assert isinstance(ans, float)
     assert ans > 0
 
 
@@ -185,5 +186,5 @@ def test_cohens_d_unequal_group_sizes():
     # mu = 100, sigma=10
     neg_control = np.random.normal(100, 10, 2000)
     ans = stats.cohens_d(pos_control, neg_control)
-    assert isinstance(ans, np.float)
+    assert isinstance(ans, float)
     assert ans > 0

@@ -27,7 +27,7 @@ def test_find_low_var_errors():
 
 def test_find_low_var_threshold():
     sigma = 0.5
-    var = sigma ** 2
+    var = sigma**2
     x = np.random.normal(loc=1, scale=sigma, size=1000)
     y = np.random.normal(loc=1, scale=1.0, size=1000)
     df2 = pd.DataFrame(list(zip(x, y)))

@@ -7,8 +7,8 @@ from joblib import Parallel, delayed
 # stop copy warning as not using chained assignment
 pd.options.mode.chained_assignment = None  # default='warn'
 
-def _check_control(data, plate_id, compound="Metadata_compound",
-                   neg_compound="DMSO"):
+
+def _check_control(data, plate_id, compound="Metadata_compound", neg_compound="DMSO"):
     """
     check each plate contains at least 1 negative control value. Raise an error
     if this is not the case.
@@ -31,9 +31,14 @@ def _check_control(data, plate_id, compound="Metadata_compound",
             raise RuntimeError(msg)
 
 
-def robust_normalise(data, plate_id, compound="Metadata_compound",
-                     neg_compound="DMSO", metadata_string="Metadata_",
-                     prefix=True):
+def robust_normalise(
+    data,
+    plate_id,
+    compound="Metadata_compound",
+    neg_compound="DMSO",
+    metadata_string="Metadata_",
+    prefix=True,
+):
     """
     Method used in the Carpenter lab. Substract the median feature value for
     each plate negative control from the treatment feature value and divide by
@@ -70,7 +75,7 @@ def robust_normalise(data, plate_id, compound="Metadata_compound",
         # subtract each row of the group by that group's DMSO values
         group[f_cols] = group[f_cols].sub(dmso_med)
         # divide by the MAD of the negative control
-        group[f_cols] = group[f_cols].apply(lambda x: (x/dmso_mad)*1.4826, axis=1)
+        group[f_cols] = group[f_cols].apply(lambda x: (x / dmso_mad) * 1.4826, axis=1)
         # concatenate group to overall dataframe
         df_out = pd.concat([df_out, group])
     # check we have not lost any rows
@@ -107,10 +112,15 @@ def normalise(data, plate_id, parallel=False, **kwargs):
         return s_normalise(data, plate_id, **kwargs)
 
 
-
-def s_normalise(data, plate_id, compound="Metadata_compound",
-                neg_compound="DMSO", method="subtract",
-                metadata_string="Metadata_", prefix=True):
+def s_normalise(
+    data,
+    plate_id,
+    compound="Metadata_compound",
+    neg_compound="DMSO",
+    method="subtract",
+    metadata_string="Metadata_",
+    prefix=True,
+):
     """
     Normalise values against negative controls values per plate.
 
@@ -172,18 +182,26 @@ def _norm_group(group, neg_compound, compound, f_cols, method):
     return copy
 
 
-def _apply_parallel(grouped_df, func, neg_compound, compound, f_cols, n_jobs,
-                    method):
+def _apply_parallel(grouped_df, func, neg_compound, compound, f_cols, n_jobs, method):
     """internal parallel gubbins for p_normalise"""
     n_cpu = multiprocessing.cpu_count()
-    output = Parallel(n_jobs=n_jobs)(delayed(func)(
-        group, neg_compound, compound, f_cols, method) for _, group in grouped_df)
+    output = Parallel(n_jobs=n_jobs)(
+        delayed(func)(group, neg_compound, compound, f_cols, method)
+        for _, group in grouped_df
+    )
     return pd.concat(output)
 
 
-def p_normalise(data, plate_id, compound="Metadata_compound",
-                neg_compound="DMSO", n_jobs=-1, method="subtraction",
-                metadata_string="Metadata_", prefix=True):
+def p_normalise(
+    data,
+    plate_id,
+    compound="Metadata_compound",
+    neg_compound="DMSO",
+    n_jobs=-1,
+    method="subtraction",
+    metadata_string="Metadata_",
+    prefix=True,
+):
     """
     parallelised version of normalise, currently only works with subtraction
     normalisation.
@@ -194,7 +212,12 @@ def p_normalise(data, plate_id, compound="Metadata_compound",
         n_jobs = multiprocessing.cpu_count()
     f_cols = utils.get_featuredata(data, metadata_string, prefix)
     grouped = data.groupby(plate_id, as_index=False)
-    return _apply_parallel(grouped_df=grouped, func=_norm_group,
-                           neg_compound=neg_compound, compound=compound,
-                           f_cols=f_cols, n_jobs=n_jobs, method=method)
-
+    return _apply_parallel(
+        grouped_df=grouped,
+        func=_norm_group,
+        neg_compound=neg_compound,
+        compound=compound,
+        f_cols=f_cols,
+        n_jobs=n_jobs,
+        method=method,
+    )

@@ -2,9 +2,10 @@
 statistical functions
 """
 
-from morar import utils
 import numpy as np
 import pandas as pd
+
+from morar import utils
 
 
 def mad(data, axis=0):
@@ -22,7 +23,7 @@ def mad(data, axis=0):
     mad : numpy array
         median absolute deviation
     """
-    arr = np.ma.array(data).compressed().astype(np.float)
+    arr = np.ma.array(data).compressed().astype(float)
     med = np.median(arr, axis=axis)
     return np.median(np.abs(arr - med))
 
@@ -166,8 +167,7 @@ def cohens_d(pos_control, neg_control):
         # if the groups are considerably different sizes then have to
         # adjust sigma prime to account for this
         n_pos, n_neg = len(pos), len(neg)
-        jacob_cohen = np.sqrt((n_pos * pos.var() + n_neg * neg.var()) / \
-                              (n_pos + n_neg - 2))
+        jacob_cohen = np.sqrt(
+            (n_pos * pos.var() + n_neg * neg.var()) / (n_pos + n_neg - 2)
+        )
     return (pos.mean() - neg.mean()) / jacob_cohen
-
-
