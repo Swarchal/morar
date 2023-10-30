@@ -3,11 +3,10 @@ a morar DataFrame, just like a pandas dataframe with a few useful extras
 """
 
 import pandas as pd
-from morar import utils
-from morar import stats
-from morar import normalise
-from morar.aggregate import aggregate
 from sklearn.decomposition import PCA
+
+from morar import normalise, stats, utils
+from morar.aggregate import aggregate
 
 
 def to_morar_df(func):
@@ -30,6 +29,10 @@ class DataFrame(pd.DataFrame):
         pd.DataFrame.__init__(self, data)
         self.metadata_string = metadata_string
         self.prefix = prefix
+
+    @property
+    def _constructor(self):
+        return DataFrame
 
     @property
     def featuredata(self):
