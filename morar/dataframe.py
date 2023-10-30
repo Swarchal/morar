@@ -85,44 +85,10 @@ class DataFrame(pd.DataFrame):
     def normalise(self, **kwargs):
         """normalise data via morar.normalise.normalise"""
         df = normalise.normalise(
-            self, metadata_string=self.metadata_string, prefix=self.prefix**kwargs
+            self, metadata_string=self.metadata_string, prefix=self.prefix, **kwargs
         )
         return DataFrame(
             df, metadata_string=self.metadata_string, prefix=self.metadata_prefix
-        )
-
-    def query(self, string, **kwargs):
-        """pass query as in pd.DataFrame.query(string)"""
-        pd_data = pd.DataFrame(self)
-        result = pd_data.query(string, **kwargs)
-        return DataFrame(
-            result, metadata_string=self.metadata_string, prefix=self.prefix
-        )
-
-    def merge(self, right, **kwargs):
-        """merge via pandas.DataFrame.merge"""
-        pd_data = pd.DataFrame(self)
-        result = pd_data.merge(right, **kwargs)
-        return DataFrame(
-            result, metadata_string=self.metadata_string, prefix=self.prefix
-        )
-
-    def dropna(self, **kwargs):
-        """dropna via pandas.DataFrame.dropna"""
-        _check_inplace(**kwargs)
-        pandas_df = pd.DataFrame(self)
-        result = pandas_df.dropna(**kwargs)
-        return DataFrame(
-            result, metadata_string=self.metadata_string, prefix=self.prefix
-        )
-
-    def drop(self, label, **kwargs):
-        """drop via pandas.DataFrame.drop"""
-        _check_inplace(**kwargs)
-        pandas_df = pd.DataFrame(self)
-        result = pandas_df.drop(label, **kwargs)
-        return DataFrame(
-            result, metadata_string=self.metadata_string, prefix=self.prefix
         )
 
     def pca(self, **kwargs):
