@@ -8,7 +8,7 @@ import pandas as pd
 from morar import utils
 
 
-def mad(data, axis=0):
+def mad(data: np.ndarray, axis: int = 0) -> float:
     """
     median absolute deviation
 
@@ -28,7 +28,7 @@ def mad(data, axis=0):
     return np.median(np.abs(arr - med))
 
 
-def glog(x, c=1.0):
+def glog(x: np.ndarray, c: float = 1.0):
     """
     generalized log transformation
 
@@ -48,7 +48,7 @@ def glog(x, c=1.0):
     return np.log10((x + (x**2 + c**2) ** 0.5) / 2)
 
 
-def z_score(x):
+def z_score(x: np.ndarray):
     """
     z_score values, mean=0, standard deviation=1
 
@@ -66,7 +66,9 @@ def z_score(x):
     return (x_np - x_np.mean()) / x_np.std()
 
 
-def scale_features(data, metadata_string="Metadata_", prefix=True):
+def scale_features(
+    data: pd.DataFrame, metadata_string: str = "Metadata_", prefix: bool = True
+):
     """
     scale and centre features with a z-score
 
@@ -91,7 +93,7 @@ def scale_features(data, metadata_string="Metadata_", prefix=True):
     return scaled_both
 
 
-def hampel(x, sigma=6, axis=0):
+def hampel(x: np.ndarray, sigma: float | int = 6, axis: int = 0):
     """
     Hampel filter without window
     (1) = positive outlier, (-1) = negative outlier, (0) = nominal value
@@ -123,7 +125,7 @@ def hampel(x, sigma=6, axis=0):
     return out
 
 
-def l1_norm(x, y):
+def l1_norm(x: np.ndarray, y: np.ndarray) -> float:
     """
     l1 norm between two vectors
 
@@ -139,7 +141,7 @@ def l1_norm(x, y):
     return np.sum(np.abs(np.asarray(x) - np.asarray(y)))
 
 
-def cohens_d(pos_control, neg_control):
+def cohens_d(pos_control: np.ndarray, neg_control: np.ndarray) -> float:
     """
     Cohen's d measure. The standardised difference between the positive and
     negative control means.

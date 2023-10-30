@@ -1,7 +1,7 @@
-from morar import utils
-from morar import stats
 import numpy as np
 import pandas as pd
+
+from morar import stats, utils
 
 """
 Function(s) for finding outliers. Outliers are normally caused by out-of-focus
@@ -9,7 +9,13 @@ images or debris within wells which can cause extreme values upon segmentation.
 """
 
 
-def get_outlier_index(data, method="values", sigma=6, adjust=True, **kwargs):
+def get_outlier_index(
+    data: pd.DataFrame,
+    method: str = "values",
+    sigma: int | float = 6,
+    adjust: bool = True,
+    **kwargs
+) -> list:
     """
     Returns index of outlying row(s)
 
@@ -36,9 +42,6 @@ def get_outlier_index(data, method="values", sigma=6, adjust=True, **kwargs):
     """
     if not isinstance(data, pd.DataFrame):
         raise ValueError("not a pandas DataFrame")
-    accepted_methods = ["values", "ImageQuality"]
-    if method not in accepted_methods:
-        raise ValueError("invalid argument. Options: values, ImageQuality")
     if method == "values":
         feature_cols = utils.get_featuredata(data, **kwargs)
         # FIXME really crude correction
@@ -47,7 +50,7 @@ def get_outlier_index(data, method="values", sigma=6, adjust=True, **kwargs):
         hampel_out = data[feature_cols].apply(stats.hampel, sigma=sigma)
         hampel_abs = hampel_out.apply(lambda x: sum(abs(x)), axis=1)
         return hampel_abs[hampel_abs > 0].index.tolist()
-    if method == "ImageQuality":
+    elif method == "ImageQuality":
         qc_cols = utils.get_image_quality(data)
         # find bad images with FocusScore
         focus_cols = [col for col in qc_cols if "FocusScore" in col]
@@ -61,3 +64,5 @@ def get_outlier_index(data, method="values", sigma=6, adjust=True, **kwargs):
         plls_bad = plls_sum[plls_sum < 0].index.tolist()
         bad_index = list(set(focus_bad + plls_bad))
         return bad_index
+    else:
+        raise ValueError("invalid argument. Options: values, ImageQuality")

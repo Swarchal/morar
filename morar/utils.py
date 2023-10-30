@@ -13,7 +13,9 @@ except ImportError:
     from sklearn.impute import SimpleImputer as Imputer
 
 
-def get_featuredata(data, metadata_string="Metadata", prefix=True):
+def get_featuredata(
+    data: pd.DataFrame, metadata_string: str = "Metadata", prefix: bool = True
+) -> list[str]:
     """
     identifies columns in a dataframe that are not labelled with the
     metadata prefix. Its assumed everything not labelled metadata is
@@ -45,7 +47,9 @@ def get_featuredata(data, metadata_string="Metadata", prefix=True):
     return f_cols
 
 
-def get_metadata(data, metadata_string="Metadata", prefix=True):
+def get_metadata(
+    data: pd.DataFrame, metadata_string: str = "Metadata", prefix: bool = True
+) -> list[str]:
     """
     identifies column in a dataframe that are labelled with the metadata_prefix
 
@@ -74,7 +78,7 @@ def get_metadata(data, metadata_string="Metadata", prefix=True):
     return m_cols
 
 
-def is_all_nan(data):
+def is_all_nan(data: pd.DataFrame) -> list[str]:
     """
     Returns column name if all values in that column are np.nan
 
@@ -97,7 +101,7 @@ def is_all_nan(data):
     return out_cols
 
 
-def get_image_quality(data):
+def get_image_quality(data: pd.DataFrame) -> list[str]:
     """
     Returns list of column names from the CelLProfiler ImageQuality module
     that are present in df.
@@ -122,7 +126,7 @@ def get_image_quality(data):
         return im_qc_cols
 
 
-def impute(data, method="median", **kwargs):
+def impute(data: pd.DataFrame, method: str = "median", **kwargs) -> pd.DataFrame:
     """
     Impute missing feature values by using the feature average.
 
@@ -148,7 +152,7 @@ def impute(data, method="median", **kwargs):
     return data
 
 
-def drop(data, threshold=1.0):
+def drop(data: pd.DataFrame, threshold: float = 1.0) -> pd.DataFrame:
     """
     Remove missing data.
 
@@ -177,7 +181,7 @@ def drop(data, threshold=1.0):
     return data_col_drop.dropna()
 
 
-def inflate_cols(dataframe):
+def inflate_cols(dataframe: pd.DataFrame) -> pd.MultiIndex:
     """
     Given a DataFrame with collapsed multi-index columns this will
     return a pandas DataFrame index. that can be used like so:
@@ -185,7 +189,7 @@ def inflate_cols(dataframe):
 
     Returns:
     --------
-    DataFrame
+    pd.MultiIndex
     """
     header_1, header_2 = [], []
     for colname in dataframe.columns:
@@ -197,12 +201,12 @@ def inflate_cols(dataframe):
     return pd.MultiIndex.from_tuples(tuples)
 
 
-def collapse_cols(dataframe, sep="_"):
+def collapse_cols(dataframe: pd.DataFrame, sep="_") -> list[str]:
     """Given a dataframe, will collapse multi-indexed columns names"""
     return [sep.join(col).strip() for col in dataframe.columns.values]
 
 
-def merge_two_cols(data, col1, col2):
+def merge_two_cols(data: pd.DataFrame, col1: str, col2: str) -> pd.Series:
     """
     merge two mutually exclusive columns
 
@@ -219,13 +223,15 @@ def merge_two_cols(data, col1, col2):
     --------
     pandas Series
     """
-    new_col = pd.concat([data[col1].dropna(), data[col2].dropna()])
-    new_col_indexed = new_col.reindex_like(data)
+    new_col = pd.Series(pd.concat([data[col1].dropna(), data[col2].dropna()]))
+    new_col_indexed = new_col.reindex(data.index)
     assert len(new_col_indexed) == data.shape[0]
     return new_col_indexed
 
 
-def img_to_metadata(data, prefix="Metadata_", extra=None):
+def img_to_metadata(
+    data: pd.DataFrame, prefix: str = "Metadata_", extra: str | list[str] | None = None
+) -> list[str]:
     """
     Prepend image column names with a prefix unless it's a feature measurement.
     I.e everything except image correlations and Granularity

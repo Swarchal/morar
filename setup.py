@@ -12,7 +12,7 @@ setup(
     url="http://github.com/swarchal/morar",
     description="Data management for CellProfiler",
     author="Scott Warchal",
-    author_email="s.warchal@sms.ed.ac.uk",
+    author_email="scott.warchal@crick.ac.uk",
     license="MIT",
     packages=["morar"],
     python_requires=">=3.10",

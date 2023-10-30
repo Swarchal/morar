@@ -1,14 +1,22 @@
-from morar import stats
-from morar import utils
-import pandas as pd
 import multiprocessing
+from typing import Callable
+
+import pandas as pd
 from joblib import Parallel, delayed
+from pandas.core.groupby.generic import DataFrameGroupBy
+
+from morar import stats, utils
 
 # stop copy warning as not using chained assignment
-pd.options.mode.chained_assignment = None  # default='warn'
+# pd.options.mode.chained_assignment = None  # default='warn'
 
 
-def _check_control(data, plate_id, compound="Metadata_compound", neg_compound="DMSO"):
+def _check_control(
+    data: pd.DataFrame,
+    plate_id: str,
+    compound: str = "Metadata_compound",
+    neg_compound: str = "DMSO",
+) -> None:
     """
     check each plate contains at least 1 negative control value. Raise an error
     if this is not the case.
@@ -32,13 +40,13 @@ def _check_control(data, plate_id, compound="Metadata_compound", neg_compound="D
 
 
 def robust_normalise(
-    data,
-    plate_id,
-    compound="Metadata_compound",
-    neg_compound="DMSO",
-    metadata_string="Metadata_",
-    prefix=True,
-):
+    data: pd.DataFrame,
+    plate_id: str,
+    compound: str = "Metadata_compound",
+    neg_compound: str = "DMSO",
+    metadata_string: str = "Metadata_",
+    prefix: bool = True,
+) -> pd.DataFrame:
     """
     Method used in the Carpenter lab. Substract the median feature value for
     each plate negative control from the treatment feature value and divide by
@@ -83,7 +91,9 @@ def robust_normalise(
     return df_out
 
 
-def normalise(data, plate_id, parallel=False, **kwargs):
+def normalise(
+    data: pd.DataFrame, plate_id: str, parallel: bool = False, **kwargs
+) -> pd.DataFrame:
     """
     Normalise values against negative controls values per plate.
 
@@ -113,14 +123,14 @@ def normalise(data, plate_id, parallel=False, **kwargs):
 
 
 def s_normalise(
-    data,
-    plate_id,
-    compound="Metadata_compound",
-    neg_compound="DMSO",
-    method="subtract",
-    metadata_string="Metadata_",
-    prefix=True,
-):
+    data: pd.DataFrame,
+    plate_id: str,
+    compound: str = "Metadata_compound",
+    neg_compound: str = "DMSO",
+    method: str = "subtract",
+    metadata_string: str = "Metadata_",
+    prefix: bool = True,
+) -> pd.DataFrame:
     """
     Normalise values against negative controls values per plate.
 
@@ -169,7 +179,13 @@ def s_normalise(
     return df_out
 
 
-def _norm_group(group, neg_compound, compound, f_cols, method):
+def _norm_group(
+    group: pd.DataFrame,
+    neg_compound: str,
+    compound: str,
+    f_cols: list[str],
+    method: str,
+) -> pd.DataFrame:
     """normalisation funcion for use with p_normalise"""
     dmso_med = group[group[compound] == neg_compound][f_cols].median()
     copy = group.copy()
@@ -182,26 +198,35 @@ def _norm_group(group, neg_compound, compound, f_cols, method):
     return copy
 
 
-def _apply_parallel(grouped_df, func, neg_compound, compound, f_cols, n_jobs, method):
+def _apply_parallel(
+    grouped_df: DataFrameGroupBy,
+    func: Callable,
+    neg_compound: str,
+    compound: str,
+    f_cols: list[str],
+    n_jobs: int,
+    method: str,
+) -> pd.DataFrame:
     """internal parallel gubbins for p_normalise"""
-    n_cpu = multiprocessing.cpu_count()
     output = Parallel(n_jobs=n_jobs)(
         delayed(func)(group, neg_compound, compound, f_cols, method)
         for _, group in grouped_df
     )
+    if output is None:
+        output = []
     return pd.concat(output)
 
 
 def p_normalise(
-    data,
-    plate_id,
-    compound="Metadata_compound",
-    neg_compound="DMSO",
-    n_jobs=-1,
-    method="subtraction",
-    metadata_string="Metadata_",
-    prefix=True,
-):
+    data: pd.DataFrame,
+    plate_id: str,
+    compound: str = "Metadata_compound",
+    neg_compound: str = "DMSO",
+    n_jobs: int = -1,
+    method: str = "subtraction",
+    metadata_string: str = "Metadata_",
+    prefix: bool = True,
+) -> pd.DataFrame:
     """
     parallelised version of normalise, currently only works with subtraction
     normalisation.

@@ -2,15 +2,16 @@
 Functions used for feature selection.
 """
 
-from morar import utils
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.svm import LinearSVC
 from sklearn.feature_selection import SelectFromModel
+from sklearn.svm import LinearSVC
+
+from morar import utils
 
 
-def find_correlation(data, threshold=0.9):
+def find_correlation(data: pd.DataFrame, threshold: float = 0.9) -> list[str]:
     """
     Given a numeric pd.DataFrame, this will find highly correlated features,
     and return a list of features to remove.
@@ -43,7 +44,7 @@ def find_correlation(data, threshold=0.9):
     return select_flat
 
 
-def find_low_var(data, threshold=1e-5):
+def find_low_var(data: pd.DataFrame, threshold: float = 1e-5) -> list[str]:
     """
     Return column names of feature columns with zero or very low variance
 
@@ -68,7 +69,9 @@ def find_low_var(data, threshold=1e-5):
     return columns
 
 
-def find_replicate_var(data, grouping, sorted_by_var=True):
+def find_replicate_var(
+    data: pd.DataFrame, grouping: str | list[str], sorted_by_var: bool = True
+) -> list[tuple[str, float]]:
     """
     Return within replicate variance of featuredata
     """
@@ -85,8 +88,12 @@ def find_replicate_var(data, grouping, sorted_by_var=True):
 
 
 def feature_importance(
-    data, neg_cmpd, pos_cmpd, compound_col="Metadata_compound", sort=False
-):
+    data: pd.DataFrame,
+    neg_cmpd: str,
+    pos_cmpd: str,
+    compound_col: str = "Metadata_compound",
+    sort: bool = False,
+) -> list[list]:
     """
     Return features importances, based on separating the positive and negative
     controls in a random forest classifier.
@@ -125,7 +132,13 @@ def feature_importance(
     return importances
 
 
-def select_features(data, neg_cmpd, pos_cmpd, compound_col="Metadata_compound", C=0.01):
+def select_features(
+    data: pd.DataFrame,
+    neg_cmpd: str,
+    pos_cmpd: str,
+    compound_col: str = "Metadata_compound",
+    C: float = 0.01,
+) -> list[str]:
     """
     Return selected features basd on L1 linear svc.
 
@@ -155,7 +168,9 @@ def select_features(data, neg_cmpd, pos_cmpd, compound_col="Metadata_compound", 
     return selected_features
 
 
-def _split_classes(data, neg_cmpd, pos_cmpd, compound_col):
+def _split_classes(
+    data: pd.DataFrame, neg_cmpd: str, pos_cmpd: str, compound_col: str
+) -> list:
     """
     Internal function used to separate featuredata and compound labels for
     classification.
@@ -197,7 +212,9 @@ def _split_classes(data, neg_cmpd, pos_cmpd, compound_col):
     return [X, Y]
 
 
-def find_unwanted(data, extra=None):
+def find_unwanted(
+    data: pd.DataFrame, extra: str | list[str] | None = None
+) -> list[str]:
     """
     Return list of typically unwanted columns such as object number of
     object X,Y position
