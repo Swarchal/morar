@@ -47,7 +47,9 @@ def aggregate(
     mcols = utils.get_metadata(data, metadata_string, prefix)
     for i in on:
         assert i in mcols, "on must be one or more metadata columns"
-    fdata_agg = data[fcols].groupby(on).agg(method).reset_index().drop(columns=on)
+    fdata_agg = (
+        data[fcols].groupby(on).agg(method).reset_index().drop(on, axis="columns")
+    )
     mdata_agg = data[mcols].groupby(on).agg("first").reset_index()
     agg_merged = pd.concat([fdata_agg, mdata_agg], axis=1)
     return agg_merged[orig_cols]
