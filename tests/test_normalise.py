@@ -1,7 +1,8 @@
-from morar import normalise
-import pandas as pd
 import numpy as np
+import pandas as pd
 import pytest
+
+from morar import normalise
 
 
 def test_check_control():
@@ -301,3 +302,21 @@ def test_parallel_normalise():
     standard_output = normalise.normalise(df, plate_id="Metadata_plate")
     parallel_output = normalise.normalise(df, plate_id="Metadata_plate", parallel=True)
     assert standard_output.equals(parallel_output)
+
+
+def test_whitening():
+    x = np.random.normal(loc=1, scale=1, size=100)
+    df = pd.DataFrame(
+        {
+            "x": x,
+            "y": x + np.random.normal(loc=0, scale=0.1, size=100),
+            "z": x + np.random.normal(loc=0, scale=0.5, size=100),
+            "Metadata_stuff": ["test"] * 100,
+        }
+    )
+    df_whitened = normalise.whiten(df)
+    assert "Metadata_stuff" in df_whitened.columns
+    # check columns have less correlation
+    df_corr = df[["x", "y", "z"]].corr()
+    df_w_corr = df_whitened[["x", "y", "z"]].corr()
+    assert all(df_w_corr <= df_corr)

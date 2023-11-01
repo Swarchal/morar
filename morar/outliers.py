@@ -9,6 +9,9 @@ images or debris within wells which can cause extreme values upon segmentation.
 """
 
 
+# TODO: IsolationForest outlier detection
+
+
 def get_outlier_index(
     data: pd.DataFrame,
     method: str = "values",

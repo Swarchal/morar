@@ -73,7 +73,7 @@ def test_glog_dataframe():
     y = np.random.randn(1000)
     z = np.random.randn(1000)
     df = pd.DataFrame(list(zip(x, y, z)))
-    glog_df = df.applymap(lambda x: stats.glog(x))
+    glog_df = df.map(lambda x: stats.glog(x))
     assert isinstance(glog_df, pd.DataFrame)
 
 
