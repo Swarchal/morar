@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
 
-from morar import normalise, stats, utils
+from morar import normalise, positional_correction, stats, utils
 from morar.aggregate import aggregate
 
 
@@ -80,9 +80,7 @@ class DataFrame(pd.DataFrame):
         df = normalise.normalise(
             self, metadata_string=self.metadata_string, prefix=self.prefix, **kwargs
         )
-        return DataFrame(
-            df, metadata_string=self.metadata_string, prefix=self.metadata_prefix
-        )
+        return DataFrame(df, metadata_string=self.metadata_string, prefix=self.prefix)
 
     def pca(self, **kwargs) -> tuple[Self, np.ndarray]:
         """
@@ -187,4 +185,14 @@ class DataFrame(pd.DataFrame):
             metadata_string=self.metadata_string,
             prefix=self.predix,
         )
-        return DataFrame(df_whitened, self.metadata_string, self.predix)
+        return DataFrame(df_whitened, self.metadata_string, self.prefix)
+
+    def median_polish(self, well_col: str, plate_col: str) -> Self:
+        """2-way median polish on feature data."""
+        df_smoothed = positional_correction.median_smooth_df(
+            self.data, fcols=self.featurecols, plate_id_col=plate_col, well_col=well_col
+        )
+        df_copy = self.data.copy()
+        df_copy = df_copy.drop(columns=self.featurecols)
+        df_merged = pd.merge(df_copy, df_smoothed, on=[well_col, plate_col], how="left")
+        return DataFrame(df_merged, self.metadata_string, self.prefix)

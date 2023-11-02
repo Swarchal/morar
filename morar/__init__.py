@@ -1,9 +1,5 @@
+from morar import (feature_selection, normalise, outliers,
+                   positional_correction, stats, utils)
 from morar.aggregate import aggregate
-from morar import stats
-from morar import normalise
-from morar import outliers
-from morar import feature_selection
-from morar import utils
-from morar.utils import get_featuredata
-from morar.utils import get_metadata
 from morar.dataframe import DataFrame
+from morar.utils import get_featuredata, get_metadata
