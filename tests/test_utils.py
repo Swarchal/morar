@@ -1,7 +1,8 @@
-from morar import utils
-import pandas as pd
 import numpy as np
+import pandas as pd
 import pytest
+
+from morar import utils
 
 
 def test_get_featuredata_simple():
@@ -141,7 +142,7 @@ def test_impute():
     y = [2, 4, 9, 10]
     dataframe = pd.DataFrame(list(zip(x, y)))
     dataframe.columns = ["x", "y"]
-    out = utils.impute(dataframe)
+    out = utils.impute(dataframe, fcols=["x", "y"])
     assert out["x"].values.tolist() == [1, 2, 3, 2]
     assert out.shape == dataframe.shape
     assert out.columns.tolist() == dataframe.columns.tolist()
@@ -152,7 +153,7 @@ def test_impute_mean():
     y = [1, 2, 3]
     dataframe = pd.DataFrame(list(zip(x, y)))
     dataframe.columns = ["x", "y"]
-    out = utils.impute(dataframe, method="mean")
+    out = utils.impute(dataframe, method="mean", fcols=["x", "y"])
     assert out["x"].values.tolist() == [1, 10, 5.5]
 
 
@@ -162,7 +163,7 @@ def test_impute_with_metadata():
     metadata_something = ["a", "b", "c", "d", "e"]
     dataframe = pd.DataFrame(list(zip(x, y, metadata_something)))
     dataframe.columns = ["x", "y", "Metadata_x"]
-    out = utils.impute(dataframe)
+    out = utils.impute(dataframe, fcols=["x", "y"])
     assert out.columns.tolist() == dataframe.columns.tolist()
     assert out.shape == dataframe.shape
 

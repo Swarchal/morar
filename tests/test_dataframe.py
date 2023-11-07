@@ -153,7 +153,36 @@ def test_aggregate_diff_metadata_prefix():
 def test_pca():
     """morar.dataframe.DataFrame.pca()"""
     pca_df, var = M_TEST_DF.pca()
-    assert isinstance(pca_df, morar.dataframe.DataFrame)
+    assert isinstance(pca_df, morar.DataFrame)
     assert M_TEST_DF.shape == pca_df.shape
     assert pca_df.featurecols == ["PC1", "PC2"]
     assert abs(np.sum(var) - 1) < 0.1
+
+
+def test_median_polish():
+    df = pd.read_csv(my_data_path)
+    df = df.rename(columns={"Image_ImageNumber": "Image_Metadata_ImageNumber"})
+    df = morar.DataFrame(df, metadata_string="Image_Metadata_")
+    out = df.median_polish("Image_Metadata_well", "Image_Metadata_platename")
+    assert out.shape == df.shape
+    assert sorted(out.columns.tolist()) == sorted(df.columns.tolist())
+    # TODO: test feature data has actual been median polished
+    #       this requires data with plate effects and some way to quantify it
+
+
+def test_impute():
+    df = pd.read_csv(my_data_path)
+    df = df.rename(columns={"Image_ImageNumber": "Image_Metadata_ImageNumber"})
+    df = morar.DataFrame(df, metadata_string="Image_Metadata_")
+    out = df.impute()
+    assert out.shape == df.shape
+    assert sorted(out.columns.tolist()) == sorted(df.columns.tolist())
+
+
+def test_whiten():
+    df = pd.read_csv(my_data_path)
+    df = df.rename(columns={"Image_ImageNumber": "Image_Metadata_ImageNumber"})
+    df = morar.DataFrame(df, metadata_string="Image_Metadata_")
+    out = df.impute().whiten()
+    assert out.shape == df.shape
+    assert sorted(out.columns.tolist()) == sorted(df.columns.tolist())

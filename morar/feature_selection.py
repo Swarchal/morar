@@ -195,11 +195,11 @@ def _split_classes(
     if not isinstance(data, pd.DataFrame):
         raise ValueError("is not a pandas DataFrame")
     if compound_col not in data.columns:
-        raise ValueError("{} is not a column in data".format(compound_col))
+        raise ValueError(f"{compound_col} is not a column in data")
     if neg_cmpd not in data[compound_col].tolist():
-        raise ValueError("{} is not in column {}".format(neg_cmpd, compound_col))
+        raise ValueError(f"{neg_cmpd} is not in column {compound_col}")
     if pos_cmpd not in data[compound_col].tolist():
-        raise ValueError("{} is not in column {}".format(pos_cmpd, compound_col))
+        raise ValueError(f"{pos_cmpd} is not in column {compound_col}")
     # split data into just positive and negative controls
     controls = [neg_cmpd, pos_cmpd]
     df_cntrl = data[data[compound_col].isin(controls)].copy()

@@ -126,7 +126,9 @@ def get_image_quality(data: pd.DataFrame) -> list[str]:
         return im_qc_cols
 
 
-def impute(data: pd.DataFrame, method: str = "median", **kwargs) -> pd.DataFrame:
+def impute(
+    data: pd.DataFrame, fcols: list[str], method: str = "median", **kwargs
+) -> pd.DataFrame:
     """
     Impute missing feature values by using the feature average.
 
@@ -146,9 +148,9 @@ def impute(data: pd.DataFrame, method: str = "median", **kwargs) -> pd.DataFrame
         DataFrame with imputed missing values
     """
     imp = Imputer(strategy=method, **kwargs)
-    data_feature = data[get_featuredata(data, **kwargs)].copy()
+    data_feature = data[fcols].copy()
     imputed_data = imp.fit_transform(data_feature)
-    data[get_featuredata(data, **kwargs)] = imputed_data
+    data[fcols] = imputed_data
     return data
 
 

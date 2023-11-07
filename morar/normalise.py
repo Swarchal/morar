@@ -37,8 +37,7 @@ def _check_control(
     for name, group in data.groupby(plate_id):
         group_cmps = group[compound].unique()
         if neg_compound not in group_cmps:
-            msg = "{} does not contain any negative control values".format(name)
-            raise RuntimeError(msg)
+            raise RuntimeError(f"{name} does not contain any negative control values")
 
 
 def robust_normalise(
@@ -157,7 +156,7 @@ def s_normalise(
     """
     valid_methods = ["subtract", "divide"]
     if method not in valid_methods:
-        raise ValueError("Invalid method, options: {}".format(valid_methods))
+        raise ValueError(f"Invalid method, options: {valid_methods}")
     # check there are some negative controls on each plate
     _check_control(data, plate_id, compound, neg_compound)
     # identify feature columns
@@ -196,7 +195,7 @@ def _norm_group(
     elif method == "division":
         copy[f_cols] = copy[f_cols].div(dmso_med)
     else:
-        raise ValueError("{} not a valid method".format(method))
+        raise ValueError(f"{method} not a valid method")
     return copy
 
 

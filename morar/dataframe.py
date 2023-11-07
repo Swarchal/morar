@@ -12,13 +12,10 @@ from morar.aggregate import aggregate
 
 
 class DataFrame(pd.DataFrame):
-
-    """
-    morar.DataFrame inherits pandas dataframe with a few extra methods
-    """
+    """morar.DataFrame inherits pandas dataframe with a few extra methods"""
 
     _metadata = ["metadata_string", "prefix"]
-    _internal_names = pd.DataFrame._internal_names + ["metadata_string", "prefix"]
+    _internal_names = pd.DataFrame._internal_names + _metadata
     _internal_names_set = set(_internal_names)
 
     metadata_string = "Metadata_"
@@ -161,11 +158,11 @@ class DataFrame(pd.DataFrame):
         morar.DataFrame
         A dataframe with imputed missing values
         """
-        imputed_df = utils.impute(self, method, **kwargs)
+        imputed_df = utils.impute(self, self.featurecols, method, **kwargs)
         return DataFrame(
             imputed_df,
             metadata_string=self.metadata_string,
-            prefix=self.metadata_prefix,
+            prefix=self.prefix,
         )
 
     def whiten(self, centre=True, method="ZCA") -> Self:
@@ -179,20 +176,24 @@ class DataFrame(pd.DataFrame):
         same dimensions as input, but feature columns have been whitened.
         """
         df_whitened = normalise.whiten(
-            self.data,
+            self,
             centre=centre,
             method=method,
             metadata_string=self.metadata_string,
-            prefix=self.predix,
+            prefix=self.prefix,
         )
-        return DataFrame(df_whitened, self.metadata_string, self.prefix)
+        return DataFrame(
+            df_whitened, metadata_string=self.metadata_string, prefix=self.prefix
+        )
 
     def median_polish(self, well_col: str, plate_col: str) -> Self:
         """2-way median polish on feature data."""
         df_smoothed = positional_correction.median_smooth_df(
-            self.data, fcols=self.featurecols, plate_id_col=plate_col, well_col=well_col
+            self, fcols=self.featurecols, plate_id_col=plate_col, well_col=well_col
         )
-        df_copy = self.data.copy()
+        df_copy = self.copy()
         df_copy = df_copy.drop(columns=self.featurecols)
         df_merged = pd.merge(df_copy, df_smoothed, on=[well_col, plate_col], how="left")
-        return DataFrame(df_merged, self.metadata_string, self.prefix)
+        return DataFrame(
+            df_merged, metadata_string=self.metadata_string, prefix=self.prefix
+        )

@@ -52,7 +52,7 @@ def aggregate(
     )
     mdata_agg = data[mcols].groupby(on).agg("first").reset_index()
     agg_merged = pd.concat([fdata_agg, mdata_agg], axis=1)
-    return agg_merged[orig_cols]
+    return pd.DataFrame(agg_merged[orig_cols])
 
 
 def _check_inputs(data, on, method):
@@ -61,16 +61,15 @@ def _check_inputs(data, on, method):
     if not isinstance(data, pd.DataFrame):
         raise ValueError("not a a pandas DataFrame")
     if method not in valid_methods:
-        msg = "{} is not a valid method, options: median or mean".format(method)
-        raise ValueError(msg)
+        raise ValueError(f"{method} is not a valid method, options: median or mean")
     df_columns = data.columns.tolist()
     if isinstance(on, str):
         if on not in df_columns:
-            raise ValueError("{} not a column in df".format(on))
+            raise ValueError(f"{on} not a column in df")
     elif isinstance(on, list):
         for col in on:
             if col not in df_columns:
-                raise ValueError("{} not a column in df".format(col))
+                raise ValueError(f"{col} not a column in df")
 
 
 def _check_featuredata(data, on, metadata_string, prefix):
@@ -84,5 +83,4 @@ def _check_featuredata(data, on, metadata_string, prefix):
     if any(is_number(df_to_check.dtypes) == False):
         # return column name
         nn_col = df_to_check.columns[is_number(df_to_check.dtypes) == False]
-        err_msg = "{} is a non-numeric featuredata columns".format(nn_col)
-        raise ValueError(err_msg)
+        raise ValueError(f"{nn_col} is a non-numeric featuredata columns")
