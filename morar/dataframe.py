@@ -1,6 +1,7 @@
 """
 a morar DataFrame, just like a pandas dataframe with a few useful extras
 """
+
 from typing import Self
 
 import numpy as np
@@ -17,9 +18,6 @@ class DataFrame(pd.DataFrame):
     _metadata = ["metadata_string", "prefix"]
     _internal_names = pd.DataFrame._internal_names + _metadata
     _internal_names_set = set(_internal_names)
-
-    metadata_string = "Metadata_"
-    prefix = True
 
     def __init__(
         self, *args, metadata_string: str = "Metadata_", prefix: bool = True, **kwargs
@@ -137,7 +135,7 @@ class DataFrame(pd.DataFrame):
         return DataFrame(
             pd.concat([umap_df, metadata], axis=1),
             metadata_string=self.metadata_string,
-            predix=self.prefix,
+            prefix=self.prefix,
         )
 
     def impute(self, method: str = "median", **kwargs) -> Self:

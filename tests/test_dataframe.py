@@ -186,3 +186,10 @@ def test_whiten():
     out = df.impute().whiten()
     assert out.shape == df.shape
     assert sorted(out.columns.tolist()) == sorted(df.columns.tolist())
+    # TODO: better test for removing linear correlation across features
+    # currently just testing if off-diagonal of the corr matrix is lower
+    out_corr = out[out.featurecols].corr().to_numpy()
+    np.fill_diagonal(out_corr, 0)
+    df_corr = df[df.featurecols].corr().to_numpy()
+    np.fill_diagonal(df_corr, 0)
+    assert out_corr.mean() < df_corr.mean()
